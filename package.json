@@ -1,17 +1,27 @@
 {
   "name": "@alpaca-travel/import-streams",
-  "version": "1.0.0",
+  "version": "0.0.2-alpha.0",
   "description": "A set of libraries ot assist import related tasks, such as drawing content from a site and pushing to an API",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
     "test": "jest",
-    "test:coverage": "npm run build & jest --coverage",
+    "test:coverage": "jest --coverage",
     "clean": "rm -rf dist",
     "build": "npm run build:rollup",
-    "build:rollup": "rollup -c"
+    "build:rollup": "rollup -c",
+    "prepublish": "npm run clean & npm run build"
+  },
+  "homepage": "https://github.com/AlpacaTravel/import-streams",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/AlpacaTravel/import-streams.git"
+  },
+  "env": {
+    "jest": true
   },
   "files": [
     "dist"
