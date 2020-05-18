@@ -140,7 +140,7 @@ const mapTransform: TransformFunction<
     })();
 
     // Set the value
-    attribute.value = value;
+    attribute.value = values[i];
 
     // Add back into the attributes
     Object.assign(obj, {

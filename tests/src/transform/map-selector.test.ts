@@ -14,6 +14,7 @@ describe("Map Selector", () => {
     const options: MapSelectorOptions = {
       mapping: {
         fubar: "foo",
+        "custom://value": "fubar",
       },
       context,
     };
@@ -30,7 +31,7 @@ describe("Map Selector", () => {
     const readable = new Readable({
       objectMode: true,
       read() {
-        this.push({ foo: "bar" });
+        this.push({ foo: "bar", fubar: "custom-value" });
         this.push(null);
       },
     });
@@ -44,6 +45,13 @@ describe("Map Selector", () => {
         .on("error", err);
     });
 
-    expect(result).toMatchObject([{ fubar: "bar" }]);
+    expect(result).toMatchObject([
+      {
+        fubar: "bar",
+        attributes: [
+          { attribute: { $ref: "custom://value" }, value: "custom-value" },
+        ],
+      },
+    ]);
   });
 });
