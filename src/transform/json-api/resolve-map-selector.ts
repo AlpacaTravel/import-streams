@@ -1,4 +1,5 @@
 import assert from "assert";
+import { Writable } from "readable-stream";
 import { TransformFunction, TransformOptions } from "../../types";
 import {
   createTransformStream as createMapSelectorTransformStream,
@@ -6,7 +7,6 @@ import {
   Mapping,
 } from "../map-selector";
 import { createReadStream } from "../../read/json-api-data";
-import { Writable } from "stream";
 
 interface JsonApiHref {
   href: string;

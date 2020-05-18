@@ -1,5 +1,5 @@
 import network from "../network";
-import { Readable } from "stream";
+import { Readable } from "readable-stream";
 
 interface JsonApiHref {
   href: string;

@@ -1,5 +1,5 @@
 import assert from "assert";
-import { Writable } from "stream";
+import { Writable } from "readable-stream";
 import network from "../network";
 
 interface CollectionOptions {

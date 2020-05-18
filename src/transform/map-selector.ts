@@ -1,4 +1,4 @@
-import { Transform as StreamTransform } from "stream";
+import { Transform as StreamTransform } from "readable-stream";
 import * as _ from "lodash";
 
 import { TransformFunction, TransformFunctionOptions } from "../types";
