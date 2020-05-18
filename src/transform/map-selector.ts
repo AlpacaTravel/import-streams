@@ -1,4 +1,5 @@
 import { Transform as StreamTransform } from "stream";
+import * as _ from "lodash";
 
 import { TransformFunction, TransformFunctionOptions } from "../types";
 import processSelector, { Selector } from "./selector";
@@ -109,13 +110,15 @@ const mapTransform: TransformFunction<
   })();
 
   return keys.reduce((obj: MappedObject, key: string, i: number) => {
+    const clone: MappedObject = JSON.parse(JSON.stringify(obj));
     // Standard prop
     if (!/^[^:]+:\/\/.+$/.test(key)) {
-      return Object.assign({}, obj, { [key]: values[i] });
+      _.set(clone, key, values[i]);
+      return clone;
     }
 
     // Attribute definition appears as a protocol
-    const attributes = obj.attributes || [];
+    const attributes = clone.attributes || [];
     const attribute: AttributeDefinition = (() => {
       const current = attributes.find(
         (att) =>
@@ -143,11 +146,11 @@ const mapTransform: TransformFunction<
     attribute.value = values[i];
 
     // Add back into the attributes
-    Object.assign(obj, {
+    Object.assign(clone, {
       attributes: attributes.filter((a) => a !== attribute).concat([attribute]),
     });
 
-    return obj;
+    return clone;
   }, template);
 };
 

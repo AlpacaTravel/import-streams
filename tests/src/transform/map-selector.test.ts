@@ -14,6 +14,7 @@ describe("Map Selector", () => {
     const options: MapSelectorOptions = {
       mapping: {
         fubar: "foo",
+        "something.else": "foo",
         "custom://value": "fubar",
       },
       context,
@@ -48,6 +49,9 @@ describe("Map Selector", () => {
     expect(result).toMatchObject([
       {
         fubar: "bar",
+        something: {
+          else: "bar",
+        },
         attributes: [
           { attribute: { $ref: "custom://value" }, value: "custom-value" },
         ],
