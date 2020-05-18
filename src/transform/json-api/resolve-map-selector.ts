@@ -41,29 +41,25 @@ const resolveMapSelector: TransformFunction<
   // Identify the resolve end-point
   const href = (() => {
     // Check for the options href
-    if (options && options.href) {
+    if (options && typeof options.href === "string") {
       return options.href;
     }
 
     // Check for the value
-    if (value) {
-      if (typeof value === "string") {
-        return value;
-      }
+    if (typeof value === "string") {
+      return value;
+    }
 
-      if (
-        typeof value === "object" &&
-        value.links &&
-        value.links.related &&
-        value.links.related.href &&
-        value.links.related.href === "string"
-      ) {
-        return value.links.related.href;
-      }
+    if (value?.links?.related?.href) {
+      return value.links.related.href;
     }
 
     return undefined;
   })();
+
+  if (!href) {
+    return undefined;
+  }
 
   try {
     // Read in data from JSON:API
