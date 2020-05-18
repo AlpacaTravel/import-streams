@@ -1,0 +1,44 @@
+{
+  "name": "@alpaca-travel/import-streams",
+  "version": "1.0.0",
+  "description": "A set of libraries ot assist import related tasks, such as drawing content from a site and pushing to an API",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "test": "jest",
+    "test:coverage": "npm run build & jest --coverage",
+    "clean": "rm -rf dist",
+    "build": "npm run build:rollup",
+    "build:rollup": "rollup -c"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Cam Manderson <cam@alpaca.travel>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/lodash": "^4.14.151",
+    "@types/prettier": "^2.0.0",
+    "@types/sanitize-html": "^1.23.0",
+    "@types/smart-truncate": "^1.0.0",
+    "@types/striptags": "^3.1.1",
+    "axios": "^0.19.2",
+    "axios-rate-limit": "^1.2.1",
+    "prettier": "^2.0.5",
+    "sanitize-html": "^1.23.0",
+    "smart-truncate": "^1.0.1",
+    "striptags": "^3.1.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.2.2",
+    "@types/node": "^14.0.1",
+    "jest": "^26.0.1",
+    "nock": "^12.0.3",
+    "rollup": "^2.10.2",
+    "rollup-plugin-typescript2": "^0.27.1",
+    "ts-jest": "^26.0.0",
+    "typescript": "^3.9.2"
+  }
+}
