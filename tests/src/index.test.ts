@@ -1,8 +1,20 @@
-import { transforms as modTransforms } from "../../src/index";
+import {
+  transforms as modTransforms,
+  createCollectionWriteStream,
+  createJsonApiDataReadStream,
+  createMapSelectorTransformStream,
+} from "../../src/index";
 import { TransformFunctions } from "../../src/types";
 
 describe("module", () => {
-  test("exports", () => {
+  test("named exports", () => {
+    expect(typeof createCollectionWriteStream).toBe("function");
+    expect(typeof createJsonApiDataReadStream).toBe("function");
+    expect(typeof createMapSelectorTransformStream).toBe("function");
+    expect(typeof modTransforms).toBe("object");
+  });
+
+  test("exports for transforms", () => {
     // Should export required functions
     const transforms: TransformFunctions = modTransforms;
     expect(typeof transforms.boolean).toBe("function");
