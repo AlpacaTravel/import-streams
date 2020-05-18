@@ -1,3 +1,4 @@
+// @ts-ignore
 import smartTruncate from "smart-truncate";
 import { TransformFunction, TransformOptions } from "../types";
 
