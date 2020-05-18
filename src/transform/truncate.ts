@@ -1,4 +1,4 @@
-import { smartTruncate } from "smart-truncate";
+import smartTruncate from "smart-truncate";
 import { TransformFunction, TransformOptions } from "../types";
 
 export interface TruncateOptions extends TransformOptions {
