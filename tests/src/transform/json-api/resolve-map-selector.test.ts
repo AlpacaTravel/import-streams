@@ -25,6 +25,29 @@ describe("JSON:API Resolve Map Selector", () => {
           },
           data: [{ foo: "bar-1" }, { foo: "bar-2" }],
           links: {
+            next: {
+              href: "https://www.example.com/jsonapi-2",
+            },
+          },
+        },
+        ["Content-Type", "application/vnd.api+json"]
+      );
+
+    nock("https://www.example.com:443", {
+      encodedQueryParams: true,
+    })
+      .get("/jsonapi-2")
+      .reply(
+        200,
+        {
+          jsonapi: {
+            version: "1.0",
+            meta: {
+              links: { self: { href: "http://jsonapi.org/format/1.0/" } },
+            },
+          },
+          data: [{ foo: "bar-3" }],
+          links: {
             next: {},
           },
         },
@@ -40,12 +63,13 @@ describe("JSON:API Resolve Map Selector", () => {
     };
     const result = await resolveMapSelector(null, options);
 
-    expect(result.length).toBe(2);
+    expect(result.length).toBe(3);
     expect(result).toMatchObject([
       {
         fubar: "bar-1",
       },
       { fubar: "bar-2" },
+      { fubar: "bar-3" },
     ]);
   });
 
