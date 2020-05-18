@@ -25,6 +25,7 @@ interface JsonApiReference {
 export interface ResolveMapSelectorOptions extends TransformOptions {
   iterate?: boolean;
   href?: string;
+  limit?: number;
   mapping?: Mapping;
 }
 
@@ -71,7 +72,7 @@ const resolveMapSelector: TransformFunction<
     const records: Array<any> = [];
 
     // Read and collate streams
-    const readStream = createReadStream(href);
+    const readStream = createReadStream(href, { limit: options.limit });
     const collatorStream = new Writable({
       objectMode: true,
       write: (chunk: any, _, callback: Callback) => {

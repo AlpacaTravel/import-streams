@@ -46,7 +46,7 @@ describe("JSON:API Resolve Map Selector", () => {
               links: { self: { href: "http://jsonapi.org/format/1.0/" } },
             },
           },
-          data: [{ foo: "bar-3" }],
+          data: [{ foo: "bar-3" }, { foo: "bar-4" }, { foo: "bar-5" }],
           links: {
             next: {},
           },
@@ -57,6 +57,7 @@ describe("JSON:API Resolve Map Selector", () => {
     const options: ResolveMapSelectorOptions = {
       href: "https://www.example.com/jsonapi",
       context,
+      limit: 3,
       mapping: {
         fubar: "foo",
       },

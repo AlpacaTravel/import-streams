@@ -18,16 +18,24 @@ interface JsonApiEnvelope {
   links: JsonApiLinks;
 }
 
-interface JsonApiOptions {}
+interface JsonApiOptions {
+  limit?: number;
+}
 
 export default class JsonApiDataReadable extends Readable {
   private href: string;
   private generator: any;
+  private limit: number;
+  private count: number;
 
   constructor(href: string, options?: JsonApiOptions) {
     super({ objectMode: true });
 
     this.href = href;
+
+    const { limit = 0 } = options || {};
+    this.limit = limit;
+    this.count = 0;
   }
 
   async *getRecordsGenerator() {
@@ -80,8 +88,9 @@ export default class JsonApiDataReadable extends Readable {
         const { value, done } = await generator.next();
         if (value) {
           this.push(value);
+          this.count += 1;
         }
-        if (done) {
+        if (done || (this.limit && this.count >= this.limit)) {
           this.push(null);
         }
       } catch (e) {
