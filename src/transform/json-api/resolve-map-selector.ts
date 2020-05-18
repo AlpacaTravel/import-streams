@@ -38,7 +38,7 @@ const resolveMapSelector: TransformFunction<
   options: ResolveMapSelectorOptions
 ): Promise<any | undefined> => {
   // Identify the resolve end-point
-  const href = () => {
+  const href = (() => {
     // Check for the options href
     if (options && options.href) {
       return options.href;
@@ -62,7 +62,7 @@ const resolveMapSelector: TransformFunction<
     }
 
     return undefined;
-  };
+  })();
 
   try {
     // Read in data from JSON:API
