@@ -5,6 +5,7 @@ import {
   createMapSelectorTransformStream,
 } from "../../src/index";
 import { TransformFunctions } from "../../src/types";
+import { Readable, Writable } from "stream";
 
 describe("module", () => {
   test("named exports", () => {
@@ -50,5 +51,50 @@ describe("module", () => {
     );
     expect(typeof transforms["drupal.field-types.text-plain"]).toBe("function");
     expect(typeof transforms["json-api.resolve-map-selector"]).toBe("function");
+  });
+
+  test("use case example", async () => {
+    const records: any[] = [];
+
+    const read = new Readable({
+      objectMode: true,
+      read() {
+        this.push({
+          foo: "alpaca.travel",
+        });
+        this.push(null);
+      },
+    });
+
+    const write = new Writable({
+      objectMode: true,
+      write(chunk, encoding, callback) {
+        records.push(chunk);
+        callback();
+      },
+    });
+
+    await new Promise((success) => {
+      read
+        .pipe(
+          createMapSelectorTransformStream({
+            mapping: {
+              fubar: {
+                selector: ["not-here", "foo"],
+                transform: [
+                  {
+                    type: "url",
+                  },
+                ],
+              },
+            },
+            context: { transforms: modTransforms },
+          })
+        )
+        .pipe(write)
+        .on("finish", success);
+    });
+
+    expect(records).toMatchObject([{ fubar: "http://alpaca.travel" }]);
   });
 });
