@@ -1,0 +1,186 @@
+#!/usr/bin/env node
+const fs = require("fs");
+const path = require("path");
+const { spawn } = require("child_process");
+
+console.log(
+  "TODO: Check that the packages follow the Package Loading/Package Standard rules described in the Readme.md"
+);
+
+const sdkRoot = path.resolve(__dirname, "..");
+
+const main = async () => {
+  const tally = { failed: [], passed: [], noTests: [] };
+
+  for (let package of findPackages()) {
+    const { packageName, packageRootDir } = package;
+    await runTallied(packageName, packageRootDir, tally);
+  }
+
+  printTally(tally);
+
+  process.exit(anyFailed(tally) ? 1 : 0);
+};
+
+// Execute shell command, piping the stdout/stderr to the screen
+const exec = (command, { cwd }) => {
+  console.log(`$ cd ./${path.relative(sdkRoot, cwd)}`);
+  console.log("$", command);
+  const subprocess = spawn(command, [], {
+    cwd,
+    stdio: "inherit",
+    shell: true,
+  });
+  return new Promise((resolve, reject) => {
+    subprocess.on("close", (code) => {
+      if (code === 0) {
+        resolve(code);
+      } else {
+        reject(code);
+      }
+    });
+  });
+};
+
+// True if the given project has node_modules installed
+const projectHasNodeModulesInstalled = (projectPath) => {
+  // If we're running on the CI always install the dependencies because the
+  // bitbucket pipelines cache functionality interferes with proper detection of
+  // node_modules install status
+  if (process.env.CI) {
+    return false;
+  }
+
+  try {
+    const nodeModulesDir = path.resolve(projectPath, "node_modules");
+    const stat = fs.lstatSync(nodeModulesDir);
+    return stat.isDirectory();
+  } catch (e) {
+    return false;
+  }
+};
+
+// True if the given project has the test npm-script defined
+const projectHasTestNPMScriptDefined = (projectsPath) => {
+  try {
+    const packageJsonPath = path.resolve(projectsPath, "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+    return (
+      packageJson.scripts.test != null &&
+      packageJson.scripts["test:coverage"] !== null
+    );
+  } catch (e) {
+    return false;
+  }
+};
+
+// True if the given project has the license included
+const projectHasLicenseDefined = (projectsPath) => {
+  try {
+    const packageJsonPath = path.resolve(projectsPath, "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+    return packageJson.license == "MIT";
+  } catch (e) {
+    return false;
+  }
+};
+
+// const projectHasFileRefsDefined = projectsPath => {
+//   try {
+//     const packageJsonPath = path.resolve(projectsPath, 'package.json');
+//     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+//     return Object.keys(packageJson.devDependencies || {})
+//       .concat(Object.keys(packageJson.peerDependencies || {}))
+//       .concat(Object.keys(packageJson.dependencies || {}))
+//       .filter(key => /^@alpaca-travel/.test(key))
+//       .map(
+//         key =>
+//           (packageJson.dependencies || {})[key] ||
+//           (packageJson.devDependencies || {})[key] ||
+//           (packageJson.peerDependencies || {})[key],
+//       )
+//       .every(ref => /^file:/.test(ref));
+//   } catch (e) {
+//     return false;
+//   }
+// };
+
+// Returns a list of all the packages with name and project root
+const findPackages = () => {
+  const packagesHome = path.resolve(sdkRoot, "packages");
+  return fs
+    .readdirSync(packagesHome)
+    .map((packageName) => {
+      const packageRootDir = path.resolve(packagesHome, packageName);
+      return { packageRootDir, packageName };
+    })
+    .filter(({ packageRootDir, packageName }) => {
+      return (
+        !/^sdk$/.test(packageName) && fs.lstatSync(packageRootDir).isDirectory()
+      );
+    });
+};
+
+// Run tests for the given project
+const runProjectTests = async (name, projectPath) => {
+  console.log(`-------------------- Testing ${name} --------------------`);
+  // Should contain a license file
+  if (!projectHasLicenseDefined(projectPath)) {
+    console.log("Missing license definition for package");
+    return "failed";
+  }
+  // if (!projectHasFileRefsDefined(projectPath)) {
+  //   console.log('Incorrect reference to @alpaca-travel package, should start with file:');
+  //   return 'failed';
+  // }
+  // Should have valid tests define that pass
+  if (!projectHasTestNPMScriptDefined(projectPath)) {
+    console.log("No tests found");
+    return "noTests";
+  } else {
+    const npmInstallRequired = !projectHasNodeModulesInstalled(projectPath);
+    const command = `${
+      npmInstallRequired ? "npm install && " : ""
+    }npm run test:coverage`;
+    try {
+      await exec(command, { cwd: projectPath });
+      return "passed";
+    } catch (code) {
+      return "failed";
+    }
+  }
+};
+
+// Run tests for the given project while adding to a tally of the results
+const runTallied = async (name, projectPath, tally) => {
+  const result = await runProjectTests(name, projectPath);
+  tally[result].push(name);
+  return tally;
+};
+
+// Pretty prints the results tally
+const printTally = (tally) => {
+  const printTest = (name) => console.log(" -", name);
+
+  console.log("\n-------------------- Summary --------------------");
+
+  const total =
+    tally.passed.length + tally.failed.length + tally.noTests.length;
+
+  if (tally.failed.length > 0) {
+    console.log("Failed", `(${tally.failed.length} of ${total})`);
+    tally.failed.forEach(printTest);
+  }
+
+  if (tally.noTests.length > 0) {
+    console.log("\nNo Tests Found", `(${tally.noTests.length} of ${total})`);
+    tally.noTests.forEach(printTest);
+  }
+
+  console.log("\nPassed", `(${tally.passed.length} of ${total})`);
+};
+
+// True if any of the tests failed
+const anyFailed = (tally) => tally.failed.length > 0;
+
+main().catch(console.error);
