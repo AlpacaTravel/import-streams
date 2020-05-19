@@ -1,0 +1,54 @@
+{
+  "name": "@alpaca-travel/import-streams-compose",
+  "version": "0.0.13-alpha.0",
+  "description": "Composition of import-streams",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "test": "jest",
+    "test:coverage": "npm run build & jest --coverage",
+    "clean": "rm -rf dist",
+    "build": "npm run build:rollup",
+    "build:rollup": "rollup -c"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Cam Manderson <cam@alpaca.travel>",
+  "env": {
+    "jest": true
+  },
+  "jest2": {
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!<rootDir>/node_modules/"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    }
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@alpaca-travel/import-streams": "0.0.13-alpha.0",
+    "@types/assert": "^1.4.7",
+    "@types/readable-stream": "^2.3.6",
+    "assert": "^2.0.0",
+    "multistream": "^4.0.0",
+    "readable-stream": "^3.6.0",
+    "yaml": "^1.9.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^11.1.0",
+    "@types/jest": "^25.2.2",
+    "@types/node": "^14.0.1",
+    "jest": "^26.0.1",
+    "nock": "^12.0.3",
+    "rollup": "^2.10.2",
+    "rollup-plugin-typescript2": "^0.27.1",
+    "ts-jest": "^26.0.0",
+    "typescript": "^3.9.2"
+  }
+}
