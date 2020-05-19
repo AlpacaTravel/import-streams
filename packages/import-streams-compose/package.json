@@ -12,7 +12,8 @@
     "test:coverage": "npm run build & jest --coverage",
     "clean": "rm -rf dist",
     "build": "npm run build:rollup",
-    "build:rollup": "rollup -c"
+    "build:rollup": "rollup -c",
+    "prepublish": "npm run clean & npm run build"
   },
   "files": [
     "dist"
