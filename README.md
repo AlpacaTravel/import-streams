@@ -12,6 +12,8 @@ Features:
 - Can process various field types, entity references and process image types
 - Can sync from one or more sources into a one or more output destinations, such as the Alpaca Collections
 
+## Outline of Streams
+
 ## Composeable Pipelines
 
 More complex pipelines can define combined read/write sources, or branch processing based on the intended sources. In order to make it easier to build more complex pipelines that could potentially be defined in a configuration file and unique to the runtime requirements, the `@alpaca-travel/import-streams-compose` was created. The library exposes a `compose` function that can read an object defining simple or complex pipelines you wish to process.
