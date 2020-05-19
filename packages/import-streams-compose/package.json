@@ -36,6 +36,7 @@
     "@types/assert": "^1.4.7",
     "@types/readable-stream": "^2.3.6",
     "assert": "^2.0.0",
+    "multi-write-stream": "^2.0.1",
     "multistream": "^4.0.0",
     "readable-stream": "^3.6.0",
     "yaml": "^1.9.2"

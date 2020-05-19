@@ -84,7 +84,21 @@ describe("", () => {
           ],
         },
         {
-          type: "catch",
+          combine: [
+            {
+              stream: [
+                {
+                  type: "add1",
+                },
+                {
+                  type: "catch",
+                },
+              ],
+            },
+            {
+              type: "catch",
+            },
+          ],
         },
       ],
     };
@@ -93,6 +107,6 @@ describe("", () => {
       compose(definition, { factory }).on("finish", success)
     );
 
-    expect(values).toMatchObject([2, 3]);
+    expect(values).toMatchObject([3, 2, 4, 3]);
   });
 });

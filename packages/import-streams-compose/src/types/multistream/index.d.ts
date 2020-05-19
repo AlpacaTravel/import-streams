@@ -11,9 +11,11 @@ declare module "multistream" {
 
   type Streams = Array<LazyStream | Readable> | FactoryStream;
 
-  class MultiStream {
-    obj(streams: Streams): Readable;
+  class MultiStream extends Readable {
+    constructor(streams: Streams);
+    static obj(streams: Streams): MultiStream;
   }
+  // export function obj(streams: Streams): MultiStream;
 
-  export default multistream;
+  export default MultiStream;
 }
