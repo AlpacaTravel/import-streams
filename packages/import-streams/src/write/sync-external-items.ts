@@ -2,7 +2,7 @@ import assert from "assert";
 import { Writable } from "readable-stream";
 import network from "../network";
 
-interface CollectionOptions {
+interface SyncExternalItemsOptions {
   apiKey: string;
   collection: string;
   profile: string;
@@ -44,8 +44,8 @@ interface RecordSync {
 
 type Callback = (error?: Error) => undefined;
 
-export const createWriteStream = (options: CollectionOptions) => {
-  return new Collection(options);
+export const createWriteStream = (options: SyncExternalItemsOptions) => {
+  return new SyncExternalItems(options);
 };
 
 const cleanRef = (ref: string, type: string) => {
@@ -53,14 +53,14 @@ const cleanRef = (ref: string, type: string) => {
   return `alpaca://${type}/${id}`;
 };
 
-class Collection extends Writable {
+class SyncExternalItems extends Writable {
   private apiKey: string;
   private collection: string;
   private profile: string;
   private cache: Promise<Array<RecordSync>> | undefined;
   private pushed: Array<RecordSync>;
 
-  constructor(options: CollectionOptions) {
+  constructor(options: SyncExternalItemsOptions) {
     super({ objectMode: true });
 
     const { apiKey, collection, profile } = options;
@@ -360,7 +360,7 @@ class Collection extends Writable {
   }
 }
 
-export default Collection;
+export default SyncExternalItems;
 
 const fetchRecordSyncDetails = (record: Item): RecordSync => {
   const externalRef = (() => {

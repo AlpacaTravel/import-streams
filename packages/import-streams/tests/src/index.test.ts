@@ -1,6 +1,6 @@
 import {
   transforms as modTransforms,
-  createCollectionWriteStream,
+  createSyncExternalItemsWriteStream,
   createJsonApiDataReadStream,
   createMapSelectorTransformStream,
 } from "../../src/index";
@@ -9,7 +9,7 @@ import { Readable, Writable } from "stream";
 
 describe("module", () => {
   test("named exports", () => {
-    expect(typeof createCollectionWriteStream).toBe("function");
+    expect(typeof createSyncExternalItemsWriteStream).toBe("function");
     expect(typeof createJsonApiDataReadStream).toBe("function");
     expect(typeof createMapSelectorTransformStream).toBe("function");
     expect(typeof modTransforms).toBe("object");
