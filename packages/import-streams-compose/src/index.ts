@@ -32,11 +32,13 @@ export type ComposableDefinition =
   | StreamDefinition
   | ComposableStreamDefinition
   | CombineStreamDefinition
+  | SupportedStream
   | string
   | Array<
       | StreamDefinition
       | ComposableStreamDefinition
       | CombineStreamDefinition
+      | SupportedStream
       | string
     >;
 
@@ -78,6 +80,18 @@ const isReadable = (stream: SupportedStream): stream is Readable => {
   return false;
 };
 
+const isSupportedStream = (tbd: any): tbd is SupportedStream => {
+  if (
+    tbd instanceof Stream ||
+    tbd instanceof Readable ||
+    tbd instanceof Writable ||
+    tbd instanceof Transform
+  ) {
+    return true;
+  }
+  return false;
+};
+
 const isStreamDefinition = (
   tbd: ComposableDefinition
 ): tbd is StreamDefinition => {
@@ -116,6 +130,7 @@ const isComposableStreamDefinition = (
 
 export interface ComposeOption {
   factory: StreamFactory;
+  source: Readable;
 }
 
 interface HeadTailStream {
@@ -149,7 +164,12 @@ const compose = (
       // Create a piped set of stream
       const streams = Array.isArray(stream) ? stream : [stream];
       const result = streams.reduce((prior: null | HeadTailStream, subdef) => {
-        const nextStream = compose(subdef, options);
+        const nextStream = (() => {
+          if (isSupportedStream(subdef)) {
+            return subdef;
+          }
+          return compose(subdef, options);
+        })();
         if (prior == null) {
           return { head: nextStream, tail: nextStream };
         }
@@ -187,6 +207,9 @@ const compose = (
       const combines = Array.isArray(combine) ? combine : [combine];
       const combinableStreams: SupportedStream[] = combines.map(
         (subdef: ComposableDefinition) => {
+          if (isSupportedStream(subdef)) {
+            return subdef;
+          }
           return compose(subdef, options);
         }
       );
@@ -233,6 +256,10 @@ const compose = (
 
     // Create a basic stream
     return options.factory(factoryDefinition);
+  }
+
+  if (isSupportedStream(definition)) {
+    return definition;
   }
 
   throw new Error("Missing either a stream, combine or type definition");
