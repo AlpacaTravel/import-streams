@@ -1,6 +1,6 @@
 {
   "name": "@alpaca-travel/import-streams-compose",
-  "version": "0.0.16-alpha.0",
+  "version": "0.0.17-alpha.0",
   "description": "Composition of import-streams",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
