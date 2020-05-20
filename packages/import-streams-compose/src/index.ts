@@ -31,7 +31,14 @@ export interface StreamDefinition {
 export type ComposableDefinition =
   | StreamDefinition
   | ComposableStreamDefinition
-  | CombineStreamDefinition;
+  | CombineStreamDefinition
+  | string
+  | Array<
+      | StreamDefinition
+      | ComposableStreamDefinition
+      | CombineStreamDefinition
+      | string
+    >;
 
 export type StreamFactory = (
   streamDefinition: StreamDefinition
@@ -74,6 +81,9 @@ const isReadable = (stream: SupportedStream): stream is Readable => {
 const isStreamDefinition = (
   tbd: ComposableDefinition
 ): tbd is StreamDefinition => {
+  if (Array.isArray(tbd) || typeof tbd === "string") {
+    return false;
+  }
   if ("type" in tbd) {
     return true;
   }
@@ -83,6 +93,9 @@ const isStreamDefinition = (
 const isCombineStreamDefinition = (
   tbd: ComposableDefinition
 ): tbd is CombineStreamDefinition => {
+  if (Array.isArray(tbd) || typeof tbd === "string") {
+    return false;
+  }
   if ("combine" in tbd) {
     return true;
   }
@@ -92,6 +105,9 @@ const isCombineStreamDefinition = (
 const isComposableStreamDefinition = (
   tbd: ComposableDefinition
 ): tbd is ComposableStreamDefinition => {
+  if (typeof tbd === "string" || Array.isArray(tbd)) {
+    return false;
+  }
   if ("stream" in tbd || "combine" in tbd) {
     return true;
   }
@@ -117,8 +133,18 @@ const compose = (
   );
 
   // Options
-  if (isComposableStreamDefinition(definition)) {
-    const { stream } = definition;
+  if (isComposableStreamDefinition(definition) || Array.isArray(definition)) {
+    // Obtain the stream
+    const stream = (() => {
+      // If an array, treat as a stream
+      if (Array.isArray(definition)) {
+        return definition;
+      }
+
+      // Return the standard
+      return definition.stream;
+    })();
+
     if (stream) {
       // Create a piped set of stream
       const streams = Array.isArray(stream) ? stream : [stream];
@@ -196,9 +222,17 @@ const compose = (
     }
   }
 
-  if (isStreamDefinition(definition)) {
+  if (isStreamDefinition(definition) || typeof definition === "string") {
+    const factoryDefinition = (() => {
+      if (typeof definition === "string") {
+        return { type: definition };
+      }
+
+      return definition;
+    })();
+
     // Create a basic stream
-    return options.factory(definition);
+    return options.factory(factoryDefinition);
   }
 
   throw new Error("Missing either a stream, combine or type definition");

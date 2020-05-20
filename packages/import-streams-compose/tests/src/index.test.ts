@@ -5,12 +5,12 @@ import compose, {
 } from "../../src/index";
 import { Readable, Transform, Writable } from "readable-stream";
 
-describe("", () => {
+describe("compose", () => {
   test("exports", () => {
     expect(typeof compose).toBe("function");
   });
 
-  test("basic composition", async () => {
+  test("basic composition use case", async () => {
     const values: number[] = [];
     const factory: StreamFactory = (
       definition: StreamDefinition
@@ -58,6 +58,8 @@ describe("", () => {
       stream: [
         {
           combine: [
+            "number", //1
+            ["number", "add1"], //2
             {
               stream: [
                 {
@@ -67,7 +69,7 @@ describe("", () => {
                   type: "add1",
                 },
               ],
-            },
+            }, //2
             {
               stream: [
                 {
@@ -80,7 +82,7 @@ describe("", () => {
                   type: "add1",
                 },
               ],
-            },
+            }, //3
           ],
         },
         {
@@ -107,6 +109,6 @@ describe("", () => {
       compose(definition, { factory }).on("finish", success)
     );
 
-    expect(values).toMatchObject([3, 2, 4, 3]);
+    expect(values).toMatchObject([2, 1, 3, 2, 3, 2, 4, 3]);
   });
 });
