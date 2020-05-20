@@ -61,7 +61,10 @@ const asWritablePipeType = (stream: SupportedStream): Transform | Writable => {
   throw new Error("Should not stream to a readable stream");
 };
 
-const isWritable = (stream: SupportedStream): stream is Writable => {
+const isWritable = (stream: any): stream is Writable => {
+  if (typeof stream === "undefined") {
+    return false;
+  }
   if (stream instanceof Writable || stream instanceof Transform) {
     return true;
   }
@@ -72,7 +75,16 @@ const isWritable = (stream: SupportedStream): stream is Writable => {
   return false;
 };
 
-const isReadable = (stream: SupportedStream): stream is Readable => {
+const isTransform = (stream: any): stream is Transform => {
+  return (
+    (isWritable(stream) && isWritable(stream)) || stream instanceof Transform
+  );
+};
+
+const isReadable = (stream: any): stream is Readable => {
+  if (typeof stream === "undefined") {
+    return false;
+  }
   if (stream instanceof Readable || stream instanceof Transform) {
     return true;
   }
@@ -130,7 +142,8 @@ const isComposableStreamDefinition = (
 
 export interface ComposeOption {
   factory: StreamFactory;
-  source: Readable;
+  readFrom?: Readable;
+  head?: boolean;
 }
 
 interface HeadTailStream {
@@ -138,14 +151,34 @@ interface HeadTailStream {
   tail: SupportedStream;
 }
 
+// const compose = (definition:ComposableDefinition, options:ComposeOption) => compose(definition, undefined, options);
+
+const optionsWithReadFrom = (
+  options: ComposeOption,
+  readFrom?: Readable
+): ComposeOption => {
+  return Object.assign({}, options, {
+    readFrom: readFrom != null ? readFrom : null,
+  });
+};
+
 const compose = (
   definition: ComposableDefinition,
   options: ComposeOption
 ): SupportedStream => {
+  assert(options, "Missing the options");
   assert(
-    options && typeof options.factory === "function",
+    typeof options.factory === "function",
     "Missing required factory method for creating factory"
   );
+  if (options && options.readFrom != null) {
+    assert(
+      isReadable(options.readFrom),
+      "Options readFrom should be a readable source"
+    );
+  }
+
+  const { readFrom, factory } = options;
 
   // Options
   if (isComposableStreamDefinition(definition) || Array.isArray(definition)) {
@@ -164,33 +197,40 @@ const compose = (
       // Create a piped set of stream
       const streams = Array.isArray(stream) ? stream : [stream];
       const result = streams.reduce((prior: null | HeadTailStream, subdef) => {
-        const nextStream = (() => {
-          if (isSupportedStream(subdef)) {
-            return subdef;
+        let nextStream = null;
+        // If first time
+        if (prior === null) {
+          nextStream = compose(subdef, optionsWithReadFrom(options, readFrom));
+        } else {
+          if (!isReadable(prior.tail)) {
+            throw new Error(
+              `Can not pipe on top of a non-readable prior stream`
+            );
           }
-          return compose(subdef, options);
-        })();
-        if (prior == null) {
-          return { head: nextStream, tail: nextStream };
+          nextStream = compose(
+            subdef,
+            optionsWithReadFrom(options, prior.tail)
+          );
         }
 
-        if (!isReadable(prior.tail)) {
-          throw new Error(`Can not pipe on top of a non-readable prior stream`);
+        if (prior == null) {
+          return { head: nextStream, tail: nextStream };
         }
 
         if (!isWritable(nextStream)) {
           throw new Error(`Can not pipe into a non-writable stream`);
         }
 
-        const { head, tail } = prior;
-        return { head, tail: tail.pipe(asWritablePipeType(nextStream)) };
+        return { head: prior.head, tail: asWritablePipeType(nextStream) };
       }, null);
 
-      if (result) {
-        // If we have defined a writable pipe as the head, return that reference
-        if (isWritable(result.head)) {
-          return result.head;
-        }
+      // If we are in a write-end stream (not a transform)
+      if (result && isWritable(result.head) && !isReadable(result.tail)) {
+        return result.head;
+      }
+
+      // Return the tail result
+      if (result && result.tail) {
         // If we have a
         return result.tail;
       }
@@ -205,46 +245,59 @@ const compose = (
 
       // Create a combined stream
       const combines = Array.isArray(combine) ? combine : [combine];
-      const combinableStreams: SupportedStream[] = combines.map(
-        (subdef: ComposableDefinition) => {
-          if (isSupportedStream(subdef)) {
-            return subdef;
+      if (combines.length) {
+        const combinableStreams: SupportedStream[] = combines.map(
+          (subdef: ComposableDefinition) => {
+            if (isSupportedStream(subdef)) {
+              return subdef;
+            }
+            return compose(subdef, optionsWithReadFrom(options, undefined));
           }
-          return compose(subdef, options);
-        }
-      );
-
-      // Check to make sure we have a combine defined
-      if (combinableStreams.length) {
-        // If we have a readable set of streams
-        if (combinableStreams.every((stream) => isReadable(stream))) {
-          const readableStreams = combinableStreams.map((s) =>
-            asReadablePipeTypes(s)
-          );
-          if (objectMode === true) {
-            return MultiReadStream.obj(readableStreams);
-          }
-          return new MultiReadStream(readableStreams);
-        }
-
-        // If we have a writable set of streams
-        if (combinableStreams.every((stream) => isWritable(stream))) {
-          const writableStreams = combinableStreams.map((s) =>
-            asWritablePipeType(s)
-          );
-          if (objectMode === true) {
-            return MultiWriteStream.obj(writableStreams);
-          }
-          return new MultiWriteStream(writableStreams);
-        }
-
-        throw new Error(
-          "Unable to combine read and writable streams in the same stream"
         );
+
+        const nextStream = (() => {
+          // If we have a readable set of streams
+          if (combinableStreams.every((stream) => isReadable(stream))) {
+            const readableStreams = combinableStreams.map((s) =>
+              asReadablePipeTypes(s)
+            );
+            if (objectMode === true) {
+              return MultiReadStream.obj(readableStreams);
+            }
+            return new MultiReadStream(readableStreams);
+          }
+
+          // If we have a writable set of streams
+          if (combinableStreams.every((stream) => isWritable(stream))) {
+            const writableStreams = combinableStreams.map((s) =>
+              asWritablePipeType(s)
+            );
+            if (objectMode === true) {
+              return MultiWriteStream.obj(writableStreams);
+            }
+            return new MultiWriteStream(writableStreams);
+          }
+
+          throw new Error(
+            "Unable to combine read and writable streams in the same stream"
+          );
+        })();
+
+        if (readFrom != null) {
+          if (!isWritable(nextStream)) {
+            throw new Error(
+              "Supplied a stream to combine that is not writable to receive options.readFrom"
+            );
+          }
+          readFrom.pipe(nextStream);
+        }
+
+        return nextStream;
       }
     }
   }
 
+  // If creating a stream
   if (isStreamDefinition(definition) || typeof definition === "string") {
     const factoryDefinition = (() => {
       if (typeof definition === "string") {
@@ -255,12 +308,36 @@ const compose = (
     })();
 
     // Create a basic stream
-    return options.factory(factoryDefinition);
+    const stream = factory(factoryDefinition);
+
+    // If we have a readFrom source
+    if (readFrom != null) {
+      if (!isWritable(stream)) {
+        throw new Error(
+          "Defined a stream that is not writable to receive options.readFrom"
+        );
+      }
+      readFrom.pipe(stream);
+    }
+
+    // Return the stream
+    return stream;
   }
 
+  // If supplied a stream
   if (isSupportedStream(definition)) {
+    if (readFrom != null) {
+      if (!isWritable(definition)) {
+        throw new Error(
+          "Supplied a stream that is not writable to receive options.readFrom"
+        );
+      }
+      readFrom.pipe(definition);
+    }
     return definition;
   }
+
+  // TODO: Use a supplied function to create the stream (lazy)
 
   throw new Error("Missing either a stream, combine or type definition");
 };

@@ -1,14 +1,21 @@
+import {
+  ComposableDefinition,
+  SupportedStream,
+} from "@alpaca-travel/import-streams-compose";
+
 export type TransformFunction<U, B extends TransformFunctionOptions> = (
   value: any,
   options: B
 ) => U;
 
 export interface TransformFunctionOptions {
-  context: TransformContext;
+  context: ComposeContext;
 }
 
-export interface TransformContext {
-  transforms: TransformFunctions;
+export type ComposeFunction = (doc: ComposableDefinition) => SupportedStream;
+
+export interface ComposeContext {
+  compose: ComposeFunction;
 }
 
 export interface TransformFactory {
@@ -21,7 +28,7 @@ export type TransformReference = string | TransformFactory;
 export type Transform = TransformReference | Array<TransformReference>;
 
 export interface TransformOptions {
-  context: TransformContext;
+  context: ComposeContext;
 }
 
 export interface TransformFunctions {

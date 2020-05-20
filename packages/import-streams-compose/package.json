@@ -33,7 +33,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@alpaca-travel/import-streams": "0.0.13-alpha.0",
     "@types/assert": "^1.4.7",
     "@types/readable-stream": "^2.3.6",
     "assert": "^2.0.0",

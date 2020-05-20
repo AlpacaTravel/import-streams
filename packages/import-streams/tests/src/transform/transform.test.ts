@@ -1,4 +1,7 @@
+import { createCompose } from "../../../src/index";
 import transforms from "../../../src/transform/index";
+
+const compose = createCompose();
 
 describe("transforms", () => {
   test("coverage of mapping/selector/basic use cases", async () => {
@@ -31,7 +34,7 @@ describe("transforms", () => {
             },
           },
           context: {
-            transforms,
+            compose,
           },
         }
       )

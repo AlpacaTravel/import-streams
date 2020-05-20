@@ -3,10 +3,13 @@ import {
   createTransformStream,
   MapSelectorOptions,
 } from "../../../src/transform/map-selector";
-import transforms from "../../../src/transform/index";
+import { createCompose } from "../../../src/index";
+import { ComposeContext } from "../../../src/types";
 
-const context = {
-  transforms,
+const createdCompose = createCompose();
+
+const context: ComposeContext = {
+  compose: createdCompose,
 };
 
 describe("Map Selector", () => {

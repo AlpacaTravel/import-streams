@@ -1,6 +1,8 @@
 import nock from "nock";
 import entityReference from "../../../../../../src/transform/drupal/field-types/json-api/entity-reference";
-import transforms from "../../../../../../src/transform";
+import { createCompose } from "../../../../../../src/index";
+
+const compose = createCompose();
 
 describe("Entity Reference", () => {
   test("With basic value", async () => {
@@ -38,7 +40,7 @@ describe("Entity Reference", () => {
         foo: "bar",
       },
       context: {
-        transforms,
+        compose,
       },
     };
 

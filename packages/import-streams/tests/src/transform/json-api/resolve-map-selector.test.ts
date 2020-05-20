@@ -2,10 +2,12 @@ import nock from "nock";
 import resolveMapSelector, {
   ResolveMapSelectorOptions,
 } from "../../../../src/transform/json-api/resolve-map-selector";
-import transforms from "../../../../src/transform/index";
+import { createCompose } from "../../../../src/index";
 
+const compose = createCompose();
 const context = {
-  transforms,
+  foo: "bar",
+  compose,
 };
 
 describe("JSON:API Resolve Map Selector", () => {

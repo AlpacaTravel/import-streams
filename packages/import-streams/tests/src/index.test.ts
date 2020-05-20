@@ -1,5 +1,6 @@
-import {
-  transforms as modTransforms,
+import compose, {
+  createCompose,
+  transforms,
   createSyncExternalItemsWriteStream,
   createJsonApiDataReadStream,
   createMapSelectorTransformStream,
@@ -9,48 +10,63 @@ import { Readable, Writable } from "stream";
 
 describe("module", () => {
   test("named exports", () => {
+    expect(typeof compose).toBe("function");
+    expect(typeof createCompose).toBe("function");
     expect(typeof createSyncExternalItemsWriteStream).toBe("function");
     expect(typeof createJsonApiDataReadStream).toBe("function");
     expect(typeof createMapSelectorTransformStream).toBe("function");
-    expect(typeof modTransforms).toBe("object");
+    expect(typeof transforms).toBe("object");
   });
 
   test("exports for transforms", () => {
     // Should export required functions
-    const transforms: TransformFunctions = modTransforms;
-    expect(typeof transforms.boolean).toBe("function");
-    expect(typeof transforms.date).toBe("function");
-    expect(typeof transforms.flatten).toBe("function");
-    expect(typeof transforms["html-prettier"]).toBe("function");
-    expect(typeof transforms["html-sanitize"]).toBe("function");
-    expect(typeof transforms["map-selector"]).toBe("function");
-    expect(typeof transforms.number).toBe("function");
-    expect(typeof transforms.position).toBe("function");
-    expect(typeof transforms.replace).toBe("function");
-    expect(typeof transforms.selector).toBe("function");
-    expect(typeof transforms.text).toBe("function");
-    expect(typeof transforms.transform).toBe("function");
-    expect(typeof transforms.truncate).toBe("function");
-    expect(typeof transforms.url).toBe("function");
+    const exportedTransforms: TransformFunctions = transforms;
+    expect(typeof exportedTransforms.boolean).toBe("function");
+    expect(typeof exportedTransforms.date).toBe("function");
+    expect(typeof exportedTransforms.flatten).toBe("function");
+    expect(typeof exportedTransforms["html-prettier"]).toBe("function");
+    expect(typeof exportedTransforms["html-sanitize"]).toBe("function");
+    expect(typeof exportedTransforms["map-selector"]).toBe("function");
+    expect(typeof exportedTransforms.number).toBe("function");
+    expect(typeof exportedTransforms.position).toBe("function");
+    expect(typeof exportedTransforms.replace).toBe("function");
+    expect(typeof exportedTransforms.selector).toBe("function");
+    expect(typeof exportedTransforms.text).toBe("function");
+    expect(typeof exportedTransforms.truncate).toBe("function");
+    expect(typeof exportedTransforms.url).toBe("function");
     expect(
-      typeof transforms["drupal.field-types.json-api.entity-reference"]
+      typeof exportedTransforms["drupal.field-types.json-api.entity-reference"]
     ).toBe("function");
-    expect(typeof transforms["drupal.field-types.json-api.image"]).toBe(
+    expect(typeof exportedTransforms["drupal.field-types.json-api.image"]).toBe(
       "function"
     );
-    expect(typeof transforms["drupal.field-types.address-field"]).toBe(
+    expect(typeof exportedTransforms["drupal.field-types.address-field"]).toBe(
       "function"
     );
-    expect(typeof transforms["drupal.field-types.boolean"]).toBe("function");
-    expect(typeof transforms["drupal.field-types.email"]).toBe("function");
-    expect(typeof transforms["drupal.field-types.geofield"]).toBe("function");
-    expect(typeof transforms["drupal.field-types.link"]).toBe("function");
-    expect(typeof transforms["drupal.field-types.telephone"]).toBe("function");
-    expect(typeof transforms["drupal.field-types.text-formatted"]).toBe(
+    expect(typeof exportedTransforms["drupal.field-types.boolean"]).toBe(
       "function"
     );
-    expect(typeof transforms["drupal.field-types.text-plain"]).toBe("function");
-    expect(typeof transforms["json-api.resolve-map-selector"]).toBe("function");
+    expect(typeof exportedTransforms["drupal.field-types.email"]).toBe(
+      "function"
+    );
+    expect(typeof exportedTransforms["drupal.field-types.geofield"]).toBe(
+      "function"
+    );
+    expect(typeof exportedTransforms["drupal.field-types.link"]).toBe(
+      "function"
+    );
+    expect(typeof exportedTransforms["drupal.field-types.telephone"]).toBe(
+      "function"
+    );
+    expect(typeof exportedTransforms["drupal.field-types.text-formatted"]).toBe(
+      "function"
+    );
+    expect(typeof exportedTransforms["drupal.field-types.text-plain"]).toBe(
+      "function"
+    );
+    expect(typeof exportedTransforms["json-api.resolve-map-selector"]).toBe(
+      "function"
+    );
   });
 
   test("use case example", async () => {
@@ -88,7 +104,7 @@ describe("module", () => {
                 ],
               },
             },
-            context: { transforms: modTransforms },
+            context: { compose: createCompose() },
           })
         )
         .pipe(write)

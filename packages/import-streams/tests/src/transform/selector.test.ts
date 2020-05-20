@@ -1,12 +1,14 @@
+import { createCompose } from "../../../src/index";
 import selector from "../../../src/transform/selector";
-import transforms from "../../../src/transform/index";
+
+const compose = createCompose();
 
 describe("selectorTransforms", () => {
   test("will obtain a value from a selector", async () => {
     const options = {
       selector: "foo",
       context: {
-        transforms,
+        compose,
       },
     };
     const value = {
@@ -24,7 +26,7 @@ describe("selectorTransforms", () => {
         transform: "url",
       },
       context: {
-        transforms,
+        compose,
       },
     };
     expect(await selector(value, options)).toBe("http://www.google.com");
@@ -39,12 +41,12 @@ describe("selectorTransforms", () => {
         transform: [{ type: "boolean", options: { inverse: true } }],
       },
       context: {
-        transforms,
+        compose,
       },
     };
     expect(await selector(value, config)).toBe(false);
   });
-  test("will obtain a value from a selector and process a mixed array of modifiers", async () => {
+  test.only("will obtain a value from a selector and process a mixed array of modifiers", async () => {
     const value = {
       foo: "www.google.com",
     };
@@ -54,7 +56,7 @@ describe("selectorTransforms", () => {
         transform: ["text", { type: "url" }],
       },
       context: {
-        transforms,
+        compose,
       },
     };
     expect(await selector(value, options)).toBe("http://www.google.com");
@@ -69,7 +71,7 @@ describe("selectorTransforms", () => {
         transform: ["text", { type: "url" }],
       },
       context: {
-        transforms,
+        compose,
       },
     };
     expect(await selector(value, options)).toBe("http://www.google.com");

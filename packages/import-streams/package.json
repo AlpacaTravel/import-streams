@@ -29,6 +29,7 @@
   "author": "Cam Manderson <cam@alpaca.travel>",
   "license": "MIT",
   "dependencies": {
+    "@alpaca-travel/import-streams-compose": "0.0.16-alpha.0",
     "@types/lodash": "^4.14.151",
     "@types/prettier": "^2.0.0",
     "@types/readable-stream": "^2.3.6",

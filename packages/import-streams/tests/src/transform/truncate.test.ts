@@ -1,12 +1,14 @@
 import truncate from "../../../src/transform/truncate";
-import transforms from "../../../src/transform/index";
+import { createCompose } from "../../../src/index";
+
+const compose = createCompose();
 
 describe("truncate", () => {
   test("will obtain a value from a string", async () => {
     const options = {
       length: 5,
       context: {
-        transforms,
+        compose,
       },
     };
     const value = "A really long string";

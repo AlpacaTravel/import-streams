@@ -1,19 +1,17 @@
+import { Readable, Writable, Transform, Stream } from "readable-stream";
+import {
+  ComposableDefinition,
+  SupportedStream,
+} from "@alpaca-travel/import-streams-compose";
 import { TransformFunction, TransformFunctionOptions } from "../types";
 import assert from "assert";
 import processSelector from "../selector";
 
-interface TransformFactory {
-  type: string;
-  options?: any;
-}
-
 type SelectorPath = string | Array<string>;
-
-type Transform = string | TransformFactory | Array<string | TransformFactory>;
 
 export interface SelectorDefinition {
   selector?: SelectorPath;
-  transform?: Transform;
+  transform?: ComposableDefinition;
 }
 
 type PathOrSelectorDefinition = Array<string> | string | SelectorDefinition;
@@ -25,6 +23,30 @@ export type Selector =
 export interface SelectorOptions extends TransformFunctionOptions {
   selector: Selector;
 }
+
+const isComposableDefinition = (doc: any): doc is ComposableDefinition => {
+  if (typeof doc === "undefined") {
+    return false;
+  }
+  return true;
+};
+
+const isReadable = (stream: SupportedStream): stream is Readable => {
+  if (stream instanceof Readable || stream instanceof Transform) {
+    return true;
+  }
+  return false;
+};
+
+const isWritable = (stream: any): stream is Writable => {
+  if (stream instanceof Writable) {
+    return true;
+  }
+  if ("writable" in stream && stream instanceof Stream) {
+    return false;
+  }
+  return false;
+};
 
 `
   title
@@ -106,6 +128,7 @@ const selector: TransformFunction<Promise<any>, SelectorOptions> = async (
 
           // Process the raw value with a series of transformations if defined
           if (
+            !isComposableDefinition(selectorDefinition.transform) ||
             !selectorDefinition.transform ||
             (Array.isArray(selectorDefinition.transform) &&
               !selectorDefinition.transform.length)
@@ -113,13 +136,53 @@ const selector: TransformFunction<Promise<any>, SelectorOptions> = async (
             return raw;
           }
 
-          // Process the streams
-          const transformOptions = {
-            context,
-            transform: selectorDefinition.transform,
-          };
+          // Process the definition
+          let streamResult = raw;
+          await new Promise((success, fail) => {
+            // Compose a stream based on the selector transforms
+            if (isComposableDefinition(selectorDefinition.transform)) {
+              // Ensure we have compose
+              const { compose } = context;
+              assert(
+                typeof compose === "function",
+                "Should have received the compose function in context"
+              );
 
-          return context.transforms.transform(raw, transformOptions);
+              // Compose our stream
+              const stream = compose({
+                stream: [
+                  // Make our reader the start of the stream
+                  new Readable({
+                    objectMode: true, // TODO: Should we optionalise this against selector options?
+                    read() {
+                      this.push(raw); // <- The value to transform
+                      this.push(null);
+                    },
+                  }),
+
+                  // Include the next transform pipeline
+                  selectorDefinition.transform,
+
+                  // Finalise back into our writer
+                  new Writable({
+                    objectMode: true,
+                    write(chunk, _, callback) {
+                      streamResult = chunk; // <- The result of the transform
+                      callback();
+                    },
+                  }),
+                ],
+              });
+
+              stream.on("finish", success).on("error", fail);
+            } else {
+              // Return the raw result
+              success();
+            }
+          });
+
+          // Return the result of the stream
+          return streamResult;
         }, Promise.resolve(undefined));
       })();
     },

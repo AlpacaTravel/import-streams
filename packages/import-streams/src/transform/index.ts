@@ -1,5 +1,5 @@
 import { TransformFunctions } from "../types";
-import transform from "./transform";
+// import transform from "./transform";
 import selector from "./selector";
 import mapSelector from "./map-selector";
 import url from "./url";
@@ -23,7 +23,7 @@ const transforms: TransformFunctions = {};
 
 // Defaults
 Object.assign(transforms, {
-  transform,
+  // transform,
   selector,
   "map-selector": mapSelector,
   url,
