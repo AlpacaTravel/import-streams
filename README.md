@@ -11,7 +11,8 @@ Features:
 - Read sources include JSON:API, which comes as a core module in Drupal v8 (and as an extension module to v9)
 - Can process various field types, entity references and process image types
 - Can sync from one or more sources into a one or more output destinations, such as the Alpaca Collections
-- Rate limit reads and writes
+- Rate limit reads and writes against network, to avoid flooding network calls from origin or sources
+- Use streams capable to start pushing data once data has becomes available (fast!)
 
 ## Outline of Streams
 
