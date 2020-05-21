@@ -28,60 +28,16 @@ const write = rateLimit(
     : { maxRequests: 50, perMilliseconds: 20 }
 );
 
-type AxiosEmptyRequest = (url: string, options?: any) => Promise<any>;
-type AxiosBodyRequest = (url: string, data: any, options?: any) => Promise<any>;
-
-// TODO: This is messy! refactor this to use aspect or a container with logger manager
-
-const wrapEmptyRequest = async (
-  desc: string,
-  func: AxiosEmptyRequest,
-  url: string,
-  options?: any
-) => {
-  const prod = process.env.NODE_ENV !== "test";
-  prod && console.log("Queing Network", desc, url);
-  try {
-    const response = await func(url, options);
-    return response;
-  } catch (e) {
-    prod && console.error("Network call encountered an error", desc, url);
-    throw e;
-  }
-};
-
-const wrapBodyRequest = async (
-  desc: string,
-  func: AxiosBodyRequest,
-  url: string,
-  data: any,
-  options?: any
-) => {
-  const prod = process.env.NODE_ENV !== "test";
-  prod && console.log("Queing Network", desc, url);
-  try {
-    const response = await func(url, data, options);
-    return response;
-  } catch (e) {
-    prod && console.error("Network call encountered an error", desc, url);
-    throw e;
-  }
-};
-
 export default {
   // Read concurrency
-  get: (url: string, options?: any) =>
-    wrapEmptyRequest("get", read.get, url, options),
-  options: (url: string, options?: any) =>
-    wrapEmptyRequest("options", read.options, url, options),
+  get: (url: string, options?: any) => read.get(url, options),
+  options: (url: string, options?: any) => read.options(url, options),
 
   // Write concurrency
-  put: (url: string, data: any, options?: any) =>
-    wrapBodyRequest("put", write.put, url, data, options),
+  put: (url: string, data: any, options?: any) => write.put(url, data, options),
   post: (url: string, data: any, options?: any) =>
-    wrapBodyRequest("post", write.post, url, data, options),
+    write.post(url, data, options),
   patch: (url: string, data: any, options?: any) =>
-    wrapBodyRequest("patch", write.patch, url, data, options),
-  delete: (url: string, options: any) =>
-    wrapEmptyRequest("delete", write.delete, url, options),
+    write.patch(url, data, options),
+  delete: (url: string, options: any) => write.delete(url, options),
 };

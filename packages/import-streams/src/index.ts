@@ -9,6 +9,7 @@ import compose, {
 } from "@alpaca-travel/import-streams-compose";
 import assert from "assert";
 import { Transform } from "readable-stream";
+import YAML from "yaml";
 
 import transforms from "./transform/index";
 import { createReadStream as createJsonApiDataReadStream } from "./read/json-api-data";
@@ -42,7 +43,8 @@ interface CombineStreamDefinitionDocument extends CombineStreamDefinition {
 type Document =
   | StreamDefinitionDocument
   | ComposableStreamDefinitionDocument
-  | CombineStreamDefinitionDocument;
+  | CombineStreamDefinitionDocument
+  | string;
 interface Options {
   factory?: StreamFactory;
 }
@@ -198,16 +200,31 @@ export const createCompose = (options?: Options) => {
   return composeWithOptions;
 };
 
+const isString = (str: any): str is String => {
+  if (typeof str === "string") {
+    return true;
+  }
+  return false;
+};
+
 const composition = (doc: Document, options?: Options) => {
+  const resolvedDocument = (() => {
+    if (isString(doc)) {
+      return YAML.parse(doc, { merge: true });
+    }
+
+    return doc;
+  })();
+
   // Doc version check
-  const { version } = doc || {};
+  const { version } = resolvedDocument || {};
   assert(
     version === 1 || version === "1.0" || version === "1.0.0",
     "Invalid source version, must be 1.0"
   );
 
   // Build and execute the compose
-  return createCompose(options)(doc);
+  return createCompose(options)(resolvedDocument);
 };
 
 export default composition;

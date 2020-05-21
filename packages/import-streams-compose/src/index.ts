@@ -44,7 +44,7 @@ export type ComposableDefinition =
 
 export type StreamFactory = (
   streamDefinition: StreamDefinition
-) => SupportedStream;
+) => SupportedStream | null | undefined;
 
 const asReadablePipeTypes = (stream: SupportedStream): Readable => {
   if (isReadable(stream)) {
@@ -309,6 +309,11 @@ const compose = (
 
     // Create a basic stream
     const stream = factory(factoryDefinition);
+    if (stream == null) {
+      throw new Error(
+        `Unable to create the stream based on the supplied definition. Factory method did not return a stream`
+      );
+    }
 
     // If we have a readFrom source
     if (readFrom != null) {

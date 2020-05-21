@@ -6,7 +6,11 @@ import compose, {
   createMapSelectorTransformStream,
 } from "../../src/index";
 import { TransformFunctions } from "../../src/types";
-import { Readable, Writable } from "stream";
+import { Readable, Writable } from "readable-stream";
+import {
+  StreamFactory,
+  SupportedStream,
+} from "@alpaca-travel/import-streams-compose";
 
 describe("module", () => {
   test("named exports", () => {
@@ -69,48 +73,46 @@ describe("module", () => {
     );
   });
 
-  test("use case example", async () => {
-    const records: any[] = [];
-
-    const read = new Readable({
-      objectMode: true,
-      read() {
-        this.push({
-          foo: "alpaca.travel",
+  test("use case example of a composed document", async () => {
+    let output = null;
+    const factory: StreamFactory = ({
+      type,
+    }: {
+      type: string;
+    }): SupportedStream | null | undefined => {
+      if (type === "fu") {
+        return new Readable({
+          objectMode: true,
+          read() {
+            this.push("fubar.com");
+            this.push(null);
+          },
         });
-        this.push(null);
-      },
+      }
+      if (type === "write") {
+        return new Writable({
+          objectMode: true,
+          write(chunk, _, callback) {
+            output = chunk;
+            callback();
+          },
+        });
+      }
+      return null;
+    };
+
+    const doc = `
+version: 1.0
+stream:
+  - fu
+  - url
+  - write
+`;
+
+    await new Promise((success, err) => {
+      compose(doc, { factory }).on("finish", success).on("error", err);
     });
 
-    const write = new Writable({
-      objectMode: true,
-      write(chunk, encoding, callback) {
-        records.push(chunk);
-        callback();
-      },
-    });
-
-    await new Promise((success) => {
-      read
-        .pipe(
-          createMapSelectorTransformStream({
-            mapping: {
-              fubar: {
-                selector: ["not-here", "foo"],
-                transform: [
-                  {
-                    type: "url",
-                  },
-                ],
-              },
-            },
-            context: { compose: createCompose() },
-          })
-        )
-        .pipe(write)
-        .on("finish", success);
-    });
-
-    expect(records).toMatchObject([{ fubar: "http://alpaca.travel" }]);
+    expect(output).toBe("http://fubar.com");
   });
 });
