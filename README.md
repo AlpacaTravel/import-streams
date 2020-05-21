@@ -40,7 +40,6 @@ Features:
 
 ```javascript
 import compose from "@alpaca-travel/import-streams";
-import fs from "fs";
 
 // Example import configuration using import-streams
 // You can use YAML, JSON or use exported typescript types
@@ -86,7 +85,7 @@ streams:
           selector: relationships.field_types
           transform:
           # Leverage pre-existing transforms offered to map data
-          - type: drupal.field-types.entity-reference
+          - type: drupal.field-types.json-api.entity-reference
             options:
               iterate: true
               mapping:
