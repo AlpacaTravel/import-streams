@@ -8,7 +8,7 @@ A set of libraries ot assist import related tasks, assisting importing (or expor
 
 Features:
 
-- Define complete bespoke imports (or any other complex stream pipelines) entirely with YAML
+- Define complete bespoke imports (or any other complex stream pipelines) entirely with YAML/JSON
 - Flexibility with prewritten capabilities and easy mapping syntax
 - Read sources include JSON:API, which comes as a core module in Drupal v8 (and as an extension module to v9)
 - Can process various field types, entity references and process image types
@@ -43,6 +43,7 @@ import compose from "@alpaca-travel/import-streams";
 import fs from "fs";
 
 // Example import configuration using import-streams
+// You can use YAML, JSON or use exported typescript types
 const yaml = `
 version: 1.0
 streams:
