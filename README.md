@@ -8,6 +8,8 @@ A set of libraries ot assist import related tasks, assisting importing (or expor
 
 Features:
 
+- Define complete bespoke imports (or any other complex stream pipelines) entirely with YAML
+- Flexibility with prewritten capabilities and easy mapping syntax
 - Read sources include JSON:API, which comes as a core module in Drupal v8 (and as an extension module to v9)
 - Can process various field types, entity references and process image types
 - Can sync from one or more sources into a one or more output destinations, such as the Alpaca Collections
@@ -120,5 +122,7 @@ const factory = ({ type, options }) => {
 };
 
 // Compose a stream based on a struct
-const stream = compose(struct, { factory });
+const stream = compose(struct, { factory }).on("finish", () =>
+  console.log("Complete!")
+);
 ```
