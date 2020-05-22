@@ -1,7 +1,7 @@
 import nock from "nock";
-import resolveHttpRequest, {
-  ResolveHttpRequest,
-} from "../../../src/transform/resolve-http-request";
+import resolveFetchObject, {
+  ResolveFetchObjectOptions,
+} from "../../../src/transform/resolve-fetch-object";
 import { createCompose } from "../../../src/index";
 
 const compose = createCompose();
@@ -23,7 +23,7 @@ describe("Ressolve HTTP Request", () => {
         ["Content-Type", "application/json"]
       );
 
-    const options: ResolveHttpRequest = {
+    const options: ResolveFetchObjectOptions = {
       context,
       mapping: {
         fubar: "foo",
@@ -33,7 +33,7 @@ describe("Ressolve HTTP Request", () => {
         iterate: true,
       },
     };
-    const result = await resolveHttpRequest(
+    const result = await resolveFetchObject(
       "https://www.example.com/records",
       options
     );

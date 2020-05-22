@@ -2,7 +2,7 @@ import compose, {
   createCompose,
   transforms,
   createJourneyReadStream,
-  createHttpRequestReadStream,
+  createFetchObjectStream,
   createSyncExternalItemsWriteStream,
   createJsonApiDataReadStream,
   createMapSelectorTransformStream,
@@ -20,7 +20,7 @@ describe("module", () => {
     expect(typeof createCompose).toBe("function");
     expect(typeof createSyncExternalItemsWriteStream).toBe("function");
     expect(typeof createJsonApiDataReadStream).toBe("function");
-    expect(typeof createHttpRequestReadStream).toBe("function");
+    expect(typeof createFetchObjectStream).toBe("function");
     expect(typeof createJourneyReadStream).toBe("function");
     expect(typeof createMapSelectorTransformStream).toBe("function");
     expect(typeof transforms).toBe("object");
@@ -37,7 +37,7 @@ describe("module", () => {
     expect(typeof exportedTransforms["map-selector"]).toBe("function");
     expect(typeof exportedTransforms.number).toBe("function");
     expect(typeof exportedTransforms.concat).toBe("function");
-    expect(typeof exportedTransforms["resolve-http-request"]).toBe("function");
+    expect(typeof exportedTransforms["resolve-fetch-object"]).toBe("function");
     expect(typeof exportedTransforms["resolve-journey"]).toBe("function");
     expect(typeof exportedTransforms["json-stringify"]).toBe("function");
     expect(typeof exportedTransforms["console"]).toBe("function");

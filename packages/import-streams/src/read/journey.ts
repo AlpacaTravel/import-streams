@@ -47,9 +47,13 @@ export default class Journey extends Readable {
     // Source the records
     let current;
     while ((current = urls.pop())) {
-      const { data: query }: { data: JourneyJsonEnvelope } = await network.get(
-        current
-      );
+      const query: JourneyJsonEnvelope = await network.objectRead(current, {
+        method: "get",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
 
       const { journey } = query;
       yield journey;

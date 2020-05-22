@@ -22,7 +22,7 @@ interface JsonApiOptions {
   limit?: number;
 }
 
-export default class JsonApiDataReadable extends Readable {
+export default class JsonApiDataReadable<T> extends Readable {
   private href: string;
   private generator: any;
   private limit: number;
@@ -42,15 +42,12 @@ export default class JsonApiDataReadable extends Readable {
     let url = this.href;
 
     while (true) {
-      const { data: query }: { data: JsonApiEnvelope } = await network.get(
-        url,
-        {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-          },
-        }
-      );
+      const query: JsonApiEnvelope = await network.objectRead(url, {
+        headers: {
+          Accept: "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+        },
+      });
 
       if (Array.isArray(query.data)) {
         for (let value of query.data) {
@@ -85,7 +82,10 @@ export default class JsonApiDataReadable extends Readable {
 
     (async () => {
       try {
-        const { value, done } = await generator.next();
+        const {
+          value,
+          done,
+        }: { value: T; done: boolean } = await generator.next();
         if (value) {
           this.push(value);
           this.count += 1;
@@ -94,15 +94,12 @@ export default class JsonApiDataReadable extends Readable {
           this.push(null);
         }
       } catch (e) {
-        console.error(e.message);
         this.destroy(e);
       }
     })();
   }
 }
 
-export const createReadStream = (href: string, options?: JsonApiOptions) => {
-  const api = new JsonApiDataReadable(href, options);
-
-  return api;
-};
+export function createReadStream<T>(href: string, options?: JsonApiOptions) {
+  return new JsonApiDataReadable<T>(href, options);
+}

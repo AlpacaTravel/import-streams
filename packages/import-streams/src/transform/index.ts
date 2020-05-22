@@ -15,7 +15,7 @@ import truncate from "./truncate";
 import concat from "./concat";
 import console from "./console";
 import stringify from "./json-stringify";
-import resolveHttpRequest from "./resolve-http-request";
+import resolveFetchObject from "./resolve-fetch-object";
 
 import jsonApi from "./json-api";
 import drupal from "./drupal";
@@ -38,7 +38,7 @@ Object.assign(transforms, {
   flatten,
   "html-prettier": htmlPrettier,
   "html-sanitize": htmlSanitize,
-  ["resolve-http-request"]: resolveHttpRequest,
+  ["resolve-fetch-object"]: resolveFetchObject,
   ["resolve-journey"]: resolveJourney,
   number,
   truncate,

@@ -7,7 +7,7 @@ export interface Headers {
   [str: string]: any;
 }
 
-export interface HttpRequestOptions {
+export interface FetchObjectOptions {
   method?: string;
   limit?: number;
   headers?: Headers;
@@ -16,14 +16,7 @@ export interface HttpRequestOptions {
   data?: any;
 }
 
-const isFunction = (fn: any): fn is Function => {
-  if (typeof fn === "function") {
-    return true;
-  }
-  return false;
-};
-
-export default class HttpRequest extends Readable {
+export default class FetchObject<T> extends Readable {
   private urls: string[];
   private generator: any;
   private limit: number;
@@ -32,9 +25,9 @@ export default class HttpRequest extends Readable {
   private path?: string;
   private headers: Headers;
   private iterate: boolean;
-  private data: boolean;
+  private data: any;
 
-  constructor(urls: string | string[], options?: HttpRequestOptions) {
+  constructor(urls: string | string[], options?: FetchObjectOptions) {
     super({ objectMode: true });
 
     const processedUrls = Array.isArray(urls) ? urls : [urls];
@@ -64,29 +57,25 @@ export default class HttpRequest extends Readable {
 
   async *getRecordsGenerator() {
     const urls = this.urls.map((url) => url);
-    const method = this.method != null ? this.method : "get";
-
-    // Build headers
-    const httpOptions = {
-      headers: this.headers,
+    const headers = {
+      Accept: "application/json",
+      ["Content-Type"]: "application/json",
     };
 
-    // Attach data
-    const data = this.data || null;
-
     const callable = (url: string) => {
-      const fn = network[method.toLocaleLowerCase()];
-      assert(isFunction(fn), "Method does not exist");
-      if (["get"].indexOf(method) > -1) {
-        return fn(url, httpOptions);
-      }
-      return fn(url, data, httpOptions);
+      const opts = {
+        headers: Object.assign({}, headers, this.headers),
+        method: this.method,
+        data: this.data,
+      };
+
+      return network.objectRead<any>(url, opts);
     };
 
     // Source the records
     let current;
     while ((current = urls.pop())) {
-      const { data: query }: { data: any } = await callable(current);
+      const query = await callable(current);
 
       // Peel off a section
       let result = query;
@@ -116,7 +105,10 @@ export default class HttpRequest extends Readable {
 
     (async () => {
       try {
-        const { value, done } = await generator.next();
+        const {
+          value,
+          done,
+        }: { value: T; done: boolean } = await generator.next();
         if (value) {
           this.push(value);
           this.count += 1;
@@ -125,18 +117,16 @@ export default class HttpRequest extends Readable {
           this.push(null);
         }
       } catch (e) {
-        console.error(e.message);
+        console.error(e);
         this.destroy(e);
       }
     })();
   }
 }
 
-export const createReadStream = (
+export function createReadStream<T>(
   urls: string | string[],
-  options?: HttpRequestOptions
-) => {
-  const api = new HttpRequest(urls, options);
-
-  return api;
-};
+  options?: FetchObjectOptions
+) {
+  return new FetchObject<T>(urls, options);
+}

@@ -18,14 +18,14 @@ import { createTransformStream as createMapSelectorTransformStream } from "./tra
 import { createWriteStream as createSyncExternalItemsWriteStream } from "./write/sync-external-items";
 import { createReadStream as createJourneyReadStream } from "./read/journey";
 import {
-  createReadStream as createHttpRequestReadStream,
+  createReadStream as createFetchObjectStream,
   Headers,
-} from "./read/http-request";
+} from "./read/fetch-object";
 
 export {
   // Read Streams
   createJsonApiDataReadStream,
-  createHttpRequestReadStream,
+  createFetchObjectStream,
   createJourneyReadStream,
   // Transform Streams
   transforms,
@@ -62,7 +62,7 @@ export interface JsonApiDataOptions extends StreamFactoryOptions {
   limit?: number;
 }
 
-export interface HttpRequestOptions extends StreamFactoryOptions {
+export interface FetchObjectOptions extends StreamFactoryOptions {
   url: string | string[];
   method?: string;
   limit?: number;
@@ -88,9 +88,9 @@ const isJsonApiDataOptions = (
   return false;
 };
 
-const isHttpRequestOptions = (
+const isFetchObjectOptions = (
   options?: StreamFactoryOptions
-): options is HttpRequestOptions => {
+): options is FetchObjectOptions => {
   if (!options) {
     return false;
   }
@@ -161,15 +161,15 @@ export const createCompose = (options?: Options) => {
         );
       }
 
-      case "http-request": {
-        if (isHttpRequestOptions(stream.options)) {
+      case "fetch-object": {
+        if (isFetchObjectOptions(stream.options)) {
           assert(
             stream.options.url,
             "Missing the URL for the HttpRequest stream"
           );
 
           // Create the read stream
-          return createHttpRequestReadStream(stream.options.url, {
+          return createFetchObjectStream(stream.options.url, {
             limit: stream.options.limit,
             method: stream.options.method,
             path: stream.options.path,
@@ -178,6 +178,8 @@ export const createCompose = (options?: Options) => {
           });
         }
       }
+
+      case "fetch-stream":
 
       case "journey": {
         if (isJourneyOptions(stream.options)) {

@@ -1,8 +1,8 @@
 import { TransformFunction, TransformOptions, Callback } from "../types";
 import {
-  createReadStream as createHttpRequestsReadStream,
-  HttpRequestOptions,
-} from "../read/http-request";
+  createReadStream as createFetchObjectReadStream,
+  FetchObjectOptions,
+} from "../read/fetch-object";
 import { Writable } from "readable-stream";
 import {
   createTransformStream as createMapSelectorTransformStream,
@@ -11,21 +11,21 @@ import {
 } from "./map-selector";
 import assert from "assert";
 
-export interface ResolveHttpRequest extends TransformOptions {
+export interface ResolveFetchObjectOptions extends TransformOptions {
   includeRouteGeometry?: boolean;
   iterate?: boolean;
   mapping?: Mapping;
   method?: string;
   url?: string;
-  request?: HttpRequestOptions;
+  request?: FetchObjectOptions;
 }
 
-const resolveHttpRequest: TransformFunction<
+const resolveFetchObject: TransformFunction<
   Promise<any | undefined>,
-  ResolveHttpRequest
+  ResolveFetchObjectOptions
 > = async (
   value: any,
-  options: ResolveHttpRequest
+  options: ResolveFetchObjectOptions
 ): Promise<any | undefined> => {
   try {
     const records: any[] = [];
@@ -38,7 +38,7 @@ const resolveHttpRequest: TransformFunction<
       assert(urls, "Missing a url");
 
       // Build the subcall
-      const httpRequestOptions: HttpRequestOptions = Object.assign(
+      const httpRequestOptions: FetchObjectOptions = Object.assign(
         {},
         options.request
       );
@@ -46,7 +46,7 @@ const resolveHttpRequest: TransformFunction<
         httpRequestOptions.data = value;
       }
 
-      const readStream = createHttpRequestsReadStream(urls, httpRequestOptions);
+      const readStream = createFetchObjectReadStream(urls, httpRequestOptions);
       const collatorStream = new Writable({
         objectMode: true,
         write(response: any, _: string, callback: Callback) {
@@ -87,4 +87,4 @@ const resolveHttpRequest: TransformFunction<
   }
 };
 
-export default resolveHttpRequest;
+export default resolveFetchObject;

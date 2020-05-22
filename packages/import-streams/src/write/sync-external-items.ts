@@ -146,7 +146,16 @@ class SyncExternalItems extends Writable {
             }
 
             const url = `https://withalpaca.com/api/v2/${merged.$id}/publish?accessToken=${this.apiKey}`;
-            await network.put(url, merged);
+
+            const httpOptions = {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              method: "put",
+              data: JSON.stringify(merged),
+            };
+
+            await network.write(url, httpOptions);
           } else {
             // We can ignore the record here.
           }
@@ -170,7 +179,16 @@ class SyncExternalItems extends Writable {
 
           // If no, just push
           const url = `https://withalpaca.com/api/v2/item?accessToken=${this.apiKey}`;
-          await network.post(url, this.getItemForTransport(merged));
+
+          const httpOptions = {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            method: "post",
+            data: JSON.stringify(this.getItemForTransport(merged)),
+          };
+
+          await network.write(url, httpOptions);
         }
 
         callback();
@@ -228,7 +246,15 @@ class SyncExternalItems extends Writable {
           );
 
           const url = `https://withalpaca.com/api/v2/${merged.$id}/publish?accessToken=${this.apiKey}`;
-          await network.put(url, merged);
+          const httpOptions = {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            method: "put",
+            data: JSON.stringify(merged),
+          };
+
+          await network.write(url, httpOptions);
         });
 
         await Promise.all(removeTasks);
@@ -253,9 +279,16 @@ class SyncExternalItems extends Writable {
       const limit = 100;
       let offset = 0;
       let href = `https://withalpaca.com/api/v2/item?collection=${this.collection}&profile=${this.profile}&limit=${limit}&offset=${offset}&accessToken=${this.apiKey}`;
+      const httpOptions = {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        method: "get",
+      };
       while (true && recordSyncs.length < totalItems) {
         href = href.replace(/offset=[\d]+/, `offset=${offset}`);
-        const { data } = await network.get(href);
+        const data: any = await network.objectRead(href, httpOptions);
         // Exit
         if (
           !data ||
@@ -326,7 +359,14 @@ class SyncExternalItems extends Writable {
     const { id } = origin;
 
     const url = `https://withalpaca.com/api/v2/${id}?accessToken=${this.apiKey}`;
-    const { data } = await network.get(url);
+    const httpOptions = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "get",
+    };
+    const data = await network.objectRead(url, httpOptions);
     if (!data) {
       throw new Error(`Record ${id} no longer exists`);
     }
