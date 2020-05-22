@@ -1,4 +1,4 @@
-import { TransformFunctions } from "../../../types";
+import { TransformReferences } from "../../../types";
 import boolean from "./boolean";
 import email from "./email";
 import addressField from "./address-field";
@@ -11,7 +11,7 @@ import jsonApi from "./json-api";
 
 import { packageTransforms } from "../../../packaging";
 
-const packages: TransformFunctions = {
+const packages: TransformReferences = {
   boolean,
   "address-field": addressField,
   email,

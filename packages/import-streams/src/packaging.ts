@@ -1,16 +1,12 @@
-import { TransformFunction } from "./types";
-
-interface PackagedTranforms {
-  [key: string]: TransformFunction<any, any>;
-}
+import { TransformFunction, TransformReferences } from "./types";
 
 export const packageTransforms = (
-  suppliedPackage: PackagedTranforms,
+  suppliedPackage: TransformReferences,
   prefix?: string
-): PackagedTranforms =>
+): TransformReferences =>
   (() =>
     Object.keys(suppliedPackage).reduce(
-      (c: PackagedTranforms, packageExport: string) =>
+      (c: TransformReferences, packageExport: string) =>
         Object.assign({}, c, {
           [prefix
             ? `${prefix}.${packageExport}`

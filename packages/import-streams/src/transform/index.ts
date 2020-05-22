@@ -1,5 +1,4 @@
-import { TransformFunctions } from "../types";
-// import transform from "./transform";
+import { TransformReferences } from "../types";
 import selector from "./selector";
 import mapSelector from "./map-selector";
 import url from "./url";
@@ -13,17 +12,24 @@ import position from "./position";
 import replace from "./replace";
 import text from "./text";
 import truncate from "./truncate";
+import concat from "./concat";
+import console from "./console";
+import stringify from "./json-stringify";
+import resolveHttpRequest from "./resolve-http-request";
 
 import jsonApi from "./json-api";
 import drupal from "./drupal";
 
 import { packageTransforms } from "../packaging";
+import resolveJourney from "./resolve-journey";
 
-const transforms: TransformFunctions = {};
+const transforms: TransformReferences = {};
 
 // Defaults
 Object.assign(transforms, {
-  // transform,
+  concat,
+  console,
+  "json-stringify": stringify,
   selector,
   "map-selector": mapSelector,
   url,
@@ -32,6 +38,8 @@ Object.assign(transforms, {
   flatten,
   "html-prettier": htmlPrettier,
   "html-sanitize": htmlSanitize,
+  ["resolve-http-request"]: resolveHttpRequest,
+  ["resolve-journey"]: resolveJourney,
   number,
   truncate,
   position,

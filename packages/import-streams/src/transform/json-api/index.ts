@@ -1,8 +1,8 @@
-import { TransformFunctions } from "../../types";
+import { TransformReferences } from "../../types";
 
 import resolveMapSelector from "./resolve-map-selector";
 
-const packages: TransformFunctions = {
+const packages: TransformReferences = {
   "resolve-map-selector": resolveMapSelector,
 };
 

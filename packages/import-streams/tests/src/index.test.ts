@@ -1,11 +1,13 @@
 import compose, {
   createCompose,
   transforms,
+  createJourneyReadStream,
+  createHttpRequestReadStream,
   createSyncExternalItemsWriteStream,
   createJsonApiDataReadStream,
   createMapSelectorTransformStream,
 } from "../../src/index";
-import { TransformFunctions } from "../../src/types";
+import { TransformReferences } from "../../src/types";
 import { Readable, Writable } from "readable-stream";
 import {
   StreamFactory,
@@ -18,13 +20,15 @@ describe("module", () => {
     expect(typeof createCompose).toBe("function");
     expect(typeof createSyncExternalItemsWriteStream).toBe("function");
     expect(typeof createJsonApiDataReadStream).toBe("function");
+    expect(typeof createHttpRequestReadStream).toBe("function");
+    expect(typeof createJourneyReadStream).toBe("function");
     expect(typeof createMapSelectorTransformStream).toBe("function");
     expect(typeof transforms).toBe("object");
   });
 
   test("exports for transforms", () => {
     // Should export required functions
-    const exportedTransforms: TransformFunctions = transforms;
+    const exportedTransforms: TransformReferences = transforms;
     expect(typeof exportedTransforms.boolean).toBe("function");
     expect(typeof exportedTransforms.date).toBe("function");
     expect(typeof exportedTransforms.flatten).toBe("function");
@@ -32,6 +36,11 @@ describe("module", () => {
     expect(typeof exportedTransforms["html-sanitize"]).toBe("function");
     expect(typeof exportedTransforms["map-selector"]).toBe("function");
     expect(typeof exportedTransforms.number).toBe("function");
+    expect(typeof exportedTransforms.concat).toBe("function");
+    expect(typeof exportedTransforms["resolve-http-request"]).toBe("function");
+    expect(typeof exportedTransforms["resolve-journey"]).toBe("function");
+    expect(typeof exportedTransforms["json-stringify"]).toBe("function");
+    expect(typeof exportedTransforms["console"]).toBe("function");
     expect(typeof exportedTransforms.position).toBe("function");
     expect(typeof exportedTransforms.replace).toBe("function");
     expect(typeof exportedTransforms.selector).toBe("function");
@@ -80,6 +89,16 @@ describe("module", () => {
     }: {
       type: string;
     }): SupportedStream | null | undefined => {
+      if (type === "fus") {
+        return new Readable({
+          objectMode: true,
+          read() {
+            this.push("fubar.com");
+            this.push("fubar.com");
+            this.push(null);
+          },
+        });
+      }
       if (type === "fu") {
         return new Readable({
           objectMode: true,
@@ -90,6 +109,7 @@ describe("module", () => {
         });
       }
       if (type === "write") {
+        output = null;
         return new Writable({
           objectMode: true,
           write(chunk, _, callback) {
@@ -101,7 +121,7 @@ describe("module", () => {
       return null;
     };
 
-    const doc = `
+    const doc1 = `
 version: 1.0
 stream:
   - fu
@@ -110,9 +130,24 @@ stream:
 `;
 
     await new Promise((success, err) => {
-      compose(doc, { factory }).on("finish", success).on("error", err);
+      compose(doc1, { factory }).on("finish", success).on("error", err);
     });
 
     expect(output).toBe("http://fubar.com");
+
+    const doc2 = `
+version: 1.0
+stream:
+  - fus
+  - url
+  - concat
+  - write
+`;
+
+    await new Promise((success, err) => {
+      compose(doc2, { factory }).on("finish", success).on("error", err);
+    });
+
+    expect(output).toMatchObject(["http://fubar.com", "http://fubar.com"]);
   });
 });

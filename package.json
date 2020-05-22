@@ -16,5 +16,6 @@
     "coveralls": "^3.1.0",
     "istanbul": "^0.4.5",
     "lerna": "^3.18.3"
-  }
+  },
+  "dependencies": {}
 }

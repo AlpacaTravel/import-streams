@@ -11,14 +11,22 @@ import assert from "assert";
 import { Transform } from "readable-stream";
 import YAML from "yaml";
 
+import { isTransformFunction, isTransformSupportingContext } from "./types";
 import transforms from "./transform/index";
 import { createReadStream as createJsonApiDataReadStream } from "./read/json-api-data";
 import { createTransformStream as createMapSelectorTransformStream } from "./transform/map-selector";
 import { createWriteStream as createSyncExternalItemsWriteStream } from "./write/sync-external-items";
+import { createReadStream as createJourneyReadStream } from "./read/journey";
+import {
+  createReadStream as createHttpRequestReadStream,
+  Headers,
+} from "./read/http-request";
 
 export {
   // Read Streams
   createJsonApiDataReadStream,
+  createHttpRequestReadStream,
+  createJourneyReadStream,
   // Transform Streams
   transforms,
   createMapSelectorTransformStream,
@@ -49,8 +57,22 @@ interface Options {
   factory?: StreamFactory;
 }
 
-interface JsonApiDataOptions extends StreamFactoryOptions {
+export interface JsonApiDataOptions extends StreamFactoryOptions {
   url: string;
+  limit?: number;
+}
+
+export interface HttpRequestOptions extends StreamFactoryOptions {
+  url: string | string[];
+  method?: string;
+  limit?: number;
+  iterate?: boolean;
+  path?: string;
+  headers: Headers;
+}
+
+export interface JourneyOptions extends StreamFactoryOptions {
+  id: string | string[];
   limit?: number;
 }
 
@@ -61,6 +83,30 @@ const isJsonApiDataOptions = (
     return false;
   }
   if ("url" in options) {
+    return true;
+  }
+  return false;
+};
+
+const isHttpRequestOptions = (
+  options?: StreamFactoryOptions
+): options is HttpRequestOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("url" in options) {
+    return true;
+  }
+  return false;
+};
+
+const isJourneyOptions = (
+  options?: StreamFactoryOptions
+): options is JourneyOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("id" in options) {
     return true;
   }
   return false;
@@ -102,7 +148,7 @@ export const createCompose = (options?: Options) => {
         if (isJsonApiDataOptions(stream.options)) {
           assert(
             stream.options.url,
-            "Missing the URL for the JsonApiData service"
+            "Missing the URL for the JsonApiData stream"
           );
 
           // Create the read stream
@@ -113,6 +159,35 @@ export const createCompose = (options?: Options) => {
         throw new Error(
           "Missing the configuration for JsonApiData options, should have: url"
         );
+      }
+
+      case "http-request": {
+        if (isHttpRequestOptions(stream.options)) {
+          assert(
+            stream.options.url,
+            "Missing the URL for the HttpRequest stream"
+          );
+
+          // Create the read stream
+          return createHttpRequestReadStream(stream.options.url, {
+            limit: stream.options.limit,
+            method: stream.options.method,
+            path: stream.options.path,
+            headers: stream.options.headers,
+            iterate: stream.options.iterate,
+          });
+        }
+      }
+
+      case "journey": {
+        if (isJourneyOptions(stream.options)) {
+          assert(stream.options.id, "Missing the ID for the journey stream");
+
+          // Create the read stream
+          return createJourneyReadStream(stream.options.id, {
+            limit: stream.options.limit,
+          });
+        }
       }
 
       case "sync-external-items": {
@@ -142,44 +217,51 @@ export const createCompose = (options?: Options) => {
         if (stream.type in transforms) {
           const transform = transforms[stream.type];
 
-          // Create a transform
-          return new Transform({
-            objectMode: true,
-
-            transform(value: any, _, callback: Callback) {
-              (async () => {
-                try {
-                  // Interleave a context into the object
-                  const interleavedContext = {
-                    context: {
-                      compose: composeWithOptions,
-                    },
-                  };
-
-                  // Options
-                  const transformOptions = Object.assign(
-                    {},
-                    interleavedContext,
-                    stream.options
-                  );
-
-                  // Transform the value
-                  const transformedValue = await transform(
-                    value,
-                    transformOptions
-                  );
-
-                  this.push(transformedValue);
-
-                  // Return the value
-                  callback();
-                } catch (e) {
-                  // Capture the error
-                  callback(e);
-                }
-              })();
+          // Interleave a context into the object
+          const interleavedContext = {
+            context: {
+              compose: composeWithOptions,
             },
-          });
+          };
+
+          // Options
+          const transformOptions = Object.assign(
+            {},
+            interleavedContext,
+            stream.options
+          );
+
+          if (isTransformSupportingContext(transform)) {
+            return new transform(transformOptions);
+          } else {
+            // A Class that returns a Transform, supporting the options through constructor
+            if (isTransformFunction(transform)) {
+              // Create a transform wrapper
+              return new Transform({
+                objectMode: true,
+
+                transform(value: any, _, callback: Callback) {
+                  (async () => {
+                    try {
+                      // Transform the value
+
+                      const transformedValue = await transform(
+                        value,
+                        transformOptions
+                      );
+                      this.push(transformedValue);
+
+                      // Return the value
+                      callback();
+                    } catch (e) {
+                      // Capture the error
+                      callback(e);
+                    }
+                  })();
+                },
+              });
+            }
+          }
         }
 
         break;

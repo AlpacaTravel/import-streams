@@ -1,6 +1,6 @@
 import assert from "assert";
 import { Writable } from "readable-stream";
-import { TransformFunction, TransformOptions } from "../../types";
+import { TransformFunction, TransformOptions, Callback } from "../../types";
 import {
   createTransformStream as createMapSelectorTransformStream,
   MapSelectorOptions,
@@ -28,8 +28,6 @@ export interface ResolveMapSelectorOptions extends TransformOptions {
   limit?: number;
   mapping?: Mapping;
 }
-
-type Callback = (error?: Error, data?: any) => undefined;
 
 const resolveMapSelector: TransformFunction<
   Promise<any | undefined>,
@@ -113,10 +111,8 @@ const resolveMapSelector: TransformFunction<
 
     return records;
   } catch (e) {
-    console.error(e);
+    throw e;
   }
-
-  return undefined;
 };
 
 export default resolveMapSelector;

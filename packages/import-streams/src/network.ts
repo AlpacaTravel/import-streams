@@ -28,7 +28,11 @@ const write = rateLimit(
     : { maxRequests: 50, perMilliseconds: 20 }
 );
 
-export default {
+interface NetworkMethods {
+  [fn: string]: any;
+}
+
+const methods: NetworkMethods = {
   // Read concurrency
   get: (url: string, options?: any) => read.get(url, options),
   options: (url: string, options?: any) => read.options(url, options),
@@ -41,3 +45,5 @@ export default {
     write.patch(url, data, options),
   delete: (url: string, options: any) => write.delete(url, options),
 };
+
+export default methods;
