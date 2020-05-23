@@ -57,7 +57,7 @@ Features:
 import compose from "@alpaca-travel/import-streams";
 
 // Using YAML, but can use JSON etc.
-const yaml = `
+const definition = /* YAML */ `
 # Example of syncing places from a CSV file
 version: 1.0
 streams:
@@ -141,7 +141,7 @@ const factory = ({ type, options }) => {
 };
 
 // Compose a stream based on a struct
-const stream = compose(struct, { factory }).on("finish", () =>
+const stream = compose(definition, { factory }).on("finish", () =>
   console.log("Complete!")
 );
 ```
@@ -155,7 +155,7 @@ import compose from "@alpaca-travel/import-streams";
 
 // Example import configuration using import-streams
 // You can use YAML, JSON or use exported typescript types
-const yaml = `
+const definition = /* YAML */ `
 # Example of syncing records from a Drupal site with the JSON:API core module enabled
 # This can support all types of entities and media based on the already available drupal field-types
 version: 1.0
@@ -236,7 +236,7 @@ const factory = ({ type, options }) => {
 };
 
 // Compose a stream based on a struct
-const stream = compose(struct, { factory }).on("finish", () =>
+const stream = compose(definition, { factory }).on("finish", () =>
   console.log("Complete!")
 );
 ```
