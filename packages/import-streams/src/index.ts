@@ -9,6 +9,7 @@ import compose, {
 } from "@alpaca-travel/import-streams-compose";
 import assert from "assert";
 import { Transform } from "readable-stream";
+import parse from "csv-parse";
 import YAML from "yaml";
 
 import { isTransformFunction, isTransformSupportingContext } from "./types";
@@ -21,6 +22,7 @@ import {
   createReadStream as createFetchObjectStream,
   Headers,
 } from "./read/fetch-object";
+import createFetchStream from "./read/fetch-stream";
 
 export {
   // Read Streams
@@ -68,7 +70,13 @@ export interface FetchObjectOptions extends StreamFactoryOptions {
   limit?: number;
   iterate?: boolean;
   path?: string;
-  headers: Headers;
+  headers?: Headers;
+}
+
+export interface FetchStreamOptions extends StreamFactoryOptions {
+  url: string;
+  headers?: Headers;
+  method?: string;
 }
 
 export interface JourneyOptions extends StreamFactoryOptions {
@@ -100,6 +108,17 @@ const isFetchObjectOptions = (
   return false;
 };
 
+const isFetchStreamOptions = (
+  options?: StreamFactoryOptions
+): options is FetchStreamOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("url" in options) {
+    return true;
+  }
+  return false;
+};
 const isJourneyOptions = (
   options?: StreamFactoryOptions
 ): options is JourneyOptions => {
@@ -163,10 +182,7 @@ export const createCompose = (options?: Options) => {
 
       case "fetch-object": {
         if (isFetchObjectOptions(stream.options)) {
-          assert(
-            stream.options.url,
-            "Missing the URL for the HttpRequest stream"
-          );
+          assert(stream.options.url, "Missing the URL for the stream");
 
           // Create the read stream
           return createFetchObjectStream(stream.options.url, {
@@ -179,7 +195,16 @@ export const createCompose = (options?: Options) => {
         }
       }
 
-      case "fetch-stream":
+      case "fetch-stream": {
+        if (isFetchStreamOptions(stream.options)) {
+          assert(stream.options.url, "Missing the URL for the stream");
+
+          return createFetchStream(stream.options.url, {
+            method: stream.options.method,
+            headers: stream.options.headers,
+          });
+        }
+      }
 
       case "journey": {
         if (isJourneyOptions(stream.options)) {
@@ -212,6 +237,10 @@ export const createCompose = (options?: Options) => {
         throw new Error(
           "Missing the configuration in SyncExternalItems options, should have: apiKey, collection and profile"
         );
+      }
+
+      case "csv-parse": {
+        return parse(stream.options);
       }
 
       default:

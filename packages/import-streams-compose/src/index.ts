@@ -1,11 +1,23 @@
 import { Writable, Readable, Transform, Stream } from "readable-stream";
+import {
+  Writable as NodeJSWritable,
+  Readable as NodeJSReadable,
+  Transform as NodeJSTransform,
+} from "stream";
 import MultiReadStream from "multistream";
 import MultiWriteStream from "multi-write-stream";
 import assert from "assert";
 
 export interface StreamFactoryOptions {}
 
-export type SupportedStream = Readable | Transform | Writable;
+export type SupportedStream =
+  | Readable
+  | Transform
+  | Writable
+  | Stream
+  | NodeJSReadable
+  | NodeJSTransform
+  | NodeJSWritable;
 
 export interface CombineStreamOptions {
   objectMode?: boolean;
@@ -65,7 +77,12 @@ const isWritable = (stream: any): stream is Writable => {
   if (typeof stream === "undefined") {
     return false;
   }
-  if (stream instanceof Writable || stream instanceof Transform) {
+  if (
+    stream instanceof Writable ||
+    stream instanceof Transform ||
+    stream instanceof NodeJSWritable ||
+    stream instanceof NodeJSTransform
+  ) {
     return true;
   }
   if (stream instanceof Stream && "writable" in stream) {
@@ -85,7 +102,12 @@ const isReadable = (stream: any): stream is Readable => {
   if (typeof stream === "undefined") {
     return false;
   }
-  if (stream instanceof Readable || stream instanceof Transform) {
+  if (
+    stream instanceof Readable ||
+    stream instanceof Transform ||
+    stream instanceof NodeJSReadable ||
+    stream instanceof NodeJSTransform
+  ) {
     return true;
   }
 
@@ -97,7 +119,10 @@ const isSupportedStream = (tbd: any): tbd is SupportedStream => {
     tbd instanceof Stream ||
     tbd instanceof Readable ||
     tbd instanceof Writable ||
-    tbd instanceof Transform
+    tbd instanceof Transform ||
+    tbd instanceof NodeJSReadable ||
+    tbd instanceof NodeJSTransform ||
+    tbd instanceof NodeJSWritable
   ) {
     return true;
   }

@@ -19,10 +19,7 @@ const write = new Bottleneck({
 type Fetch = (url: string, options: any) => Promise<any>;
 
 const stream = (source: Fetch) => {
-  function aStream(
-    url: string,
-    options: any
-  ): Promise<Readable | ReadableStream<Uint8Array> | null> {
+  function aStream(url: string, options: any): Promise<Readable> {
     return source(url, options).then((res) => {
       if (!res.ok) {
         throw new Error(res.statusText);

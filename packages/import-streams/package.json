@@ -38,6 +38,7 @@
     "@types/striptags": "^3.1.1",
     "assert": "^2.0.0",
     "bottleneck": "^2.19.5",
+    "csv-parse": "^4.10.1",
     "isomorphic-unfetch": "^3.0.0",
     "node-fetch": "^2.6.0",
     "prettier": "^2.0.5",

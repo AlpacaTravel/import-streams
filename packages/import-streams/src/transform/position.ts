@@ -2,6 +2,7 @@ import { TransformFunction, TransformOptions } from "../types";
 
 export interface PositionOptions extends TransformOptions {
   flip?: boolean;
+  delimiter?: string;
 }
 
 const position: TransformFunction<
@@ -13,7 +14,7 @@ const position: TransformFunction<
 ): Promise<Array<number> | undefined> => {
   // Support a split (long,lat)
   if (typeof value === "string") {
-    const [_1, _2] = value.split(",");
+    const [_1, _2] = value.split((options && options.delimiter) || ",");
 
     // If the string is (lat, long), flip
     if (options && typeof options.flip === "boolean" && options.flip) {

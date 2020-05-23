@@ -3,6 +3,7 @@ import {
   SupportedStream,
 } from "@alpaca-travel/import-streams-compose";
 import { Transform as ReadableStreamTransform } from "readable-stream";
+import { Transform as NodeJSTransform } from "stream"; // Discussion here on required
 
 export type TransformFunction<U, B extends TransformFunctionOptions> = (
   value: any,
@@ -142,6 +143,7 @@ export const isTransformSupportingContext = (
   }
   if (
     tbd.prototype instanceof ReadableStreamTransform ||
+    tbd.prototype instanceof NodeJSTransform ||
     // Possibly not required, instanceof may test recursively?
     isTransformFunction(tbd.prototype)
   ) {
