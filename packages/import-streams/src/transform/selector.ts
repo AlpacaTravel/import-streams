@@ -1,16 +1,17 @@
+import assert from "assert";
 import { Readable, Writable, Transform, Stream } from "readable-stream";
 import {
   ComposableDefinition,
   SupportedStream,
 } from "@alpaca-travel/import-streams-compose";
 import { TransformFunction, TransformFunctionOptions } from "../types";
-import assert from "assert";
 import processSelector from "../selector";
+import { assertValidKeys } from "../assertions";
 
 type SelectorPath = string | Array<string>;
 
 export interface SelectorDefinition {
-  selector?: SelectorPath;
+  path?: SelectorPath;
   transform?: ComposableDefinition;
 }
 
@@ -52,7 +53,7 @@ const isWritable = (stream: any): stream is Writable => {
   title
 
   - title
-  - selector: 
+  - path: 
     - title
     - value
     transform: text
@@ -77,7 +78,7 @@ const selector: TransformFunction<Promise<any>, SelectorOptions> = async (
     (input: PathOrSelectorDefinition) => {
       if (typeof input === "string") {
         return {
-          selector: input,
+          path: input,
         };
       }
       if (Array.isArray(input)) {
@@ -86,15 +87,23 @@ const selector: TransformFunction<Promise<any>, SelectorOptions> = async (
           "All selector paths should be strings"
         );
         return {
-          selector: input,
+          path: input,
         };
       }
 
       assert(
-        typeof input.selector === "string" ||
-          (Array.isArray(input.selector) &&
-            input.selector.every((i) => typeof i === "string"),
-          "Selector not correctly shaped, should be { selector: string | [string], transform?: ... }")
+        typeof input.path === "string" ||
+          (Array.isArray(input.path) &&
+            input.path.every((i) => typeof i === "string"),
+          "Selector not correctly shaped, should be { path: string | [string], transform?: ... }")
+      );
+
+      assertValidKeys(
+        input,
+        ["path", "transform"],
+        `Ensure that the selector provided only contains the keys: [path:string|string[], transform:transform|transform[]]. Instead supplied keys: ${Object.keys(
+          input
+        )}`
       );
 
       return input;
@@ -111,9 +120,9 @@ const selector: TransformFunction<Promise<any>, SelectorOptions> = async (
 
       // Get a value using the path/or/selector with transform
       return (async () => {
-        const selectorsPaths = Array.isArray(selectorDefinition.selector)
-          ? selectorDefinition.selector
-          : [selectorDefinition.selector];
+        const selectorsPaths = Array.isArray(selectorDefinition.path)
+          ? selectorDefinition.path
+          : [selectorDefinition.path];
 
         // Search for the first selector path that returns a value, eventually returning undefined
         return selectorsPaths.reduce(async (prior, path) => {

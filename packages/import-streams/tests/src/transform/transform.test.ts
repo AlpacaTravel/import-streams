@@ -22,15 +22,15 @@ describe("transforms", () => {
           {
             mapping: {
               bool1: {
-                selector: "bool1",
+                path: "bool1",
                 transform: "boolean",
               },
               bool2: {
-                selector: "bool2",
+                path: "bool2",
                 transform: "boolean",
               },
               date: {
-                selector: "date",
+                path: "date",
                 transform: {
                   type: "date",
                   options: {

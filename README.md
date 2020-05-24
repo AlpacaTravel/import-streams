@@ -101,7 +101,7 @@ streams:
 
         # Obtain a lng/lat from the lng-lat column; e.g. "lng,lat" 
         position:
-          selector: coords
+          path: coords
           type: position
           options:
             # Depending if you use lng/lat or lat/lng
@@ -111,7 +111,7 @@ streams:
 
         # Syncing fields, this can be used only to update affected records
         modified:
-          selector: last_updated
+          path: last_updated
           type: date
         
         # Map a "custom://external-ref" to your ID to sync
@@ -119,7 +119,7 @@ streams:
 
         # Assign the source (Recommended to avoid ID conflicts)
         custom://external-source:
-          selector: .
+          path: .
           type: replace
           options:
             value: https://www.example.com
@@ -175,18 +175,18 @@ streams:
 
         # Parse basic types with transforms
         modified:
-          selector: attributes.changed
+          path: attributes.changed
           transform:
             - date
 
         # Parse more complex values with pre-established transforms
         position:
-          selector: attributes.lngLat
+          path: attributes.lngLat
           type: position
 
         # Parse through multiple streams
         description:
-          selector:
+          path:
             - attributes.description
             # support additional selectors with fall-over
           transform:
@@ -196,7 +196,7 @@ streams:
         
         # Support map/reduce on individual fields
         tags:
-          selector: relationships.field_types
+          path: relationships.field_types
           transform:
           # Leverage pre-existing transforms offered to map data
           - type: drupal.field-types.json-api.entity-reference
@@ -212,7 +212,7 @@ streams:
 
         # With more complex transforms
         custom://external-source:
-          selector: .
+          path: .
           transform:
             - type: replace
               options:

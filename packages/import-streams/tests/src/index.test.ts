@@ -212,29 +212,29 @@ stream:
     options:
       mapping:
         position:
-          selector: lngLat
+          path: lngLat
           transform: position
         html:
-          selector: html
+          path: html
           transform:
             - html-sanitize
             - html-prettier
         checked:
-          selector: isChecked
+          path: isChecked
           transform:
             - boolean
         count:
-          selector: count
+          path: count
           transform:
             - number
         value:
-          selector: .
+          path: .
           transform:
             - type: replace
               options:
                 value: replaced
         tag:
-          selector: tags
+          path: tags
           transform:
             - flatten
   - write
