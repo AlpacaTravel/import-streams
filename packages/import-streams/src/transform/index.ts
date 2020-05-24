@@ -16,6 +16,7 @@ import concat from "./concat";
 import console from "./console";
 import stringify from "./json-stringify";
 import resolveFetchObject from "./resolve-fetch-object";
+import base64Decode from "./base64-decode";
 
 import jsonApi from "./json-api";
 import drupal from "./drupal";
@@ -32,6 +33,7 @@ Object.assign(transforms, {
   "json-stringify": stringify,
   selector,
   "map-selector": mapSelector,
+  "base64-decode": base64Decode,
   url,
   boolean,
   date,
