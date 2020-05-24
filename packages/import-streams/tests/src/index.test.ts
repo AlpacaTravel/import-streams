@@ -15,6 +15,7 @@ import {
   StreamFactory,
   SupportedStream,
 } from "@alpaca-travel/import-streams-compose";
+import input from "../data/input.json";
 
 describe("module", () => {
   test("named exports", () => {
@@ -84,120 +85,94 @@ describe("module", () => {
     );
   });
 
-  test("use case example of a composed document", async () => {
-    let output = null;
-    const factory: StreamFactory = ({
-      type,
-    }: {
-      type: string;
-    }): SupportedStream | null | undefined => {
-      if (type === "fus") {
-        return new Readable({
-          objectMode: true,
-          read() {
-            this.push("fubar.com");
-            this.push("fubar.com");
-            this.push(null);
-          },
-        });
-      }
-      if (type === "fu") {
-        return new Readable({
-          objectMode: true,
-          read() {
-            this.push("fubar.com");
-            this.push(null);
-          },
-        });
-      }
-      if (type === "write") {
-        output = null;
-        return new Writable({
-          objectMode: true,
-          write(chunk, _, callback) {
-            output = chunk;
-            callback();
-          },
-        });
-      }
-      if (type === "append") {
-        output = [];
-        return new Writable({
-          objectMode: true,
-          write(chunk, _, callback) {
-            output.push(chunk);
-            callback();
-          },
-        });
-      }
-      return null;
+  test("simple single read/transform/write example", async () => {
+    let output: any = null;
+    const setOutput = (value: any) => {
+      output = value;
     };
+    const factory = getFactory(setOutput);
 
-    const doc1 = `
-version: 1.0
-stream:
-  - fu
-  - url
-  - write
-`;
+    const doc = `
+  version: 1.0
+  stream:
+    - fu
+    - url
+    - write
+  `;
 
     await new Promise((success, err) => {
-      compose(doc1, { factory }).on("finish", success).on("error", err);
+      compose(doc, { factory }).on("finish", success).on("error", err);
     });
 
     expect(output).toBe("http://fubar.com");
+  });
 
-    const doc2 = `
-version: 1.0
-stream:
-  - fus
-  - url
-  - concat
-  - write
-`;
+  test("simple multiple read/transform/write example", async () => {
+    let output: any = null;
+    const setOutput = (value: any) => {
+      output = value;
+    };
+    const factory = getFactory(setOutput);
+
+    const doc = `
+  version: 1.0
+  stream:
+    - fus
+    - url
+    - concat
+    - write
+  `;
 
     await new Promise((success, err) => {
-      compose(doc2, { factory }).on("finish", success).on("error", err);
+      compose(doc, { factory }).on("finish", success).on("error", err);
     });
 
     expect(output).toMatchObject(["http://fubar.com", "http://fubar.com"]);
+  });
+
+  test("network fetch stream with csv stream", async () => {
+    const output: any[] = [];
+    const setOutput = (value: any) => {
+      output.push(value);
+    };
+    const factory = getFactory(setOutput);
 
     const csv = `"Month", "1958", "1959", "1960"
-"JAN",  340,  360,  417
-"FEB",  318,  342,  391
-"MAR",  362,  406,  419
-"APR",  348,  396,  461
-"MAY",  363,  420,  472
-"JUN",  435,  472,  535
-"JUL",  491,  548,  622
-"AUG",  505,  559,  606
-"SEP",  404,  463,  508
-"OCT",  359,  407,  461
-"NOV",  310,  362,  390
-"DEC",  337,  405,  432`;
+  "JAN",  340,  360,  417
+  "FEB",  318,  342,  391
+  "MAR",  362,  406,  419
+  "APR",  348,  396,  461
+  "MAY",  363,  420,  472
+  "JUN",  435,  472,  535
+  "JUL",  491,  548,  622
+  "AUG",  505,  559,  606
+  "SEP",  404,  463,  508
+  "OCT",  359,  407,  461
+  "NOV",  310,  362,  390
+  "DEC",  337,  405,  432`;
 
     nock("https://www.example.com:443")
       .get("/example.csv")
       .reply(200, csv, ["Content-Type", "text/plain; charset=UTF-8"]);
 
-    const doc3 = `
-version: 1.0
-stream:
-  - type: fetch-stream
-    options:
-      url: https://www.example.com/example.csv
-  - type: csv-parse
-    options:
-      columns: true
-      quote: '"'
-      ltrim: true
-      rtrim: true
-      delimiter: ,
-  - append
-`;
+    const doc = `
+  version: 1.0
+  stream:
+    - type: fetch-stream
+      options:
+        url: https://www.example.com/example.csv
+    - type: csv-parse
+      options:
+        columns: true
+        quote: '"'
+        ltrim: true
+        rtrim: true
+        delimiter: ,
+    - write
+  `;
 
     await new Promise((success, err) => {
-      compose(doc3, { factory }).on("finish", success).on("error", err);
+      compose(doc, { factory }).on("finish", success).on("error", err);
     });
 
     expect(output).toMatchObject([
@@ -215,4 +190,109 @@ stream:
       { "1958": "337", "1959": "405", "1960": "432", Month: "DEC" },
     ]);
   });
+
+  test("Fetch object with basic transformations", async () => {
+    let output: any = null;
+    const setOutput = (value: any) => {
+      output = value;
+    };
+    const factory = getFactory(setOutput);
+
+    nock("https://www.example.com:443")
+      .get("/example.csv")
+      .reply(200, input, ["Content-Type", "application/json; charset=UTF-8"]);
+
+    const doc = `
+version: 1.0
+stream:
+  - type: fetch-object
+    options:
+      url: https://www.example.com/example.csv
+  - type: map-selector
+    options:
+      mapping:
+        position:
+          selector: lngLat
+          transform: position
+        html:
+          selector: html
+          transform:
+            - html-sanitize
+            - html-prettier
+        checked:
+          selector: isChecked
+          transform:
+            - boolean
+        count:
+          selector: count
+          transform:
+            - number
+        value:
+          selector: .
+          transform:
+            - type: replace
+              options:
+                value: replaced
+        tag:
+          selector: tags
+          transform:
+            - flatten
+  - write
+`;
+
+    await new Promise((success, err) => {
+      compose(doc, { factory }).on("finish", success).on("error", err);
+    });
+
+    expect(output).toMatchObject({
+      position: [123, 23],
+      count: 22,
+      checked: true,
+      value: "replaced",
+      tag: "eat",
+      html:
+        "<p>An <em>Extraordinary Formatting &amp; Statement</em> across poor html</p>\n",
+    });
+  });
 });
+
+type SetValue = (value: any) => void;
+
+const getFactory = (setOutput: SetValue): StreamFactory => {
+  const factory: StreamFactory = ({
+    type,
+  }: {
+    type: string;
+  }): SupportedStream | null | undefined => {
+    if (type === "fus") {
+      return new Readable({
+        objectMode: true,
+        read() {
+          this.push("fubar.com");
+          this.push("fubar.com");
+          this.push(null);
+        },
+      });
+    }
+    if (type === "fu") {
+      return new Readable({
+        objectMode: true,
+        read() {
+          this.push("fubar.com");
+          this.push(null);
+        },
+      });
+    }
+    if (type === "write") {
+      return new Writable({
+        objectMode: true,
+        write(chunk, _, callback) {
+          setOutput(chunk);
+          callback();
+        },
+      });
+    }
+    return null;
+  };
+  return factory;
+};
