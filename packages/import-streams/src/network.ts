@@ -20,12 +20,27 @@ type Fetch = (url: string, options: any) => Promise<any>;
 
 const stream = (source: Fetch) => {
   function aStream(url: string, options: any): Promise<Readable> {
-    return source(url, options).then((res) => {
-      if (!res.ok) {
-        throw new Error(res.statusText);
-      }
-      return res.body;
-    });
+    let timeout: any = null;
+    return Promise.race<Promise<Readable>>([
+      new Promise((resolve) => {
+        // Create a timeout value
+        timeout = setTimeout(resolve, 30000, () => {
+          throw new Error(`Timeout value exceeded calling ${url}`);
+        });
+      }),
+      (async () => {
+        return source(url, options).then((res) => {
+          // Clear our neighbour
+          if (timeout != null) {
+            clearTimeout(timeout);
+          }
+          if (!res.ok) {
+            throw new Error(res.statusText);
+          }
+          return res.body;
+        });
+      })(),
+    ]);
   }
 
   return aStream;

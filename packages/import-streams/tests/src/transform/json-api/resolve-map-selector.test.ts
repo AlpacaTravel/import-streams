@@ -63,6 +63,8 @@ describe("JSON:API Resolve Map Selector", () => {
       href: "https://www.example.com/jsonapi",
       context,
       limit: 3,
+      retry: 1,
+      wait: 100,
       mapping: {
         fubar: "foo",
       },

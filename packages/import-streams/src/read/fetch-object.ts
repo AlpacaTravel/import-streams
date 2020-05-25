@@ -14,6 +14,8 @@ export interface FetchObjectOptions {
   iterate?: boolean;
   path?: string;
   data?: any;
+  retry?: boolean | number;
+  wait?: number;
 }
 
 export default class FetchObject<T> extends Readable {
@@ -26,6 +28,8 @@ export default class FetchObject<T> extends Readable {
   private headers: Headers;
   private iterate: boolean;
   private data: any;
+  private retries: number;
+  private wait: number;
 
   constructor(urls: string | string[], options?: FetchObjectOptions) {
     super({ objectMode: true });
@@ -45,6 +49,8 @@ export default class FetchObject<T> extends Readable {
       path,
       iterate = false,
       data,
+      retry = 1,
+      wait = 5000,
     } = options || {};
     this.limit = limit;
     this.count = 0;
@@ -53,6 +59,11 @@ export default class FetchObject<T> extends Readable {
     this.path = path;
     this.iterate = iterate;
     this.data = data;
+    this.wait = wait;
+    this.retries =
+      (typeof retry === "boolean" && retry === true ? 1 : 0) ||
+      (typeof retry === "number" && retry) ||
+      0;
   }
 
   async *getRecordsGenerator() {
@@ -75,7 +86,24 @@ export default class FetchObject<T> extends Readable {
     // Source the records
     let current;
     while ((current = urls.pop())) {
-      const query = await callable(current);
+      let query: any | undefined = undefined;
+      let attempts = 0;
+      while (attempts <= this.retries) {
+        try {
+          // Make an attempt
+          attempts += 1;
+          query = await callable(current);
+          // Break if successful (we have a query)
+          break;
+        } catch (e) {
+          // If we are more than we want to retry
+          if (attempts > this.retries) {
+            throw e;
+          }
+          // Just back off and we will retry
+          await new Promise((success) => setTimeout(success, this.wait));
+        }
+      }
 
       // Peel off a section
       let result = query;

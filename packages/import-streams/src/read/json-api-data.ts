@@ -21,6 +21,8 @@ interface JsonApiEnvelope {
 interface JsonApiOptions {
   limit?: number;
   debug?: boolean;
+  retry?: number | boolean;
+  wait?: number;
 }
 
 export default class JsonApiDataReadable<T> extends Readable {
@@ -29,16 +31,20 @@ export default class JsonApiDataReadable<T> extends Readable {
   private limit: number;
   private count: number;
   private useDebug: boolean;
+  private retries: number;
+  private wait: number;
 
   constructor(href: string, options?: JsonApiOptions) {
     super({ objectMode: true });
 
     this.href = href;
 
-    const { limit = 0, debug = false } = options || {};
+    const { limit = 0, debug = false, retry = 1, wait = 5000 } = options || {};
     this.limit = limit;
     this.count = 0;
     this.useDebug = debug;
+    this.wait = wait;
+    this.retries = typeof retry === "boolean" ? 1 : retry;
   }
 
   debug(...args: any[]) {
@@ -58,19 +64,32 @@ export default class JsonApiDataReadable<T> extends Readable {
         },
       };
       this.debug("Calling:", url);
-      let query: JsonApiEnvelope;
-      try {
-        query = await network.objectRead(url, httpOptions);
-      } catch (e) {
-        this.debug("Retrying:", url);
-        await new Promise((success) => setTimeout(success, 5000));
-        query = await network.objectRead(url, httpOptions);
+      let query: JsonApiEnvelope | undefined = undefined;
+      let attempts = 0;
+      while (attempts <= this.retries) {
+        try {
+          // Make an attempt
+          attempts += 1;
+          query = await network.objectRead(url, httpOptions);
+          // Break if successful (we have a query)
+          break;
+        } catch (e) {
+          // If we are more than we want to retry
+          if (attempts > this.retries) {
+            throw e;
+          }
+          // Just back off and we will retry
+          this.debug("Caught error to retry:", url, e.message);
+          await new Promise((success) => setTimeout(success, this.wait));
+        }
       }
 
-      if (!query) {
-        throw Error("Unable to process url");
+      // If we still don't have a value, we can't continue
+      if (query == null) {
+        throw new Error("Unable to obtain a query");
       }
 
+      // Paginate responses
       if (Array.isArray(query.data)) {
         for (let value of query.data) {
           yield value;

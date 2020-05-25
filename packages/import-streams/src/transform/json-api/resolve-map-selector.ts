@@ -30,6 +30,8 @@ export interface ResolveMapSelectorOptions extends TransformOptions {
   mapping?: Mapping;
   template?: any;
   attributeLocale?: string;
+  retry?: number;
+  wait?: number;
 }
 
 const resolveMapSelector: TransformFunction<
@@ -41,7 +43,16 @@ const resolveMapSelector: TransformFunction<
 ): Promise<any | undefined> => {
   assertValidTransformOptions(
     options,
-    ["iterate", "href", "limit", "mapping", "template", "attributeLocale"],
+    [
+      "iterate",
+      "href",
+      "limit",
+      "mapping",
+      "template",
+      "attributeLocale",
+      "retry",
+      "wait",
+    ],
     "json-api.resolve-map-selector"
   );
   // Identify the resolve end-point
@@ -74,7 +85,11 @@ const resolveMapSelector: TransformFunction<
     const records: Array<any> = [];
 
     // Read and collate streams
-    const readStream = createReadStream(href, { limit: options.limit });
+    const readStream = createReadStream(href, {
+      limit: options.limit,
+      wait: options.wait,
+      retry: options.retry,
+    });
     const collatorStream = new Writable({
       objectMode: true,
       write: (chunk: any, _, callback: Callback) => {

@@ -63,6 +63,8 @@ export interface JsonApiDataOptions extends StreamFactoryOptions {
   url: string;
   limit?: number;
   debug?: boolean;
+  wait?: number;
+  retry?: boolean | number;
 }
 
 export interface FetchObjectOptions extends StreamFactoryOptions {
@@ -72,6 +74,8 @@ export interface FetchObjectOptions extends StreamFactoryOptions {
   iterate?: boolean;
   path?: string;
   headers?: Headers;
+  wait?: number;
+  retry?: boolean | number;
 }
 
 export interface FetchStreamOptions extends StreamFactoryOptions {
@@ -177,6 +181,8 @@ export const createCompose = (options?: Options) => {
           return createJsonApiDataReadStream(stream.options.url, {
             limit: stream.options.limit,
             debug: stream.options.debug,
+            retry: stream.options.retry,
+            wait: stream.options.wait,
           });
         }
         throw new Error(
@@ -195,6 +201,8 @@ export const createCompose = (options?: Options) => {
             path: stream.options.path,
             headers: stream.options.headers,
             iterate: stream.options.iterate,
+            retry: stream.options.retry,
+            wait: stream.options.wait,
           });
         }
       }
