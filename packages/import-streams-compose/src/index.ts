@@ -165,10 +165,13 @@ const isComposableStreamDefinition = (
   return false;
 };
 
+type ErrorHandler = (err: Error, part: ComposableDefinition) => void;
+
 export interface ComposeOption {
   factory: StreamFactory;
   readFrom?: Readable;
   head?: boolean;
+  onError?: ErrorHandler;
 }
 
 interface HeadTailStream {
@@ -317,6 +320,14 @@ const compose = (
           readFrom.pipe(nextStream);
         }
 
+        // Attach the error handler
+        if (options.onError != null) {
+          nextStream.on(
+            "error",
+            (err) => options.onError && options.onError(err, definition)
+          );
+        }
+
         return nextStream;
       }
     }
@@ -350,6 +361,14 @@ const compose = (
       readFrom.pipe(stream);
     }
 
+    // Attach the error handler
+    if (options.onError != null) {
+      stream.on(
+        "error",
+        (err) => options.onError && options.onError(err, definition)
+      );
+    }
+
     // Return the stream
     return stream;
   }
@@ -364,6 +383,15 @@ const compose = (
       }
       readFrom.pipe(definition);
     }
+
+    // Attach the error handler
+    if (options.onError != null) {
+      definition.on(
+        "error",
+        (err) => options.onError && options.onError(err, definition)
+      );
+    }
+
     return definition;
   }
 
