@@ -29,6 +29,9 @@
   "author": "Cam Manderson <cam@alpaca.travel>",
   "license": "MIT",
   "dependencies": {
+    "@alpaca-travel/fexp-js": "^1.0.0-alpha.0",
+    "@alpaca-travel/fexp-js-lang": "^1.0.0-alpha.0",
+    "@alpaca-travel/fexp-js-lang-gis": "^0.3.0",
     "@alpaca-travel/import-streams-compose": "^0.0.19-alpha.0",
     "@types/lodash": "^4.14.151",
     "@types/node-fetch": "^2.5.7",

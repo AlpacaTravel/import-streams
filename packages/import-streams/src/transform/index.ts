@@ -23,6 +23,8 @@ import drupal from "./drupal";
 
 import { packageTransforms } from "../packaging";
 import resolveJourney from "./resolve-journey";
+import fexp from "./fexp";
+import FilterFexp from "./filter-fexp";
 
 const transforms: TransformReferences = {};
 
@@ -36,6 +38,8 @@ Object.assign(transforms, {
   "base64-decode": base64Decode,
   url,
   boolean,
+  fexp: fexp,
+  "filter-fexp": FilterFexp,
   date,
   flatten,
   "html-prettier": htmlPrettier,
