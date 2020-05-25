@@ -143,7 +143,7 @@ const isSyncExternalItemsOptions = (
   if (!options) {
     return false;
   }
-  if ("mapping" in options && "apiKey" in options && "profile" in options) {
+  if ("collection" in options && "apiKey" in options && "profile" in options) {
     return true;
   }
   return false;
