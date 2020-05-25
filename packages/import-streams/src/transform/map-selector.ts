@@ -3,6 +3,7 @@ import * as _ from "lodash";
 
 import { TransformFunction, TransformFunctionOptions } from "../types";
 import processSelector, { Selector } from "./selector";
+import { assertValidTransformOptions } from "../assertions";
 
 export interface MapSelectorOptions extends TransformFunctionOptions {
   mapping: Mapping;
@@ -13,31 +14,6 @@ export interface MapSelectorOptions extends TransformFunctionOptions {
 export interface Mapping {
   [key: string]: Selector;
 }
-
-`
-  business:
-    title: title
-
-    title:
-      selector: title
-      transform: text
-
-    otherTitle:
-      selector:
-        - title
-        - something
-      transform:
-      - text
-      - url
-    
-    media:
-      selector: abc
-      transform:
-        - type: mapTransform
-          options:
-            mapping: selector
-            
-`;
 
 interface Attribute {
   $ref: String;
@@ -65,7 +41,7 @@ export const createTransformStream = (options: MapSelectorOptions) => {
       (async () => {
         try {
           // Transform the value
-          const transformedValue = await mapTransform(value, options);
+          const transformedValue = await mapSelector(value, options);
 
           this.push(transformedValue);
 
@@ -80,10 +56,16 @@ export const createTransformStream = (options: MapSelectorOptions) => {
   });
 };
 
-const mapTransform: TransformFunction<
-  MappedObject,
-  MapSelectorOptions
-> = async (value: any, options: MapSelectorOptions): Promise<MappedObject> => {
+const mapSelector: TransformFunction<MappedObject, MapSelectorOptions> = async (
+  value: any,
+  options: MapSelectorOptions
+): Promise<MappedObject> => {
+  assertValidTransformOptions(
+    options,
+    ["mapping", "attributeLocale", "template"],
+    "map-selector"
+  );
+
   const { mapping = {}, attributeLocale = null, context } = options;
 
   // The mapped object keys
@@ -154,4 +136,4 @@ const mapTransform: TransformFunction<
   }, template);
 };
 
-export default mapTransform;
+export default mapSelector;

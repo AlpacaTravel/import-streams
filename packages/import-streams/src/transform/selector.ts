@@ -49,16 +49,6 @@ const isWritable = (stream: any): stream is Writable => {
   return false;
 };
 
-`
-  title
-
-  - title
-  - path: 
-    - title
-    - value
-    transform: text
-`;
-
 const selector: TransformFunction<Promise<any>, SelectorOptions> = async (
   value: any,
   options: SelectorOptions

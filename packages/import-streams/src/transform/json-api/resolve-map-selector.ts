@@ -7,6 +7,7 @@ import {
   Mapping,
 } from "../map-selector";
 import { createReadStream } from "../../read/json-api-data";
+import { assertValidTransformOptions } from "../../assertions";
 
 interface JsonApiHref {
   href: string;
@@ -27,6 +28,8 @@ export interface ResolveMapSelectorOptions extends TransformOptions {
   href?: string;
   limit?: number;
   mapping?: Mapping;
+  template?: any;
+  attributeLocale?: string;
 }
 
 const resolveMapSelector: TransformFunction<
@@ -36,6 +39,11 @@ const resolveMapSelector: TransformFunction<
   value: JsonApiReference | undefined,
   options: ResolveMapSelectorOptions
 ): Promise<any | undefined> => {
+  assertValidTransformOptions(
+    options,
+    ["iterate", "href", "limit", "mapping", "template", "attributeLocale"],
+    "json-api.resolve-map-selector"
+  );
   // Identify the resolve end-point
   const href = (() => {
     // Check for the options href
@@ -81,8 +89,13 @@ const resolveMapSelector: TransformFunction<
         // Include the map stream
         const mapSelectorOptions: MapSelectorOptions = Object.assign(
           {},
-          { mapping: {} },
-          options
+          {
+            mapping: options.mapping || {},
+            context: options.context,
+            debug: options.debug,
+            template: options.template,
+            attributeLocale: options.attributeLocale,
+          }
         );
 
         // Establish our streams

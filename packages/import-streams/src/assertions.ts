@@ -16,3 +16,15 @@ export function assertValidKeys(
   const keys = Object.keys(obj);
   assert(containsOnly(validKeys, keys), message);
 }
+
+export function assertValidTransformOptions(
+  options: any,
+  validKeys: string[],
+  type: string
+) {
+  assertValidKeys(
+    options,
+    validKeys.concat(["context", "debug"]),
+    `Configure ${type} using available options: ${(validKeys || []).join(", ")}`
+  );
+}

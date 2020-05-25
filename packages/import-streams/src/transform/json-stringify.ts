@@ -1,5 +1,6 @@
 import { Transform } from "readable-stream";
 import { TransformOptions, Callback } from "../types";
+import { assertValidTransformOptions } from "../assertions";
 
 interface StringifyOptions extends TransformOptions {
   space?: number;
@@ -7,20 +8,29 @@ interface StringifyOptions extends TransformOptions {
 
 class Stringify extends Transform {
   private space: number;
+  private useDebug: boolean;
 
   constructor(options: StringifyOptions) {
     super({ objectMode: true });
 
-    if (options != null && options.space) {
-      this.space = options.space;
-    } else {
-      this.space = 0;
-    }
+    const { space, debug = false } = options || {};
+
+    this.space = space ? space : 0;
+    this.useDebug = debug;
+
+    assertValidTransformOptions(options, ["space"], "stringify");
   }
 
   _transform(chunk: any, _: string, cb: Callback) {
-    this.push(JSON.stringify(chunk, null, this.space));
-    cb();
+    try {
+      this.push(JSON.stringify(chunk, null, this.space));
+      cb();
+    } catch (e) {
+      if (this.useDebug === true) {
+        console.error(e);
+      }
+      cb(e);
+    }
   }
 }
 

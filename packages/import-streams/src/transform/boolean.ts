@@ -1,4 +1,5 @@
 import { TransformFunction, TransformOptions } from "../types";
+import { assertValidTransformOptions } from "../assertions";
 
 export interface BooleanOptions extends TransformOptions {
   inverse?: boolean;
@@ -12,6 +13,8 @@ const boolean: TransformFunction<
   value: any,
   options: BooleanOptions
 ): Promise<boolean | undefined> => {
+  assertValidTransformOptions(options, ["inverse", "default"], "boolean");
+
   const returnValue = (() => {
     if (typeof value === "string") {
       switch (value.toLocaleLowerCase()) {

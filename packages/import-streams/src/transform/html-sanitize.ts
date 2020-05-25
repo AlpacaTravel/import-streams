@@ -1,5 +1,6 @@
 import sanitizeHtml, { IOptions } from "sanitize-html";
 import { TransformFunction, TransformOptions } from "../types";
+import { assertValidTransformOptions } from "../assertions";
 
 export interface HtmlSanitizeOptions extends TransformOptions {
   configuration?: IOptions;
@@ -12,6 +13,8 @@ const htmlSanitize: TransformFunction<
   value: any,
   options: HtmlSanitizeOptions
 ): Promise<string | undefined> => {
+  assertValidTransformOptions(options, ["configuration"], "html-sanitize");
+
   if (typeof value === "string") {
     return sanitizeHtml(value, options.configuration);
   }

@@ -6,6 +6,7 @@ import {
   Mapping,
   MapSelectorOptions,
 } from "./map-selector";
+import { assertValidTransformOptions } from "../assertions";
 
 export interface ResolveJourneyOptions extends TransformOptions {
   includeRouteGeometry?: boolean;
@@ -20,6 +21,11 @@ const resolveJourneyJson: TransformFunction<
   value: any,
   options: ResolveJourneyOptions
 ): Promise<any[] | any | undefined> => {
+  assertValidTransformOptions(
+    options,
+    ["includeRouteGeometry", "iterate", "mapping"],
+    "resolve-journey-json"
+  );
   try {
     const records: any[] = [];
 

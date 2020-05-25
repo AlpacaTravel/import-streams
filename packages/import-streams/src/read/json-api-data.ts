@@ -20,6 +20,7 @@ interface JsonApiEnvelope {
 
 interface JsonApiOptions {
   limit?: number;
+  debug?: boolean;
 }
 
 export default class JsonApiDataReadable<T> extends Readable {
@@ -27,27 +28,37 @@ export default class JsonApiDataReadable<T> extends Readable {
   private generator: any;
   private limit: number;
   private count: number;
+  private useDebug: boolean;
 
   constructor(href: string, options?: JsonApiOptions) {
     super({ objectMode: true });
 
     this.href = href;
 
-    const { limit = 0 } = options || {};
+    const { limit = 0, debug = false } = options || {};
     this.limit = limit;
     this.count = 0;
+    this.useDebug = debug;
+  }
+
+  debug(...args: any[]) {
+    if (this.useDebug === true) {
+      console.log("JsonApiDataReadable:", ...args);
+    }
   }
 
   async *getRecordsGenerator() {
     let url = this.href;
 
     while (true) {
-      const query: JsonApiEnvelope = await network.objectRead(url, {
+      const httpOptions = {
         headers: {
           Accept: "application/vnd.api+json",
           "Content-Type": "application/vnd.api+json",
         },
-      });
+      };
+      this.debug("Calling:", url);
+      const query: JsonApiEnvelope = await network.objectRead(url, httpOptions);
 
       if (Array.isArray(query.data)) {
         for (let value of query.data) {
@@ -64,6 +75,7 @@ export default class JsonApiDataReadable<T> extends Readable {
         query.links.next.href &&
         query.links.next.href !== url
       ) {
+        this.debug("Following links, next href");
         url = query.links.next.href;
       } else {
         break;
@@ -87,10 +99,19 @@ export default class JsonApiDataReadable<T> extends Readable {
           done,
         }: { value: T; done: boolean } = await generator.next();
         if (value) {
+          this.debug("Pushing a value");
           this.push(value);
           this.count += 1;
         }
         if (done || (this.limit && this.count >= this.limit)) {
+          this.debug(
+            "Finishing:",
+            done ? "Done" : "Not done",
+            "Limit:",
+            this.count,
+            "/",
+            this.limit
+          );
           this.push(null);
         }
       } catch (e) {

@@ -10,9 +10,9 @@ import {
   MapSelectorOptions,
 } from "./map-selector";
 import assert from "assert";
+import { assertValidTransformOptions } from "../assertions";
 
 export interface ResolveFetchObjectOptions extends TransformOptions {
-  includeRouteGeometry?: boolean;
   iterate?: boolean;
   mapping?: Mapping;
   method?: string;
@@ -27,6 +27,11 @@ const resolveFetchObject: TransformFunction<
   value: any,
   options: ResolveFetchObjectOptions
 ): Promise<any | undefined> => {
+  assertValidTransformOptions(
+    options,
+    ["iterate", "mapping", "method", "url", "request"],
+    "resolve-fetch-object"
+  );
   try {
     const records: any[] = [];
 

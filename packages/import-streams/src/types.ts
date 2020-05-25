@@ -21,6 +21,7 @@ export interface TransformFunctionOptions extends TransformOptions {}
 
 export interface TransformOptions {
   context: ComposeContext;
+  debug?: boolean;
 }
 
 export type ComposeFunction = (doc: ComposableDefinition) => SupportedStream;
@@ -37,10 +38,6 @@ export interface TransformFactory {
 export type TransformReference = string | TransformFactory;
 
 export type Transform = TransformReference | Array<TransformReference>;
-
-export interface TransformOptions {
-  context: ComposeContext;
-}
 
 export interface TransformReferences {
   [any: string]:

@@ -46,7 +46,7 @@ describe("selectorTransforms", () => {
     };
     expect(await selector(value, config)).toBe(false);
   });
-  test.only("will obtain a value from a selector and process a mixed array of modifiers", async () => {
+  test("will obtain a value from a selector and process a mixed array of modifiers", async () => {
     const value = {
       foo: "www.google.com",
     };

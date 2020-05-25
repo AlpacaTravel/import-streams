@@ -7,7 +7,7 @@ interface SyncExternalItemsOptions {
   collection: string;
   profile: string;
   force?: boolean;
-  console?: boolean;
+  debug?: boolean;
 }
 
 interface Attribute {
@@ -62,7 +62,7 @@ class SyncExternalItems extends Writable {
   private cache: Promise<Array<RecordSync>> | undefined;
   private pushed: Array<RecordSync>;
   private force: boolean;
-  private useConsole: boolean;
+  private useDebug: boolean;
 
   constructor(options: SyncExternalItemsOptions) {
     super({ objectMode: true });
@@ -72,7 +72,7 @@ class SyncExternalItems extends Writable {
       collection,
       profile,
       force = false,
-      console: useConsole = false,
+      debug = false,
     } = options;
 
     assert(
@@ -93,14 +93,14 @@ class SyncExternalItems extends Writable {
     this.profile = cleanRef(profile, "profile");
 
     this.force = force;
-    this.useConsole = useConsole;
+    this.useDebug = debug;
 
     this.pushed = [];
   }
 
-  log(...args: any[]) {
-    if (this.useConsole) {
-      console.log(...args);
+  debug(...args: any[]) {
+    if (this.useDebug === true) {
+      console.log("SyncExternalItems:", ...args);
     }
   }
 
@@ -137,6 +137,11 @@ class SyncExternalItems extends Writable {
             recordSync.externalSource === externalSource
         );
         if (match) {
+          this.debug(
+            "Found an match for the supplied item:",
+            externalRef,
+            externalSource
+          );
           // If yes, we need to get the full record to be able to merge
           if (
             // Send the records always using force option
@@ -147,6 +152,15 @@ class SyncExternalItems extends Writable {
               match.modified &&
               timestamp.getTime() > match.modified.getTime())
           ) {
+            this.debug(
+              "Merge - Timestamp:",
+              timestamp,
+              "Match Modified:",
+              match.modified,
+              "Force:",
+              this.force
+            );
+
             // We have detected a timestamp change OR no timestamp to compare, so just push
             const merged = this.getItemForTransport(
               await this.merge(match, item)
@@ -176,12 +190,18 @@ class SyncExternalItems extends Writable {
               method: "put",
               data: JSON.stringify(merged),
             };
-            this.log(url, httpOptions);
+            this.debug(url, httpOptions);
             await network.write(url, httpOptions);
           } else {
             // We can ignore the record here.
+            this.debug("Ignoring update of record", timestamp, match.modified);
           }
         } else {
+          this.debug(
+            "No match for supplied item:",
+            externalRef,
+            externalSource
+          );
           const merged: Item = JSON.parse(JSON.stringify(item));
 
           // Update the toggle flag
@@ -209,13 +229,13 @@ class SyncExternalItems extends Writable {
             method: "post",
             data: JSON.stringify(this.getItemForTransport(merged)),
           };
-          this.log(url, httpOptions);
+          this.debug(url, httpOptions);
           await network.write(url, httpOptions);
         }
 
         callback();
       } catch (e) {
-        this.log("Error", e);
+        this.debug("Error", e);
         callback(e);
       }
     })();
@@ -224,6 +244,7 @@ class SyncExternalItems extends Writable {
   _final(callback: Callback) {
     (async () => {
       try {
+        this.debug("Performing final updates");
         // Go through the cache
         const list = await this.getRecordSyncs();
 
@@ -277,7 +298,7 @@ class SyncExternalItems extends Writable {
             data: JSON.stringify(merged),
           };
 
-          this.log(url, httpOptions);
+          this.debug(url, httpOptions);
           await network.write(url, httpOptions);
         });
 
@@ -285,7 +306,7 @@ class SyncExternalItems extends Writable {
 
         callback();
       } catch (e) {
-        this.log("Error", e);
+        this.debug("Error", e);
         callback(e);
       }
     })();
@@ -313,7 +334,7 @@ class SyncExternalItems extends Writable {
       };
       while (true && recordSyncs.length < totalItems) {
         href = href.replace(/offset=[\d]+/, `offset=${offset}`);
-        this.log(href, httpOptions);
+        this.debug(href, httpOptions);
         const data: any = await network.objectRead(href, httpOptions);
         // Exit
         if (
@@ -392,7 +413,7 @@ class SyncExternalItems extends Writable {
       },
       method: "get",
     };
-    this.log(url, httpOptions);
+    this.debug(url, httpOptions);
     const data = await network.objectRead(url, httpOptions);
     if (!data) {
       throw new Error(`Record ${id} no longer exists`);

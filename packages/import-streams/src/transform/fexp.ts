@@ -4,6 +4,7 @@ import libGis from "@alpaca-travel/fexp-js-lang-gis";
 
 import { TransformFunction, TransformOptions } from "../types";
 import assert from "assert";
+import { assertValidTransformOptions } from "../assertions";
 
 const lang = langs(libStandard, libGis);
 
@@ -19,9 +20,8 @@ const fexp: TransformFunction<Promise<any>, FexpOptions> = async (
     typeof options.expression !== "undefined",
     "Missing the expression for the fexp transform"
   );
-
+  assertValidTransformOptions(options, ["expression"], "fexp");
   const fn = parse(options.expression, lang);
-
   return fn(value);
 };
 

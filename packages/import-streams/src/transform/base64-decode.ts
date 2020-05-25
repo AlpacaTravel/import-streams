@@ -10,6 +10,8 @@ const base64decode: TransformFunction<
   options: Base64DecodeOptions
 ): Promise<string | undefined> => {
   if (typeof value === "string") {
+    if (options.debug) {
+    }
     const buff = new Buffer(value);
     return buff.toString("ascii");
   }

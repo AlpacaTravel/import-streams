@@ -1,6 +1,7 @@
 // @ts-ignore
 import smartTruncate from "smart-truncate";
 import { TransformFunction, TransformOptions } from "../types";
+import { assertValidTransformOptions } from "../assertions";
 
 export interface TruncateOptions extends TransformOptions {
   length: number;
@@ -13,6 +14,11 @@ const truncate: TransformFunction<Promise<any>, TruncateOptions> = async (
   value: any,
   options: TruncateOptions
 ): Promise<number | string | undefined> => {
+  assertValidTransformOptions(
+    options,
+    ["length", "position", "mark", "break"],
+    "truncate"
+  );
   const { length, position, mark, break: breakText } = options;
 
   let treatedValue = value;

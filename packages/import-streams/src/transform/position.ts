@@ -1,4 +1,5 @@
 import { TransformFunction, TransformOptions } from "../types";
+import { assertValidTransformOptions } from "../assertions";
 
 export interface PositionOptions extends TransformOptions {
   flip?: boolean;
@@ -12,6 +13,8 @@ const position: TransformFunction<
   value: any,
   options: PositionOptions
 ): Promise<Array<number> | undefined> => {
+  assertValidTransformOptions(options, ["flip", "delimiter"], "position");
+
   // Support a split (long,lat)
   if (typeof value === "string") {
     const [_1, _2] = value.split((options && options.delimiter) || ",");
