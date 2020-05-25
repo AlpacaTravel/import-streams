@@ -6,6 +6,7 @@ interface SyncExternalItemsOptions {
   apiKey: string;
   collection: string;
   profile: string;
+  force?: boolean;
 }
 
 interface Attribute {
@@ -59,11 +60,12 @@ class SyncExternalItems extends Writable {
   private profile: string;
   private cache: Promise<Array<RecordSync>> | undefined;
   private pushed: Array<RecordSync>;
+  private force: boolean;
 
   constructor(options: SyncExternalItemsOptions) {
     super({ objectMode: true });
 
-    const { apiKey, collection, profile } = options;
+    const { apiKey, collection, profile, force = false } = options;
 
     assert(
       apiKey && typeof apiKey === "string" && apiKey.substr(0, 2) === "sk",
@@ -81,6 +83,8 @@ class SyncExternalItems extends Writable {
     this.apiKey = apiKey;
     this.collection = cleanRef(collection, "collection");
     this.profile = cleanRef(profile, "profile");
+
+    this.force = force;
 
     this.pushed = [];
   }
@@ -120,6 +124,9 @@ class SyncExternalItems extends Writable {
         if (match) {
           // If yes, we need to get the full record to be able to merge
           if (
+            // Send the records always using force option
+            this.force === true ||
+            // Otherwise compare the timestamps
             !timestamp ||
             (timestamp &&
               match.modified &&
