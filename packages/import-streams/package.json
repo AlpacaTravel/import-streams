@@ -43,6 +43,7 @@
     "bottleneck": "^2.19.5",
     "csv-parse": "^4.10.1",
     "isomorphic-unfetch": "^3.0.0",
+    "lodash": "^4.17.15",
     "node-fetch": "^2.6.0",
     "prettier": "^2.0.5",
     "readable-stream": "^3.6.0",
