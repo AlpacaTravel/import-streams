@@ -58,7 +58,18 @@ export default class JsonApiDataReadable<T> extends Readable {
         },
       };
       this.debug("Calling:", url);
-      const query: JsonApiEnvelope = await network.objectRead(url, httpOptions);
+      let query: JsonApiEnvelope;
+      try {
+        query = await network.objectRead(url, httpOptions);
+      } catch (e) {
+        this.debug("Retrying:", url);
+        await new Promise((success) => setTimeout(success, 5000));
+        query = await network.objectRead(url, httpOptions);
+      }
+
+      if (!query) {
+        throw Error("Unable to process url");
+      }
 
       if (Array.isArray(query.data)) {
         for (let value of query.data) {
@@ -99,7 +110,7 @@ export default class JsonApiDataReadable<T> extends Readable {
           done,
         }: { value: T; done: boolean } = await generator.next();
         if (value) {
-          this.debug("Pushing a value");
+          this.debug("Pushing a value", this.count);
           this.push(value);
           this.count += 1;
         }

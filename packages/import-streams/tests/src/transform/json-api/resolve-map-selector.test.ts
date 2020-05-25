@@ -11,10 +11,8 @@ const context = {
 };
 
 describe("JSON:API Resolve Map Selector", () => {
-  test("on array data", async () => {
-    nock("https://www.example.com:443", {
-      encodedQueryParams: true,
-    })
+  test("on array data with a retry", async () => {
+    nock("https://www.example.com:443")
       .get("/jsonapi")
       .reply(
         200,
@@ -35,9 +33,14 @@ describe("JSON:API Resolve Map Selector", () => {
         ["Content-Type", "application/vnd.api+json"]
       );
 
-    nock("https://www.example.com:443", {
-      encodedQueryParams: true,
-    })
+    nock("https://www.example.com:443")
+      .get("/jsonapi-2")
+      .reply(500, { status: "error" }, [
+        "Content-Type",
+        "application/vnd.api+json",
+      ]);
+
+    nock("https://www.example.com:443")
       .get("/jsonapi-2")
       .reply(
         200,
@@ -74,7 +77,7 @@ describe("JSON:API Resolve Map Selector", () => {
       { fubar: "bar-2" },
       { fubar: "bar-3" },
     ]);
-  });
+  }, 10000);
 
   test("on data", async () => {
     nock("https://www.example.com:443", {
