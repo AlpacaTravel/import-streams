@@ -62,5 +62,6 @@
     "rollup-plugin-typescript2": "^0.27.1",
     "ts-jest": "^26.0.0",
     "typescript": "^3.9.2"
-  }
+  },
+  "gitHead": "c6f5aaba52f907c719833eddd101f36875fad5f8"
 }
