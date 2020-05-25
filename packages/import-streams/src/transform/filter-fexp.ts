@@ -14,12 +14,14 @@ type Fn = (...args: any[]) => any;
 
 class FilterFexp extends Transform {
   private fn: Fn;
+  private expression: any;
 
   constructor(options: FilterFexpOptions) {
     super({ objectMode: true });
 
     assert(options.expression, "Missing the fexp expression");
 
+    this.expression = options.expression;
     this.fn = parse(options.expression, langs(libStd, libGis));
   }
 

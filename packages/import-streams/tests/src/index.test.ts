@@ -248,7 +248,7 @@ stream:
                   - - get
                     - uri
                   - - to-regex
-                    - facebook
+                    - facebook.com
             - type: flatten
               options:
                 key: uri

@@ -146,7 +146,7 @@ const selector: TransformFunction<Promise<any>, SelectorOptions> = async (
           }
 
           // Process the definition
-          let streamResult = raw;
+          let streamResult = undefined;
           await new Promise((success, fail) => {
             // Compose a stream based on the selector transforms
             if (isComposableDefinition(selectorDefinition.transform)) {
@@ -186,6 +186,7 @@ const selector: TransformFunction<Promise<any>, SelectorOptions> = async (
               stream.on("finish", success).on("error", fail);
             } else {
               // Return the raw result
+              streamResult = raw;
               success();
             }
           });
