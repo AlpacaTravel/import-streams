@@ -191,7 +191,10 @@ class SyncExternalItems extends Writable {
               data: JSON.stringify(merged),
             };
             this.debug(url, httpOptions);
-            await network.write(url, httpOptions);
+            const res = await network.write(url, httpOptions);
+            if (!res.ok) {
+              throw new Error(`Unable to write record, ${res.statusText}`);
+            }
           } else {
             // We can ignore the record here.
             this.debug("Ignoring update of record", timestamp, match.modified);
@@ -230,7 +233,10 @@ class SyncExternalItems extends Writable {
             data: JSON.stringify(this.getItemForTransport(merged)),
           };
           this.debug(url, httpOptions);
-          await network.write(url, httpOptions);
+          const res = await network.write(url, httpOptions);
+          if (!res.ok) {
+            throw new Error(`Unable to write record, ${res.statusText}`);
+          }
         }
 
         callback();
@@ -299,7 +305,10 @@ class SyncExternalItems extends Writable {
           };
 
           this.debug(url, httpOptions);
-          await network.write(url, httpOptions);
+          const res = await network.write(url, httpOptions);
+          if (!res.ok) {
+            throw new Error(`Unable to write record, ${res.statusText}`);
+          }
         });
 
         await Promise.all(removeTasks);

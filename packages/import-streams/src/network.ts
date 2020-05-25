@@ -48,28 +48,44 @@ const stream = (source: Fetch) => {
 
 const object = (source: Fetch) => {
   async function aObject<T>(url: string, options: any): Promise<T> {
-    const httpHeaders = Object.assign(
-      {},
-      {
-        Accept: "application/json",
-      },
-      options.headers
-    );
+    let timeout: any = null;
+    return Promise.race<Promise<T>>([
+      new Promise((resolve) => {
+        // Create a timeout value
+        timeout = setTimeout(resolve, 30000, () => {
+          throw new Error(`Timeout value exceeded calling ${url}`);
+        });
+      }),
+      (async () => {
+        const httpHeaders = Object.assign(
+          {},
+          {
+            Accept: "application/json",
+          },
+          options.headers
+        );
 
-    const httpOptions = Object.assign(
-      {},
-      {
-        headers: httpHeaders,
-      },
-      options
-    );
+        const httpOptions = Object.assign(
+          {},
+          {
+            headers: httpHeaders,
+          },
+          options
+        );
 
-    const res = await source(url, httpOptions);
-    if (!res.ok) {
-      throw new Error(res.statusText);
-    }
-    const data = res.json() as Promise<T>;
-    return await data;
+        const res = await source(url, httpOptions);
+        // Clear our neighbour
+        if (timeout != null) {
+          clearTimeout(timeout);
+        }
+
+        if (!res.ok) {
+          throw new Error(res.statusText);
+        }
+        const data = res.json() as Promise<T>;
+        return await data;
+      })(),
+    ]);
   }
 
   return aObject;

@@ -44,7 +44,10 @@ export default class JsonApiDataReadable<T> extends Readable {
     this.count = 0;
     this.useDebug = debug;
     this.wait = wait;
-    this.retries = typeof retry === "boolean" ? 1 : retry;
+    this.retries =
+      (typeof retry === "boolean" && retry === true ? 1 : 0) ||
+      (typeof retry === "number" && retry) ||
+      0;
   }
 
   debug(...args: any[]) {
