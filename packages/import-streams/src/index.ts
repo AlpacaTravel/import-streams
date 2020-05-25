@@ -62,6 +62,7 @@ interface Options {
 export interface JsonApiDataOptions extends StreamFactoryOptions {
   url: string;
   limit?: number;
+  debug?: boolean;
 }
 
 export interface FetchObjectOptions extends StreamFactoryOptions {
@@ -175,6 +176,7 @@ export const createCompose = (options?: Options) => {
           // Create the read stream
           return createJsonApiDataReadStream(stream.options.url, {
             limit: stream.options.limit,
+            debug: stream.options.debug,
           });
         }
         throw new Error(
