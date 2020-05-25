@@ -237,6 +237,21 @@ stream:
           path: tags
           transform:
             - flatten
+        facebook:
+          path: links
+          transform:
+            - each
+            - type: filter-fexp
+              options:
+                expression:
+                  - regex-test
+                  - - get
+                    - uri
+                  - - to-regex
+                    - facebook
+            - type: flatten
+              options:
+                key: uri
   - write
 `;
 
@@ -252,6 +267,7 @@ stream:
       tag: "eat",
       html:
         "<p>An <em>Extraordinary Formatting &amp; Statement</em> across poor html</p>\n",
+      facebook: "https://www.facebook.com/alpacatravel/",
     });
   });
 });

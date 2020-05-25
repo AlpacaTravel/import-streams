@@ -17,6 +17,7 @@ import console from "./console";
 import stringify from "./json-stringify";
 import resolveFetchObject from "./resolve-fetch-object";
 import base64Decode from "./base64-decode";
+import each from "./each";
 
 import jsonApi from "./json-api";
 import drupal from "./drupal";
@@ -34,6 +35,7 @@ Object.assign(transforms, {
   console,
   "json-stringify": stringify,
   selector,
+  each,
   "map-selector": mapSelector,
   "base64-decode": base64Decode,
   url,
