@@ -7,6 +7,7 @@ interface SyncExternalItemsOptions {
   collection: string;
   profile: string;
   force?: boolean;
+  console?: boolean;
 }
 
 interface Attribute {
@@ -61,11 +62,18 @@ class SyncExternalItems extends Writable {
   private cache: Promise<Array<RecordSync>> | undefined;
   private pushed: Array<RecordSync>;
   private force: boolean;
+  private useConsole: boolean;
 
   constructor(options: SyncExternalItemsOptions) {
     super({ objectMode: true });
 
-    const { apiKey, collection, profile, force = false } = options;
+    const {
+      apiKey,
+      collection,
+      profile,
+      force = false,
+      console: useConsole = false,
+    } = options;
 
     assert(
       apiKey && typeof apiKey === "string" && apiKey.substr(0, 2) === "sk",
@@ -85,8 +93,15 @@ class SyncExternalItems extends Writable {
     this.profile = cleanRef(profile, "profile");
 
     this.force = force;
+    this.useConsole = useConsole;
 
     this.pushed = [];
+  }
+
+  log(...args: any[]) {
+    if (this.useConsole) {
+      console.log(...args);
+    }
   }
 
   _write(item: Item, _: string, callback: Callback) {
@@ -161,7 +176,7 @@ class SyncExternalItems extends Writable {
               method: "put",
               data: JSON.stringify(merged),
             };
-
+            this.log(url, httpOptions);
             await network.write(url, httpOptions);
           } else {
             // We can ignore the record here.
@@ -194,12 +209,13 @@ class SyncExternalItems extends Writable {
             method: "post",
             data: JSON.stringify(this.getItemForTransport(merged)),
           };
-
+          this.log(url, httpOptions);
           await network.write(url, httpOptions);
         }
 
         callback();
       } catch (e) {
+        this.log("Error", e);
         callback(e);
       }
     })();
@@ -261,6 +277,7 @@ class SyncExternalItems extends Writable {
             data: JSON.stringify(merged),
           };
 
+          this.log(url, httpOptions);
           await network.write(url, httpOptions);
         });
 
@@ -268,6 +285,7 @@ class SyncExternalItems extends Writable {
 
         callback();
       } catch (e) {
+        this.log("Error", e);
         callback(e);
       }
     })();
@@ -295,6 +313,7 @@ class SyncExternalItems extends Writable {
       };
       while (true && recordSyncs.length < totalItems) {
         href = href.replace(/offset=[\d]+/, `offset=${offset}`);
+        this.log(href, httpOptions);
         const data: any = await network.objectRead(href, httpOptions);
         // Exit
         if (
@@ -373,6 +392,7 @@ class SyncExternalItems extends Writable {
       },
       method: "get",
     };
+    this.log(url, httpOptions);
     const data = await network.objectRead(url, httpOptions);
     if (!data) {
       throw new Error(`Record ${id} no longer exists`);

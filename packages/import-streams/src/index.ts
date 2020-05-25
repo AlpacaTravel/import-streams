@@ -136,6 +136,7 @@ interface SyncExternalItemsOptions extends StreamFactoryOptions {
   collection: string;
   profile: string;
   force?: boolean;
+  console?: boolean;
 }
 
 const isSyncExternalItemsOptions = (
@@ -233,6 +234,7 @@ export const createCompose = (options?: Options) => {
             apiKey: stream.options.apiKey,
             profile: stream.options.profile,
             force: stream.options.force,
+            console: stream.options.console,
           });
         }
 
