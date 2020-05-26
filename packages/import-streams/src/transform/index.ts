@@ -18,6 +18,7 @@ import stringify from "./json-stringify";
 import resolveFetchObject from "./resolve-fetch-object";
 import base64Decode from "./base64-decode";
 import each from "./each";
+import join from "./join";
 
 import jsonApi from "./json-api";
 import drupal from "./drupal";
@@ -32,6 +33,7 @@ const transforms: TransformReferences = {};
 // Defaults
 Object.assign(transforms, {
   concat,
+  join,
   console,
   "json-stringify": stringify,
   selector,
