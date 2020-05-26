@@ -193,7 +193,10 @@ class SyncExternalItems extends Writable {
             this.debug(url, httpOptions);
             const res = await network.write(url, httpOptions);
             if (!res.ok) {
-              throw new Error(`Unable to write record, ${res.statusText}`);
+              const text = await res.text();
+              throw new Error(
+                `Unable to write record, ${res.status} - "${res.statusText}", received ${text}`
+              );
             }
           } else {
             // We can ignore the record here.
@@ -235,7 +238,10 @@ class SyncExternalItems extends Writable {
           this.debug(url, httpOptions);
           const res = await network.write(url, httpOptions);
           if (!res.ok) {
-            throw new Error(`Unable to write record, ${res.statusText}`);
+            const text = await res.text();
+            throw new Error(
+              `Unable to write record, ${res.status} - "${res.statusText}", received ${text}`
+            );
           }
         }
 
@@ -307,7 +313,10 @@ class SyncExternalItems extends Writable {
           this.debug(url, httpOptions);
           const res = await network.write(url, httpOptions);
           if (!res.ok) {
-            throw new Error(`Unable to write record, ${res.statusText}`);
+            const text = await res.text();
+            throw new Error(
+              `Unable to write record, ${res.status} - "${res.statusText}", received ${text}`
+            );
           }
         });
 
