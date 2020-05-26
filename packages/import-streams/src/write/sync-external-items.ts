@@ -188,7 +188,7 @@ class SyncExternalItems extends Writable {
                 "Content-Type": "application/json",
               },
               method: "put",
-              data: JSON.stringify(merged),
+              body: JSON.stringify(merged),
             };
             this.debug(url, httpOptions);
             const res = await network.write(url, httpOptions);
@@ -233,7 +233,7 @@ class SyncExternalItems extends Writable {
               "Content-Type": "application/json",
             },
             method: "post",
-            data: JSON.stringify(this.getItemForTransport(merged)),
+            body: JSON.stringify(this.getItemForTransport(merged)),
           };
           this.debug(url, httpOptions);
           const res = await network.write(url, httpOptions);
@@ -307,7 +307,7 @@ class SyncExternalItems extends Writable {
               "Content-Type": "application/json",
             },
             method: "put",
-            data: JSON.stringify(merged),
+            body: JSON.stringify(merged),
           };
 
           this.debug(url, httpOptions);
