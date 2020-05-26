@@ -214,6 +214,11 @@ stream:
         position:
           path: lngLat
           transform: position
+        synopsis:
+          path: overview
+          transform:
+            - text
+            - html-entities-decode
         html:
           path: html
           transform:
@@ -263,6 +268,7 @@ stream:
       position: [123, 23],
       count: 22,
       checked: true,
+      synopsis: "What a great place! - & so close to the beach",
       value: "replaced",
       tag: "eat",
       html:

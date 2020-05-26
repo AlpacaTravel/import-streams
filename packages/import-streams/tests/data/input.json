@@ -3,6 +3,7 @@
     "lon": 123,
     "lat": 23
   },
+  "overview": "<b>What a great place!</b> - &amp; so close to the beach",
   "count": "22",
   "tags": ["eat", "stay"],
   "isChecked": "true",

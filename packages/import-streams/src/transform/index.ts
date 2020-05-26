@@ -27,6 +27,7 @@ import { packageTransforms } from "../packaging";
 import resolveJourney from "./resolve-journey";
 import fexp from "./fexp";
 import FilterFexp from "./filter-fexp";
+import htmlEntitiesDecode from "./html-entities-decode";
 
 const transforms: TransformReferences = {};
 
@@ -48,6 +49,7 @@ Object.assign(transforms, {
   flatten,
   "html-prettier": htmlPrettier,
   "html-sanitize": htmlSanitize,
+  "html-entities-decode": htmlEntitiesDecode,
   ["resolve-fetch-object"]: resolveFetchObject,
   ["resolve-journey"]: resolveJourney,
   number,
