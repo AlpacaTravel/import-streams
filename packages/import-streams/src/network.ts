@@ -18,6 +18,43 @@ const write = new Bottleneck({
 
 type Fetch = (url: string, options: any) => Promise<any>;
 
+type RetriableFunction = () => Promise<Response>;
+
+const retry = async (
+  callable: RetriableFunction,
+  retries = 1,
+  delay = 1000
+): Promise<Response> => {
+  let res: Response | undefined;
+  let attempts = 0;
+  while (attempts <= retries) {
+    try {
+      // Make an attempt
+      attempts += 1;
+      res = await callable();
+      if (!res.ok) {
+        throw new Error(`Request failed: ${res.status} - ${res.statusText}`);
+      }
+
+      // Break if successful (we have a query)
+      break;
+    } catch (e) {
+      // If we are more than we want to retry
+      if (attempts > retries) {
+        throw e;
+      }
+      // Just back off and we will retry
+      await new Promise((success) => setTimeout(success, delay));
+    }
+  }
+
+  if (!res) {
+    throw new Error("Unable to process request");
+  }
+
+  return res;
+};
+
 const stream = (source: Fetch) => {
   function aStream(url: string, options: any): Promise<Readable> {
     let timeout: any = null;
@@ -35,7 +72,7 @@ const stream = (source: Fetch) => {
             clearTimeout(timeout);
           }
           if (!res.ok) {
-            throw new Error(res.statusText);
+            throw new Error(`${res.status} - ${res.statusText}`);
           }
           return res.body;
         });
@@ -92,6 +129,7 @@ const object = (source: Fetch) => {
 };
 
 const methods = {
+  retry,
   read,
   write,
   stream: stream(fetch),

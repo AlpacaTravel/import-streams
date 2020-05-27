@@ -191,7 +191,11 @@ class SyncExternalItems extends Writable {
               body: JSON.stringify(merged),
             };
             this.debug(url, httpOptions);
-            const res = await network.write(url, httpOptions);
+            const res = await network.retry(
+              () => network.write(url, httpOptions),
+              2,
+              5000
+            );
             if (!res.ok) {
               const text = await res.text();
               throw new Error(
@@ -236,7 +240,11 @@ class SyncExternalItems extends Writable {
             body: JSON.stringify(this.getItemForTransport(merged)),
           };
           this.debug(url, httpOptions);
-          const res = await network.write(url, httpOptions);
+          const res = await network.retry(
+            () => network.write(url, httpOptions),
+            2,
+            5000
+          );
           if (!res.ok) {
             const text = await res.text();
             throw new Error(
@@ -311,7 +319,11 @@ class SyncExternalItems extends Writable {
           };
 
           this.debug(url, httpOptions);
-          const res = await network.write(url, httpOptions);
+          const res = await network.retry(
+            () => network.write(url, httpOptions),
+            2,
+            5000
+          );
           if (!res.ok) {
             const text = await res.text();
             throw new Error(
