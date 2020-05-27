@@ -22,6 +22,7 @@ import join from "./join";
 
 import jsonApi from "./json-api";
 import drupal from "./drupal";
+import skip from "./skip";
 
 import { packageTransforms } from "../packaging";
 import resolveJourney from "./resolve-journey";
@@ -47,6 +48,7 @@ Object.assign(transforms, {
   "filter-fexp": FilterFexp,
   date,
   flatten,
+  skip,
   "html-prettier": htmlPrettier,
   "html-sanitize": htmlSanitize,
   "html-entities-decode": htmlEntitiesDecode,
