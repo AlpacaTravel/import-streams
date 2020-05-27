@@ -63,6 +63,7 @@ class SyncExternalItems extends Writable {
   private pushed: Array<RecordSync>;
   private force: boolean;
   private useDebug: boolean;
+  private count: number;
 
   constructor(options: SyncExternalItemsOptions) {
     super({ objectMode: true });
@@ -96,6 +97,7 @@ class SyncExternalItems extends Writable {
     this.useDebug = debug;
 
     this.pushed = [];
+    this.count = 0;
   }
 
   debug(...args: any[]) {
@@ -153,6 +155,7 @@ class SyncExternalItems extends Writable {
               timestamp.getTime() > match.modified.getTime())
           ) {
             this.debug(
+              this.count,
               "Merge - Timestamp:",
               timestamp,
               "Match Modified:",
@@ -204,10 +207,16 @@ class SyncExternalItems extends Writable {
             }
           } else {
             // We can ignore the record here.
-            this.debug("Ignoring update of record", timestamp, match.modified);
+            this.debug(
+              this.count,
+              "Ignoring update of record",
+              timestamp,
+              match.modified
+            );
           }
         } else {
           this.debug(
+            this.count,
             "No match for supplied item:",
             externalRef,
             externalSource
@@ -253,6 +262,7 @@ class SyncExternalItems extends Writable {
           }
         }
 
+        this.count += 1;
         callback();
       } catch (e) {
         this.debug("Error", e);
