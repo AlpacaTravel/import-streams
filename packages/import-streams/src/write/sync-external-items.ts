@@ -8,6 +8,7 @@ interface SyncExternalItemsOptions {
   profile: string;
   force?: boolean;
   debug?: boolean;
+  after?: number;
 }
 
 interface Attribute {
@@ -64,6 +65,7 @@ class SyncExternalItems extends Writable {
   private force: boolean;
   private useDebug: boolean;
   private count: number;
+  private after: number;
 
   constructor(options: SyncExternalItemsOptions) {
     super({ objectMode: true });
@@ -74,6 +76,7 @@ class SyncExternalItems extends Writable {
       profile,
       force = false,
       debug = false,
+      after = 0,
     } = options;
 
     assert(
@@ -98,6 +101,7 @@ class SyncExternalItems extends Writable {
 
     this.pushed = [];
     this.count = 0;
+    this.after = after;
   }
 
   debug(...args: any[]) {
@@ -110,6 +114,12 @@ class SyncExternalItems extends Writable {
     // Perform teh sync
     (async () => {
       try {
+        // Bypass a certain record count
+        if (this.after > 0 && this.count < this.after) {
+          this.count += 1;
+          return;
+        }
+
         assert(
           typeof item.$schema === "string" && item.$schema.indexOf("item") > 0,
           "Received item should contain a valid $schema that matches an item type"
