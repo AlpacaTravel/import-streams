@@ -142,7 +142,6 @@ interface SyncExternalItemsOptions extends StreamFactoryOptions {
   profile: string;
   force?: boolean;
   debug?: boolean;
-  after?: number;
 }
 
 const isSyncExternalItemsOptions = (
@@ -246,7 +245,6 @@ export const createCompose = (options?: Options) => {
             profile: stream.options.profile,
             force: stream.options.force,
             debug: stream.options.debug,
-            after: stream.options.after,
           });
         }
 
