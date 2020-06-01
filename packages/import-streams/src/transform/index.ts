@@ -15,20 +15,20 @@ import truncate from "./truncate";
 import concat from "./concat";
 import console from "./console";
 import stringify from "./json-stringify";
+import parse from "./json-parse";
 import resolveFetchObject from "./resolve-fetch-object";
 import base64Decode from "./base64-decode";
 import each from "./each";
 import join from "./join";
-
 import jsonApi from "./json-api";
 import drupal from "./drupal";
 import skip from "./skip";
-
-import { packageTransforms } from "../packaging";
 import resolveJourney from "./resolve-journey";
 import fexp from "./fexp";
 import FilterFexp from "./filter-fexp";
 import htmlEntitiesDecode from "./html-entities-decode";
+
+import { packageTransforms } from "../packaging";
 
 const transforms: TransformReferences = {};
 
@@ -38,6 +38,7 @@ Object.assign(transforms, {
   join,
   console,
   "json-stringify": stringify,
+  "json-parse": parse,
   selector,
   each,
   "map-selector": mapSelector,
