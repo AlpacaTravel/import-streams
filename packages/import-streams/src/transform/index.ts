@@ -2,6 +2,7 @@ import { TransformReferences } from "../types";
 import selector from "./selector";
 import mapSelector from "./map-selector";
 import url from "./url";
+import uriParse from "./uri-parse";
 import boolean from "./boolean";
 import date from "./date";
 import flatten from "./flatten";
@@ -39,6 +40,7 @@ Object.assign(transforms, {
   console,
   "json-stringify": stringify,
   "json-parse": parse,
+  "uri-parse": uriParse,
   selector,
   each,
   "map-selector": mapSelector,
