@@ -10,6 +10,7 @@ import compose, {
 import assert from "assert";
 import { Transform } from "readable-stream";
 import parse from "csv-parse";
+import stringify from "csv-stringify";
 import YAML from "yaml";
 
 import { isTransformFunction, isTransformSupportingContext } from "./types";
@@ -97,6 +98,13 @@ export interface SqliteQueryOptions extends StreamFactoryOptions {
   debug?: boolean;
 }
 
+export interface CsvStringifyOptions extends StreamFactoryOptions {
+  bom?: boolean;
+  columns?: string[];
+  delimiter?: string;
+  header?: boolean;
+}
+
 const isJsonApiDataOptions = (
   options?: StreamFactoryOptions
 ): options is JsonApiDataOptions => {
@@ -104,6 +112,21 @@ const isJsonApiDataOptions = (
     return false;
   }
   if ("url" in options) {
+    return true;
+  }
+  return false;
+};
+
+const isCsvStringifyOptions = (
+  options?: StreamFactoryOptions
+): options is CsvStringifyOptions => {
+  if (!options) {
+    return true;
+  }
+  if ("bom" in options || "columns" in options || "delimiter" in options) {
+    return true;
+  }
+  if (typeof options === "object" && Object.keys(options).length === 0) {
     return true;
   }
   return false;
@@ -294,6 +317,17 @@ export const createCompose = (options?: Options) => {
 
       case "csv-parse": {
         return parse(stream.options);
+      }
+
+      case "csv-stringify": {
+        if (isCsvStringifyOptions(stream.options)) {
+          return stringify({
+            header: stream.options?.header,
+            bom: stream.options?.bom,
+            delimiter: stream.options?.delimiter || ",",
+            columns: stream.options?.columns,
+          });
+        }
       }
 
       default:
