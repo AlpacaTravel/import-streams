@@ -19,7 +19,7 @@ class SqliteQuery<T> extends Readable {
   }
 
   async *getRecordsGenerator() {
-    const db = new Database(this.path);
+    const db = new Database(this.path, { readonly: true });
 
     try {
       const select = db.prepare(this.query);
