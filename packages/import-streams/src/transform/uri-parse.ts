@@ -1,33 +1,17 @@
-import { Transform } from "readable-stream";
-import { TransformOptions, Callback } from "../types";
 import * as URI from "uri-js";
+import { TransformFunction, TransformOptions } from "../types";
 
-interface ParseOptions extends TransformOptions {}
+export interface UriParseOptions extends TransformOptions {}
 
-class Parse extends Transform {
-  private useDebug: boolean;
-
-  constructor(options: ParseOptions) {
-    super({ objectMode: true });
-
-    const { debug = false } = options || {};
-
-    this.useDebug = debug;
+const uriParse: TransformFunction<Promise<any>, UriParseOptions> = async (
+  value: any,
+  options: UriParseOptions
+): Promise<any | undefined> => {
+  if (typeof value === "string") {
+    return URI.parse(value);
   }
 
-  _transform(chunk: any, _: string, cb: Callback) {
-    try {
-      const uri = URI.parse(chunk);
+  return undefined;
+};
 
-      this.push(uri);
-      cb();
-    } catch (e) {
-      if (this.useDebug === true) {
-        console.error(e);
-      }
-      cb(e);
-    }
-  }
-}
-
-export default Parse;
+export default uriParse;
