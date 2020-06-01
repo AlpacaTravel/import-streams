@@ -27,7 +27,15 @@ Implementation Overview:
 
 ## Outline of Streams
 
-There are a lot of already developed streams available for processing input and sending output.
+There are a lot of already developed streams available for processing input and sending output. These form a "swiss-army" knife of transform functions making processing data from various sources easier.
+
+- sqlite, csv, JSON:API and fetch
+- Drupal fields, entity references
+- URI, JSON parsing
+- map, flatten, join, concat
+- path selectors
+- math, regex, control, combining, string manipulation, membership, existence type, equality
+- prettier, html santize
 
 ## Composeable Pipelines
 
