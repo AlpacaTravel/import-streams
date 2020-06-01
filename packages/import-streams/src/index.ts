@@ -330,6 +330,10 @@ export const createCompose = (options?: Options) => {
         }
       }
 
+      case "process.stdout": {
+        return process.stdout;
+      }
+
       default:
         // Check if we have defined the stream type as a transform
         if (stream.type in transforms) {
