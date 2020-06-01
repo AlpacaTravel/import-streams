@@ -18,6 +18,7 @@ import { createReadStream as createJsonApiDataReadStream } from "./read/json-api
 import { createTransformStream as createMapSelectorTransformStream } from "./transform/map-selector";
 import { createWriteStream as createSyncExternalItemsWriteStream } from "./write/sync-external-items";
 import { createReadStream as createJourneyReadStream } from "./read/journey";
+import { createReadStream as createSqliteQueryReadStream } from "./read/sqlite-query";
 import {
   createReadStream as createFetchObjectStream,
   Headers,
@@ -29,6 +30,7 @@ export {
   createJsonApiDataReadStream,
   createFetchObjectStream,
   createJourneyReadStream,
+  createSqliteQueryReadStream,
   // Transform Streams
   transforms,
   createMapSelectorTransformStream,
@@ -89,6 +91,11 @@ export interface JourneyOptions extends StreamFactoryOptions {
   limit?: number;
 }
 
+export interface SqliteQueryOptions extends StreamFactoryOptions {
+  database: string;
+  query: string;
+}
+
 const isJsonApiDataOptions = (
   options?: StreamFactoryOptions
 ): options is JsonApiDataOptions => {
@@ -131,6 +138,18 @@ const isJourneyOptions = (
     return false;
   }
   if ("id" in options) {
+    return true;
+  }
+  return false;
+};
+
+const isSqliteQueryOptions = (
+  options?: StreamFactoryOptions
+): options is SqliteQueryOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("database" in options) {
     return true;
   }
   return false;
@@ -188,6 +207,24 @@ export const createCompose = (options?: Options) => {
         throw new Error(
           "Missing the configuration for JsonApiData options, should have: url"
         );
+      }
+
+      case "sqlite-query": {
+        if (isSqliteQueryOptions(stream.options)) {
+          assert(
+            stream.options.database,
+            "Missing the database path for the sqlite-query stream"
+          );
+          assert(
+            stream.options.query,
+            "Missing the database query for the sqlite-query stream"
+          );
+
+          return createSqliteQueryReadStream({
+            database: stream.options.database,
+            query: stream.options.query,
+          });
+        }
       }
 
       case "fetch-object": {
