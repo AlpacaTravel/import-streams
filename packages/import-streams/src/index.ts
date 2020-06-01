@@ -94,6 +94,7 @@ export interface JourneyOptions extends StreamFactoryOptions {
 export interface SqliteQueryOptions extends StreamFactoryOptions {
   database: string;
   query: string;
+  debug?: boolean;
 }
 
 const isJsonApiDataOptions = (
@@ -223,6 +224,7 @@ export const createCompose = (options?: Options) => {
           return createSqliteQueryReadStream({
             database: stream.options.database,
             query: stream.options.query,
+            debug: stream.options.debug || false,
           });
         }
       }
