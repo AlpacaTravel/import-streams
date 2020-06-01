@@ -12,6 +12,7 @@ import { Transform } from "readable-stream";
 import parse from "csv-parse";
 import stringify from "csv-stringify";
 import YAML from "yaml";
+import * as fs from "fs";
 
 import { isTransformFunction, isTransformSupportingContext } from "./types";
 import transforms from "./transform/index";
@@ -179,6 +180,34 @@ const isSqliteQueryOptions = (
   return false;
 };
 
+interface FsStreamOptions extends StreamFactoryOptions {
+  path: string;
+  flags?: string;
+  encoding?:
+    | "utf8"
+    | "ascii"
+    | "utf-8"
+    | "utf16le"
+    | "ucs2"
+    | "ucs-2"
+    | "base64"
+    | "latin1"
+    | "binary"
+    | "hex";
+}
+
+const isFsStreamOptions = (
+  options?: StreamFactoryOptions
+): options is FsStreamOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("path" in options) {
+    return true;
+  }
+  return false;
+};
+
 interface SyncExternalItemsOptions extends StreamFactoryOptions {
   apiKey: string;
   collection: string;
@@ -213,6 +242,24 @@ export const createCompose = (options?: Options) => {
 
     // Attempt to create the factory ourselves
     switch (stream.type) {
+      case "file-read-stream": {
+        if (isFsStreamOptions(stream.options)) {
+          return fs.createReadStream(stream.options.path, {
+            encoding: stream.options.encoding || "utf8",
+            flags: stream.options.flags,
+          });
+        }
+      }
+
+      case "file-write-stream": {
+        if (isFsStreamOptions(stream.options)) {
+          return fs.createWriteStream(stream.options.path, {
+            encoding: stream.options.encoding || "utf8",
+            flags: stream.options.flags,
+          });
+        }
+      }
+
       case "json-api-data": {
         if (isJsonApiDataOptions(stream.options)) {
           assert(
