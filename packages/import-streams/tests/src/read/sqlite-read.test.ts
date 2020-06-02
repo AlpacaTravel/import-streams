@@ -1,7 +1,7 @@
-import { createReadStream } from "../../../src/read/sqlite-query";
+import { createReadStream } from "../../../src/read/sqlite-statement-read";
 import { Writable } from "readable-stream";
 
-describe("sqlite-read", () => {
+describe("sqlite-statement-read", () => {
   test("createReadStream", async () => {
     const output: any[] = [];
 
@@ -15,7 +15,7 @@ describe("sqlite-read", () => {
 
     const read = createReadStream({
       database: "./tests/data/test.db",
-      query: "SELECT * FROM test",
+      sql: "SELECT * FROM test",
     });
 
     await new Promise((success, failure) => {

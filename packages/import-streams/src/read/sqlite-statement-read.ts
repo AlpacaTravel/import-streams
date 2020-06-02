@@ -1,23 +1,23 @@
 import { Readable } from "readable-stream";
 import Database from "better-sqlite3";
 
-export interface SqliteQueryOptions {
+export interface SqliteStatementReadOptions {
   database: string;
-  query: string;
+  sql: string;
   debug?: boolean;
 }
 
-class SqliteQuery<T> extends Readable {
+class SqliteStatementRead<T> extends Readable {
   private path: string;
-  private query: string;
+  private sql: string;
   private generator: any;
   private useDebug: any;
 
-  constructor(options: SqliteQueryOptions) {
+  constructor(options: SqliteStatementReadOptions) {
     super({ objectMode: true });
 
     this.path = options.database;
-    this.query = options.query;
+    this.sql = options.sql;
     this.useDebug = options.debug || false;
   }
 
@@ -31,8 +31,8 @@ class SqliteQuery<T> extends Readable {
     const db = new Database(this.path, { readonly: true });
 
     try {
-      this.debug(this.query);
-      const select = db.prepare(this.query);
+      this.debug(this.sql);
+      const select = db.prepare(this.sql);
       const all = select.all();
       for (let row of all) {
         yield row;
@@ -76,8 +76,8 @@ class SqliteQuery<T> extends Readable {
   }
 }
 
-export default SqliteQuery;
+export default SqliteStatementRead;
 
-export function createReadStream<T>(options: SqliteQueryOptions) {
-  return new SqliteQuery<T>(options);
+export function createReadStream<T>(options: SqliteStatementReadOptions) {
+  return new SqliteStatementRead<T>(options);
 }

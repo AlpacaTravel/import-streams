@@ -20,7 +20,8 @@ import { createReadStream as createJsonApiDataReadStream } from "./read/json-api
 import { createTransformStream as createMapSelectorTransformStream } from "./transform/map-selector";
 import { createWriteStream as createSyncExternalItemsWriteStream } from "./write/sync-external-items";
 import { createReadStream as createJourneyReadStream } from "./read/journey";
-import { createReadStream as createSqliteQueryReadStream } from "./read/sqlite-query";
+import { createReadStream as createSqliteStatementReadStream } from "./read/sqlite-statement-read";
+import { createWriteStream as createSqliteStatementWriteStream } from "./write/sqlite-statement-write";
 import {
   createReadStream as createFetchObjectStream,
   Headers,
@@ -32,12 +33,13 @@ export {
   createJsonApiDataReadStream,
   createFetchObjectStream,
   createJourneyReadStream,
-  createSqliteQueryReadStream,
+  createSqliteStatementReadStream,
   // Transform Streams
   transforms,
   createMapSelectorTransformStream,
   // Write Streams
   createSyncExternalItemsWriteStream,
+  createSqliteStatementWriteStream,
 };
 
 type Callback = (error?: Error) => undefined;
@@ -93,9 +95,9 @@ export interface JourneyOptions extends StreamFactoryOptions {
   limit?: number;
 }
 
-export interface SqliteQueryOptions extends StreamFactoryOptions {
+export interface SqliteStatementOptions extends StreamFactoryOptions {
   database: string;
-  query: string;
+  sql: string;
   debug?: boolean;
 }
 
@@ -168,9 +170,9 @@ const isJourneyOptions = (
   return false;
 };
 
-const isSqliteQueryOptions = (
+const isSqliteStatementOptionsOptions = (
   options?: StreamFactoryOptions
-): options is SqliteQueryOptions => {
+): options is SqliteStatementOptions => {
   if (!options) {
     return false;
   }
@@ -280,20 +282,20 @@ export const createCompose = (options?: Options) => {
         );
       }
 
-      case "sqlite-query": {
-        if (isSqliteQueryOptions(stream.options)) {
+      case "sqlite-statement-read": {
+        if (isSqliteStatementOptionsOptions(stream.options)) {
           assert(
             stream.options.database,
-            "Missing the database path for the sqlite-query stream"
+            "Missing the database path for the sqlite-statement-read stream"
           );
           assert(
-            stream.options.query,
-            "Missing the database query for the sqlite-query stream"
+            stream.options.sql,
+            "Missing the database sql for the sqlite-statement-read stream"
           );
 
-          return createSqliteQueryReadStream({
+          return createSqliteStatementReadStream({
             database: stream.options.database,
-            query: stream.options.query,
+            sql: stream.options.sql,
             debug: stream.options.debug || false,
           });
         }

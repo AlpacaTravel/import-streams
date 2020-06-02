@@ -8,7 +8,7 @@ import compose, {
   createSyncExternalItemsWriteStream,
   createJsonApiDataReadStream,
   createMapSelectorTransformStream,
-  createSqliteQueryReadStream,
+  createSqliteStatementReadStream,
 } from "../../src/index";
 import { TransformReferences } from "../../src/types";
 import { Readable, Writable } from "readable-stream";
@@ -27,7 +27,7 @@ describe("module", () => {
     expect(typeof createFetchObjectStream).toBe("function");
     expect(typeof createJourneyReadStream).toBe("function");
     expect(typeof createMapSelectorTransformStream).toBe("function");
-    expect(typeof createSqliteQueryReadStream).toBe("function");
+    expect(typeof createSqliteStatementReadStream).toBe("function");
     expect(typeof transforms).toBe("object");
   });
 
