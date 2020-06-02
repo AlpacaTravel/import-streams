@@ -301,7 +301,7 @@ export const createCompose = (options?: Options) => {
         }
       }
 
-      case "sqlite-write-read": {
+      case "sqlite-statement-write": {
         if (isSqliteStatementOptionsOptions(stream.options)) {
           assert(
             stream.options.database,
