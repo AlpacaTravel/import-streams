@@ -92,7 +92,7 @@ const mapSelector: TransformFunction<MappedObject, MapSelectorOptions> = async (
   })();
 
   return keys.reduce((obj: MappedObject, key: string, i: number) => {
-    const clone: MappedObject = JSON.parse(JSON.stringify(obj));
+    const clone: MappedObject = _.clone(obj);
     // Standard prop
     if (!/^[^:]+:\/\/.+$/.test(key)) {
       _.set(clone, key, values[i]);

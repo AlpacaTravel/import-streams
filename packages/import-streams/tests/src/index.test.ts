@@ -201,7 +201,7 @@ describe("module", () => {
     const factory = getFactory(setOutput);
 
     nock("https://www.example.com:443")
-      .get("/example.csv")
+      .get("/example.json")
       .reply(200, input, ["Content-Type", "application/json; charset=UTF-8"]);
 
     const doc = `
@@ -209,7 +209,7 @@ version: 1.0
 stream:
   - type: fetch-object
     options:
-      url: https://www.example.com/example.csv
+      url: https://www.example.com/example.json
   - type: map-selector
     options:
       mapping:
@@ -221,6 +221,22 @@ stream:
           transform:
             - text
             - html-entities-decode
+        host:
+          path: url
+          transform:
+            - url
+            - uri-parse
+            - type: flatten
+              options:
+                key: host
+        missing:
+          path: missing
+          transform:
+            - url
+            - uri-parse
+            - type: flatten
+              options:
+                key: host
         html:
           path: html
           transform:
@@ -276,6 +292,8 @@ stream:
       html:
         "<p>An <em>Extraordinary Formatting &amp; Statement</em> across poor html</p>\n",
       facebook: "https://www.facebook.com/alpacatravel/",
+      host: "alpaca.travel",
+      missing: undefined,
     });
   });
 });

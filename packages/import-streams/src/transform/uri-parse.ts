@@ -7,8 +7,12 @@ const uriParse: TransformFunction<Promise<any>, UriParseOptions> = async (
   value: any,
   options: UriParseOptions
 ): Promise<any | undefined> => {
-  if (typeof value === "string") {
-    return URI.parse(value);
+  try {
+    if (typeof value === "string") {
+      return URI.parse(value);
+    }
+  } catch (e) {
+    // ...
   }
 
   return undefined;
