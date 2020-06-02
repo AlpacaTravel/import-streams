@@ -4,6 +4,7 @@ import { Writable } from "readable-stream";
 interface SqliteStatementWriteOptions {
   database: string;
   sql: string;
+  debug?: boolean;
 }
 
 type Callback = (error?: Error) => undefined;
@@ -13,12 +14,20 @@ class SqliteWrite extends Writable {
   private sql: string;
   private statement?: any;
   private database?: DatabaseType;
+  private useDebug: boolean;
 
   constructor(options: SqliteStatementWriteOptions) {
     super({ objectMode: true });
 
     this.path = options.database;
     this.sql = options.sql;
+    this.useDebug = options.debug || false;
+  }
+
+  debug(...args: any[]) {
+    if (this.useDebug === true) {
+      console.log("sqlite-statement-write:", ...args);
+    }
   }
 
   getDatabase(): DatabaseType {
@@ -45,12 +54,15 @@ class SqliteWrite extends Writable {
     try {
       const statement = this.getStatement();
       if (Array.isArray(obj)) {
+        this.debug("Pushing array", this.sql, obj);
         statement.run(...obj);
       } else {
+        this.debug("Pushing object", this.sql, obj);
         statement.run(obj);
       }
       callback();
     } catch (e) {
+      this.debug("Got error", e.message);
       callback(e);
     }
   }
@@ -58,6 +70,7 @@ class SqliteWrite extends Writable {
   _final() {
     const db = this.getDatabase();
     if (db) {
+      this.debug("Closing the database");
       db.close();
     }
   }

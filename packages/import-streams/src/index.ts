@@ -315,6 +315,7 @@ export const createCompose = (options?: Options) => {
           return createSqliteStatementWriteStream({
             database: stream.options.database,
             sql: stream.options.sql,
+            debug: stream.options.debug,
           });
         }
       }
