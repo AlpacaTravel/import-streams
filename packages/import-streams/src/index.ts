@@ -301,6 +301,24 @@ export const createCompose = (options?: Options) => {
         }
       }
 
+      case "sqlite-write-read": {
+        if (isSqliteStatementOptionsOptions(stream.options)) {
+          assert(
+            stream.options.database,
+            "Missing the database path for the sqlite-statement-write stream"
+          );
+          assert(
+            stream.options.sql,
+            "Missing the database sql for the sqlite-statement-write stream"
+          );
+
+          return createSqliteStatementWriteStream({
+            database: stream.options.database,
+            sql: stream.options.sql,
+          });
+        }
+      }
+
       case "fetch-object": {
         if (isFetchObjectOptions(stream.options)) {
           assert(stream.options.url, "Missing the URL for the stream");
