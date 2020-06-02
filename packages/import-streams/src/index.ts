@@ -404,6 +404,7 @@ export const createCompose = (options?: Options) => {
             debug: stream.options.debug,
             pathTotalRecords: stream.options.pathTotalRecords,
             offsetQueryParam: stream.options.offsetQueryParam,
+            pagesizeQueryParam: stream.options.pagesizeQueryParam,
             pagesize: stream.options.pagesize,
           });
         }
@@ -422,6 +423,8 @@ export const createCompose = (options?: Options) => {
             pathTotalRecords: stream.options.pathTotalRecords,
             pageQueryParam: stream.options.pageQueryParam,
             usePageStartingAtOne: stream.options.usePageStartingAtOne,
+            pagesize: stream.options.pagesize,
+            pagesizeQueryParam: stream.options.pagesizeQueryParam,
           });
         }
       }
