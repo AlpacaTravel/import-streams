@@ -41,11 +41,13 @@
     "@types/sanitize-html": "^1.23.0",
     "@types/sprintf-js": "^1.1.2",
     "@types/striptags": "^3.1.1",
+    "@types/urijs": "^1.19.9",
     "assert": "^2.0.0",
     "better-sqlite3": "^7.0.1",
     "bottleneck": "^2.19.5",
     "csv-parse": "^4.10.1",
     "csv-stringify": "^5.5.0",
+    "encoding": "^0.1.12",
     "html-entities": "^1.3.1",
     "isomorphic-unfetch": "^3.0.0",
     "lodash": "^4.17.15",
@@ -56,7 +58,7 @@
     "smart-truncate": "^1.0.1",
     "sprintf-js": "^1.1.2",
     "striptags": "^3.1.1",
-    "uri-js": "^4.2.2",
+    "urijs": "^1.19.2",
     "yaml": "^1.10.0"
   },
   "devDependencies": {

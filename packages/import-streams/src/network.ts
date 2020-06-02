@@ -119,7 +119,10 @@ const object = (source: Fetch) => {
         if (!res.ok) {
           throw new Error(res.statusText);
         }
-        const data = res.json() as Promise<T>;
+
+        const converted = await res.textConverted();
+        const data = JSON.parse(converted) as Promise<T>;
+
         return await data;
       })(),
     ]);

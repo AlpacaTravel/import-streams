@@ -26,6 +26,8 @@ import {
   createReadStream as createFetchObjectStream,
   Headers,
 } from "./read/fetch-object";
+import { createReadStream as createFetchPaginatedObjectsStream } from "./read/fetch-paginated-objects";
+
 import createFetchStream from "./read/fetch-stream";
 
 export {
@@ -84,6 +86,40 @@ export interface FetchObjectOptions extends StreamFactoryOptions {
   retry?: boolean | number;
 }
 
+interface OffsetBaseOptions extends FetchPaginatedObjectsOptions {
+  offsetQueryParam: string;
+}
+
+interface PageBasedOptions extends FetchPaginatedObjectsOptions {
+  pageQueryParam: string;
+  usePageStartingAtOne?: boolean;
+}
+
+export interface FetchPaginatedObjectsOptions extends StreamFactoryOptions {
+  url: string;
+  limit?: number;
+  offset?: number;
+  retry?: number;
+  wait?: number;
+  pagesize?: number;
+  pagesizeQueryParam?: string;
+  pathTotalRecords: string;
+  path: string;
+  headers?: Headers;
+  method?: string;
+}
+
+interface FetchPaginatedObjectsOffsetBaseOptions
+  extends FetchPaginatedObjectsOptions {
+  offsetQueryParam: string;
+}
+
+interface FetchPaginatedObjectsPageBasedOptions
+  extends FetchPaginatedObjectsOptions {
+  pageQueryParam: string;
+  usePageStartingAtOne?: boolean;
+}
+
 export interface FetchStreamOptions extends StreamFactoryOptions {
   url: string;
   headers?: Headers;
@@ -130,6 +166,30 @@ const isCsvStringifyOptions = (
     return true;
   }
   if (typeof options === "object" && Object.keys(options).length === 0) {
+    return true;
+  }
+  return false;
+};
+
+const isFetchPaginatedObjectsOffsetBaseOptions = (
+  options?: StreamFactoryOptions
+): options is FetchPaginatedObjectsOffsetBaseOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("offsetQueryParam" in options) {
+    return true;
+  }
+  return false;
+};
+
+const isFetchPaginatedObjectsPageBasedOptions = (
+  options?: StreamFactoryOptions
+): options is FetchPaginatedObjectsPageBasedOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("pageQueryParam" in options) {
     return true;
   }
   return false;
@@ -333,6 +393,41 @@ export const createCompose = (options?: Options) => {
             iterate: stream.options.iterate,
             retry: stream.options.retry,
             wait: stream.options.wait,
+          });
+        }
+      }
+
+      case "fetch-paginated-objects": {
+        if (isFetchPaginatedObjectsOffsetBaseOptions(stream.options)) {
+          assert(stream.options.url, "Missing the URL for the stream");
+
+          // Create the read stream
+          return createFetchPaginatedObjectsStream(stream.options.url, {
+            limit: stream.options.limit,
+            method: stream.options.method,
+            path: stream.options.path,
+            headers: stream.options.headers,
+            retry: stream.options.retry,
+            wait: stream.options.wait,
+            pathTotalRecords: stream.options.pathTotalRecords,
+            offsetQueryParam: stream.options.offsetQueryParam,
+            pagesize: stream.options.pagesize,
+          });
+        }
+        if (isFetchPaginatedObjectsPageBasedOptions(stream.options)) {
+          assert(stream.options.url, "Missing the URL for the stream");
+
+          // Create the read stream
+          return createFetchPaginatedObjectsStream(stream.options.url, {
+            limit: stream.options.limit,
+            method: stream.options.method,
+            path: stream.options.path,
+            headers: stream.options.headers,
+            retry: stream.options.retry,
+            wait: stream.options.wait,
+            pathTotalRecords: stream.options.pathTotalRecords,
+            pageQueryParam: stream.options.pageQueryParam,
+            usePageStartingAtOne: stream.options.usePageStartingAtOne,
           });
         }
       }
