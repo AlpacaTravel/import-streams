@@ -86,15 +86,6 @@ export interface FetchObjectOptions extends StreamFactoryOptions {
   retry?: boolean | number;
 }
 
-interface OffsetBaseOptions extends FetchPaginatedObjectsOptions {
-  offsetQueryParam: string;
-}
-
-interface PageBasedOptions extends FetchPaginatedObjectsOptions {
-  pageQueryParam: string;
-  usePageStartingAtOne?: boolean;
-}
-
 export interface FetchPaginatedObjectsOptions extends StreamFactoryOptions {
   url: string;
   limit?: number;
@@ -107,6 +98,7 @@ export interface FetchPaginatedObjectsOptions extends StreamFactoryOptions {
   path: string;
   headers?: Headers;
   method?: string;
+  debug?: boolean;
 }
 
 interface FetchPaginatedObjectsOffsetBaseOptions
@@ -409,6 +401,7 @@ export const createCompose = (options?: Options) => {
             headers: stream.options.headers,
             retry: stream.options.retry,
             wait: stream.options.wait,
+            debug: stream.options.debug,
             pathTotalRecords: stream.options.pathTotalRecords,
             offsetQueryParam: stream.options.offsetQueryParam,
             pagesize: stream.options.pagesize,
@@ -425,6 +418,7 @@ export const createCompose = (options?: Options) => {
             headers: stream.options.headers,
             retry: stream.options.retry,
             wait: stream.options.wait,
+            debug: stream.options.debug,
             pathTotalRecords: stream.options.pathTotalRecords,
             pageQueryParam: stream.options.pageQueryParam,
             usePageStartingAtOne: stream.options.usePageStartingAtOne,

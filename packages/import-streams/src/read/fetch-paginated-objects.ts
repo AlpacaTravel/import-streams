@@ -19,6 +19,7 @@ interface FetchPaginatedObjectsOptions {
   path: string;
   headers?: Headers;
   method?: string;
+  debug?: boolean;
 }
 
 interface OffsetBaseOptions extends FetchPaginatedObjectsOptions {
@@ -71,6 +72,7 @@ export default class FetchObject<T> extends Readable {
   private usePageStartingAtOne?: boolean;
   private generator?: any;
   private count: number;
+  private useDebug: boolean;
 
   constructor(url: string, options: OffsetBaseOptions | PageBasedOptions) {
     super({ objectMode: true });
@@ -135,6 +137,14 @@ export default class FetchObject<T> extends Readable {
       (typeof retry === "boolean" && retry === true ? 1 : 0) ||
       (typeof retry === "number" && retry) ||
       0;
+
+    this.useDebug = options.debug === true;
+  }
+
+  debug(...args: any[]) {
+    if (this.useDebug === true) {
+      console.log("fetch-paginated-objects:", ...args);
+    }
   }
 
   async *getRecordsGenerator() {
@@ -148,6 +158,8 @@ export default class FetchObject<T> extends Readable {
         headers: Object.assign({}, headers, this.headers),
         method: this.method,
       };
+
+      this.debug("Calling", url);
 
       return network.objectRead<any>(url, opts);
     };
@@ -198,8 +210,11 @@ export default class FetchObject<T> extends Readable {
         }
 
         if (!Array.isArray(result)) {
+          this.debug("Did not find pageable array in results");
           break;
         }
+
+        this.debug("Found", result.length);
 
         // Read through
         for (let record of result) {
@@ -236,10 +251,12 @@ export default class FetchObject<T> extends Readable {
           done,
         }: { value: T; done: boolean } = await generator.next();
         if (value) {
+          this.debug("Pushing", value);
           this.push(value);
           this.count += 1;
         }
         if (done || (this.limit && this.count >= this.limit)) {
+          this.debug("Done");
           this.push(null);
         }
       } catch (e) {
