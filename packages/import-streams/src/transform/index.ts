@@ -28,6 +28,7 @@ import resolveJourney from "./resolve-journey";
 import fexp from "./fexp";
 import FilterFexp from "./filter-fexp";
 import htmlEntitiesDecode from "./html-entities-decode";
+import sprintf from "./sprintf";
 
 import { packageTransforms } from "../packaging";
 
@@ -38,6 +39,7 @@ Object.assign(transforms, {
   concat,
   join,
   console,
+  sprintf,
   "json-stringify": stringify,
   "json-parse": parse,
   "uri-parse": uriParse,

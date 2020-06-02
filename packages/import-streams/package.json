@@ -39,6 +39,7 @@
     "@types/prettier": "^2.0.0",
     "@types/readable-stream": "^2.3.6",
     "@types/sanitize-html": "^1.23.0",
+    "@types/sprintf-js": "^1.1.2",
     "@types/striptags": "^3.1.1",
     "assert": "^2.0.0",
     "better-sqlite3": "^7.0.1",
@@ -53,6 +54,7 @@
     "readable-stream": "^3.6.0",
     "sanitize-html": "^1.23.0",
     "smart-truncate": "^1.0.1",
+    "sprintf-js": "^1.1.2",
     "striptags": "^3.1.1",
     "uri-js": "^4.2.2",
     "yaml": "^1.10.0"
