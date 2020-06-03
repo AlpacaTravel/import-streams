@@ -4,6 +4,7 @@ import { assertValidTransformOptions } from "../assertions";
 
 export interface HtmlPrettierOptions extends TransformOptions {
   configuration?: ParserOptions;
+  useUndefinedOnError?: boolean;
 }
 
 const htmlPrettier: TransformFunction<
@@ -18,15 +19,25 @@ const htmlPrettier: TransformFunction<
     ["configuration", "context", "debug"],
     "html-prettier"
   );
+  try {
+    const parserOptions = Object.assign(
+      {},
+      { parser: "html" },
+      options.configuration
+    );
 
-  const parserOptions = Object.assign(
-    {},
-    { parser: "html" },
-    options.configuration
-  );
+    if (typeof value === "string") {
+      return prettier.format(value, parserOptions);
+    }
+  } catch (e) {
+    if (options.debug === true) {
+      console.error(e);
+    }
+    if (options.useUndefinedOnError === true) {
+      return undefined;
+    }
 
-  if (typeof value === "string") {
-    return prettier.format(value, parserOptions);
+    throw e;
   }
 
   return undefined;
