@@ -16,7 +16,7 @@ const htmlPrettier: TransformFunction<
 ): Promise<string | undefined> => {
   assertValidTransformOptions(
     options,
-    ["configuration", "context", "debug"],
+    ["configuration", "context", "debug", "useUndefinedOnError"],
     "html-prettier"
   );
   try {
