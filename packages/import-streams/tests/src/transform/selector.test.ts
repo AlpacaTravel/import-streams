@@ -29,7 +29,7 @@ describe("selectorTransforms", () => {
         compose,
       },
     };
-    expect(await selector(value, options)).toBe("http://www.google.com");
+    expect(await selector(value, options)).toBe("http://www.google.com/");
   });
   test("will obtain a value from a selector with modifier with options", async () => {
     const value = {
@@ -59,7 +59,7 @@ describe("selectorTransforms", () => {
         compose,
       },
     };
-    expect(await selector(value, options)).toBe("http://www.google.com");
+    expect(await selector(value, options)).toBe("http://www.google.com/");
   });
   test("will support multiple selectors for fallback", async () => {
     const value = {
@@ -74,6 +74,6 @@ describe("selectorTransforms", () => {
         compose,
       },
     };
-    expect(await selector(value, options)).toBe("http://www.google.com");
+    expect(await selector(value, options)).toBe("http://www.google.com/");
   });
 });

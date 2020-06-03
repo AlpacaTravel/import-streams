@@ -106,7 +106,7 @@ describe("module", () => {
       compose(doc, { factory }).on("finish", success).on("error", err);
     });
 
-    expect(output).toBe("http://fubar.com");
+    expect(output).toBe("http://fubar.com/");
   });
 
   test("simple multiple read/transform/write example", async () => {
@@ -129,7 +129,7 @@ describe("module", () => {
       compose(doc, { factory }).on("finish", success).on("error", err);
     });
 
-    expect(output).toMatchObject(["http://fubar.com", "http://fubar.com"]);
+    expect(output).toMatchObject(["http://fubar.com/", "http://fubar.com/"]);
   });
 
   test("network fetch stream with csv stream", async () => {
