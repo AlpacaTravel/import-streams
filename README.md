@@ -10,7 +10,7 @@ Goals:
 
 - Offer a platform to describe and implement a custom import pipelines
 - Provide the tools and capabilities to move data to and from various data sources
-- Provide tools to map common data sources (CSV, File, JSON:API, REST, etc)
+- Provide tools to map common data sources (CSV, File, JSON:API, REST, AWS, etc)
 - Making mapping data easy from bespoke schemas, with common field-type processing (such as supporting reading and translating Drupal field types)
 - Use streams and offer network read/write rate limiting to optimise the pipeline
 - Offer an easy way to describe the import entirely using YAML and no implementation code
@@ -37,6 +37,10 @@ There are a lot of already developed streams available for processing input and 
 - math, regex, control, combining, string manipulation, membership, existence type, equality
 - prettier, html santize
 - cipher, zlib
+
+## Docs
+
+See [docs](https://github.com/AlpacaTravel/import-streams/tree/master/docs)
 
 ## Composeable Pipelines
 

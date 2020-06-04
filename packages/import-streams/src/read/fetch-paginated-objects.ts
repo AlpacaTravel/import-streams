@@ -16,7 +16,7 @@ interface FetchPaginatedObjectsOptions {
   pagesize?: number;
   pagesizeQueryParam?: string;
   pathTotalRecords: string;
-  path: string;
+  path?: string;
   headers?: Headers;
   method?: string;
   debug?: boolean;
@@ -57,7 +57,7 @@ const isOffsetBaseOptions = (
 
 export default class FetchObject<T> extends Readable {
   private url: string;
-  private path: string;
+  private path?: string;
   private method: string;
   private headers: Headers;
   private limit?: number;
@@ -205,7 +205,7 @@ export default class FetchObject<T> extends Readable {
         }
 
         let result = query;
-        if (this.path !== null) {
+        if (this.path != null) {
           result = selector(this.path, result);
         }
 

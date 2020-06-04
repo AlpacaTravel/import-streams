@@ -19,6 +19,11 @@ describe("aws-s3-get-object", () => {
 
     let first = true;
     AWSMock.mock("S3", "listObjectsV2", (params: any, callback: Callback) => {
+      if (first) {
+        expect(params.ContinuationToken).toBeUndefined();
+      } else {
+        expect(params.ContinuationToken).not.toBeUndefined();
+      }
       const data = {
         Contents: [
           {
