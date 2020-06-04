@@ -18,6 +18,7 @@ stream:
       url: https://www.my-data-store-location.com/endpoint?key=123
       # The path to total records (e.g. { total: 1000 }) in the response
       pathTotalRecords: total
+
       # Optional:
       # Configure the number of elements per page
       pagesize: 100

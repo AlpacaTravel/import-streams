@@ -15,6 +15,7 @@ stream:
       # Required
       bucket: my-bucket
       key: path/to/my-file.json
+
       # Optional:
       # AWS Region
       region: AP-SOUTHEAST-2

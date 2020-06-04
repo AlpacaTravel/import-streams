@@ -14,6 +14,7 @@ stream:
       # Required
       bucket: example-bucket-name
       key: path/to/key.csv.gz
+
       # Optional
       region: AP-SOUTHEAST-2
 

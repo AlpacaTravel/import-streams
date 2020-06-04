@@ -15,6 +15,7 @@ stream:
     options:
       # Required:
       bucket: my-bucket
+
       # Optional:
       # Prefix to objects
       prefix: path/my-csv-files

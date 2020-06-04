@@ -12,6 +12,7 @@ stream:
     options:
       # Required
       url: https://www.mysite.com/example.csv
+
       # Optional
       # HTTP Method, get default..
       method: get

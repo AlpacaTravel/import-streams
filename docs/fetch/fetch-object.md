@@ -15,6 +15,7 @@ stream:
       url:
         # Optional, you can just supply one string, or an array of URL's
         - https://www.my-data-store-location.com/1.json
+
       # Optional:
       # Path to the object/s
       path: some.path.to.objects
