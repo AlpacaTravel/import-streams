@@ -2,10 +2,13 @@ import { Transform } from "readable-stream";
 import { TransformOptions, Callback } from "../types";
 import { assertValidTransformOptions } from "../assertions";
 
-interface ParseOptions extends TransformOptions {}
+interface ParseOptions extends TransformOptions {
+  useUndefinedOnError?: boolean;
+}
 
 class Parse extends Transform {
   private useDebug: boolean;
+  private useUndefinedOnError: boolean;
 
   constructor(options: ParseOptions) {
     super({ objectMode: true });
@@ -13,6 +16,7 @@ class Parse extends Transform {
     const { debug = false } = options || {};
 
     this.useDebug = debug;
+    this.useUndefinedOnError = options.useUndefinedOnError === true;
   }
 
   _transform(chunk: any, _: string, cb: Callback) {
@@ -23,7 +27,12 @@ class Parse extends Transform {
       if (this.useDebug === true) {
         console.error(e);
       }
-      cb(e);
+      if (this.useUndefinedOnError) {
+        this.push(undefined);
+        cb();
+      } else {
+        cb(e);
+      }
     }
   }
 }
