@@ -13,6 +13,8 @@ import parse from "csv-parse";
 import stringify from "csv-stringify";
 import YAML from "yaml";
 import * as fs from "fs";
+import zlib from "zlib";
+import crypto from "crypto";
 
 import { isTransformFunction, isTransformSupportingContext } from "./types";
 import transforms from "./transform/index";
@@ -27,6 +29,9 @@ import {
   Headers,
 } from "./read/fetch-object";
 import { createReadStream as createFetchPaginatedObjectsStream } from "./read/fetch-paginated-objects";
+import { createReadStream as createAwsS3GetObjectStream } from "./read/aws-s3-get-object-stream";
+import { createReadStream as createAwsS3GetObject } from "./read/aws-s3-get-object";
+import { createReadStream as createAwsS3ListObjectsStream } from "./read/aws-s3-list-objects";
 
 import createFetchStream from "./read/fetch-stream";
 
@@ -135,6 +140,95 @@ export interface CsvStringifyOptions extends StreamFactoryOptions {
   delimiter?: string;
   header?: boolean;
 }
+
+export interface CipherOptions extends StreamFactoryOptions {
+  algorithm: string;
+  password: string;
+}
+
+export interface AwsS3GetObjectStreamOptions extends StreamFactoryOptions {
+  bucket: string;
+  key: string;
+  region?: string;
+}
+
+export interface AwsS3GetObjectOptions extends StreamFactoryOptions {
+  bucket: string;
+  key: string;
+  region?: string;
+  limit?: number;
+  path?: string;
+  iterate?: boolean;
+  encoding?:
+    | "utf-8"
+    | "ascii"
+    | "utf8"
+    | "utf16le"
+    | "ucs2"
+    | "ucs-2"
+    | "base64"
+    | "latin1"
+    | "binary"
+    | "hex";
+  parseJson?: boolean;
+  debug?: boolean;
+}
+
+export interface AwsS3ListObjectsStreamOptions extends StreamFactoryOptions {
+  bucket: string;
+  prefix?: string;
+  region?: string;
+  limit?: number;
+  debug?: boolean;
+}
+
+const isAwsS3ListObjectsStreamOptions = (
+  options?: StreamFactoryOptions
+): options is AwsS3ListObjectsStreamOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("bucket" in options) {
+    return true;
+  }
+  return false;
+};
+
+const isAwsS3GetObjectOptions = (
+  options?: StreamFactoryOptions
+): options is AwsS3GetObjectOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("bucket" in options) {
+    return true;
+  }
+  return false;
+};
+
+const isAwsS3GetObjectStreamOptions = (
+  options?: StreamFactoryOptions
+): options is AwsS3GetObjectStreamOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("bucket" in options) {
+    return true;
+  }
+  return false;
+};
+
+const isCipherOptions = (
+  options?: StreamFactoryOptions
+): options is CipherOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("algorithm" in options) {
+    return true;
+  }
+  return false;
+};
 
 const isJsonApiDataOptions = (
   options?: StreamFactoryOptions
@@ -448,6 +542,79 @@ export const createCompose = (options?: Options) => {
           return createJourneyReadStream(stream.options.id, {
             limit: stream.options.limit,
           });
+        }
+      }
+
+      case "aws-s3-get-object-stream": {
+        if (isAwsS3GetObjectStreamOptions(stream.options)) {
+          assert(stream.options.bucket, "Requires the bucket");
+          assert(stream.options.key, "Requires the Key");
+          return createAwsS3GetObjectStream(
+            stream.options.bucket,
+            stream.options.key,
+            {
+              region: stream.options?.region,
+            }
+          );
+        }
+      }
+
+      case "aws-s3-get-object": {
+        if (isAwsS3GetObjectOptions(stream.options)) {
+          assert(stream.options.bucket, "Requires the bucket");
+          assert(stream.options.key, "Requires the Key");
+          return createAwsS3GetObject(
+            stream.options.bucket,
+            stream.options.key,
+            {
+              region: stream.options?.region,
+              limit: stream.options?.limit,
+              debug: stream.options?.debug,
+              path: stream.options?.path,
+              encoding: stream.options?.encoding,
+              parseJson: stream.options?.parseJson,
+              iterate: stream.options?.iterate,
+            }
+          );
+        }
+      }
+
+      case "aws-s3-list-objects": {
+        if (isAwsS3ListObjectsStreamOptions(stream.options)) {
+          assert(stream.options.bucket, "Requires a bucket");
+
+          return createAwsS3ListObjectsStream(stream.options.bucket, {
+            prefix: stream.options?.prefix,
+            region: stream.options?.region,
+            debug: stream.options?.debug,
+            limit: stream.options?.limit,
+          });
+        }
+      }
+
+      case "gzip": {
+        return zlib.createGzip();
+      }
+
+      case "gunzip": {
+        return zlib.createGunzip();
+      }
+
+      case "crypto-encrypt": {
+        if (isCipherOptions(stream.options)) {
+          assert(stream.options.algorithm, "Requires algorithm");
+          assert(stream.options.password, "Requires password");
+          const password = new Buffer(stream.options.password);
+          return crypto.createCipher(stream.options.algorithm, password);
+        }
+      }
+
+      case "crypto-decrypt": {
+        if (isCipherOptions(stream.options)) {
+          assert(stream.options.algorithm, "Requires algorithm");
+          assert(stream.options.password, "Requires password");
+          const password = new Buffer(stream.options.password);
+          return crypto.createDecipher(stream.options.algorithm, password);
         }
       }
 
