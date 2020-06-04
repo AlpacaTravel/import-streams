@@ -29,13 +29,14 @@ Implementation Overview:
 
 There are a lot of already developed streams available for processing input and sending output. These form a "swiss-army" knife of transform functions making processing data from various sources easier.
 
-- sqlite, csv, JSON:API and fetch
+- Sqlite, csv, JSON:API, AWS S3 and fetch
 - Drupal fields, entity references
 - URI, JSON parsing
 - map, flatten, join, concat
 - path selectors
 - math, regex, control, combining, string manipulation, membership, existence type, equality
 - prettier, html santize
+- cipher, zlib
 
 ## Composeable Pipelines
 
