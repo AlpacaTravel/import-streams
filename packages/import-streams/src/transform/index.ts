@@ -29,6 +29,8 @@ import fexp from "./fexp";
 import FilterFexp from "./filter-fexp";
 import htmlEntitiesDecode from "./html-entities-decode";
 import sprintf from "./sprintf";
+import resolveAwsS3GetObjectStream from "./resolve-aws-s3-get-object-stream";
+import resolveAwsS3GetObject from "./resolve-aws-s3-get-object";
 
 import { packageTransforms } from "../packaging";
 
@@ -64,6 +66,8 @@ Object.assign(transforms, {
   position,
   replace,
   text,
+  ["resolve-aws-s3-get-object-stream"]: resolveAwsS3GetObjectStream,
+  ["resolve-aws-s3-get-object"]: resolveAwsS3GetObject,
 });
 
 // Assign sub-collections
