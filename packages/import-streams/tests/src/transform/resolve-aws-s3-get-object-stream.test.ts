@@ -63,6 +63,6 @@ describe("Resolve AWS S3", () => {
       read.pipe(transform).pipe(write).on("error", fail).on("finish", success);
     });
 
-    expect(output).toBe("This is a file with some contents");
+    expect(output).toBe("Hello import-streams, you are running!");
   });
 });

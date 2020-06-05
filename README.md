@@ -25,6 +25,37 @@ Implementation Overview:
 - Map fields and properties using 'selectors' as well as transforms that can change the data
 - Supply to an exposed 'compose' function that crates the implementation and performs the actions
 
+## Getting Started
+
+Create an YAML file like below into a file called `stream.yaml` locally.
+
+```yaml
+version: 1.0
+
+# Trivial stream
+stream:
+  # Read a URL source
+  - type: fetch-stream
+    options:
+      url: https://raw.githubusercontent.com/AlpacaTravel/import-streams/master/packages/import-streams/tests/data/file.txt
+
+  # Output the stream contents to the screen
+  - process.stdout
+```
+
+Try it out with a NPX (no install required)
+
+```shell
+$ npx @alpaca-travel/import-streams stream.yaml
+```
+
+If you think it is useful, you can then build your own import-streams and run them using the `import-streams` cli.
+
+```shell
+$ npm install -g @alpaca-travel/import-streams
+$ import-streams stream.yaml
+```
+
 ## Outline of Streams
 
 There are a lot of already developed streams available for processing input and sending output. These form a "swiss-army" knife of transform functions making processing data from various sources easier.

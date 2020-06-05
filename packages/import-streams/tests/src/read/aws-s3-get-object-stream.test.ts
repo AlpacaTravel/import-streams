@@ -39,6 +39,6 @@ describe("aws-s3-get-object-stream", () => {
       read.pipe(writable).on("finish", success).on("error", failure);
     });
 
-    expect(output).toBe("This is a file with some contents");
+    expect(output).toBe("Hello import-streams, you are running!");
   });
 });
