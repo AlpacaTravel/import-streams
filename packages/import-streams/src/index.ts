@@ -397,6 +397,9 @@ export const createCompose = (options?: Options) => {
             flags: stream.options.flags,
           });
         }
+        throw new Error(
+          "Missing the configuration for file-read-stream options"
+        );
       }
 
       case "file-write-stream": {
@@ -406,6 +409,9 @@ export const createCompose = (options?: Options) => {
             flags: stream.options.flags,
           });
         }
+        throw new Error(
+          "Missing the configuration for file-write-stream options"
+        );
       }
 
       case "json-api-data": {
@@ -424,7 +430,7 @@ export const createCompose = (options?: Options) => {
           });
         }
         throw new Error(
-          "Missing the configuration for JsonApiData options, should have: url"
+          "Missing the configuration for json-api-data options, should have: url"
         );
       }
 
@@ -445,6 +451,9 @@ export const createCompose = (options?: Options) => {
             debug: stream.options.debug || false,
           });
         }
+        throw new Error(
+          "Missing the configuration for sqlite-statement-read options"
+        );
       }
 
       case "sqlite-statement-write": {
@@ -464,6 +473,9 @@ export const createCompose = (options?: Options) => {
             debug: stream.options.debug,
           });
         }
+        throw new Error(
+          "Missing the configuration for sqlite-statement-write options"
+        );
       }
 
       case "fetch-object": {
@@ -481,6 +493,7 @@ export const createCompose = (options?: Options) => {
             wait: stream.options.wait,
           });
         }
+        throw new Error("Missing the configuration for fetch-object options");
       }
 
       case "fetch-paginated-objects": {
@@ -521,6 +534,9 @@ export const createCompose = (options?: Options) => {
             pagesizeQueryParam: stream.options.pagesizeQueryParam,
           });
         }
+        throw new Error(
+          "Missing the configuration for fetch-paginated-objects options"
+        );
       }
 
       case "fetch-stream": {
@@ -532,6 +548,7 @@ export const createCompose = (options?: Options) => {
             headers: stream.options.headers,
           });
         }
+        throw new Error("Missing the configuration for fetch-stream options");
       }
 
       case "journey": {
@@ -543,6 +560,7 @@ export const createCompose = (options?: Options) => {
             limit: stream.options.limit,
           });
         }
+        throw new Error("Missing the configuration for journey options");
       }
 
       case "aws-s3-get-object-stream": {
@@ -557,6 +575,9 @@ export const createCompose = (options?: Options) => {
             }
           );
         }
+        throw new Error(
+          "Missing the configuration for aws-s3-get-object-stream options"
+        );
       }
 
       case "aws-s3-get-object": {
@@ -577,6 +598,9 @@ export const createCompose = (options?: Options) => {
             }
           );
         }
+        throw new Error(
+          "Missing the configuration for aws-s3-get-object options"
+        );
       }
 
       case "aws-s3-list-objects": {
@@ -590,6 +614,9 @@ export const createCompose = (options?: Options) => {
             limit: stream.options?.limit,
           });
         }
+        throw new Error(
+          "Missing the configuration for aws-s3-list-objects options"
+        );
       }
 
       case "gzip": {
@@ -607,6 +634,7 @@ export const createCompose = (options?: Options) => {
           const password = new Buffer(stream.options.password);
           return crypto.createCipher(stream.options.algorithm, password);
         }
+        throw new Error("Missing the configuration for crypto-encrypt options");
       }
 
       case "crypto-decrypt": {
@@ -616,6 +644,7 @@ export const createCompose = (options?: Options) => {
           const password = new Buffer(stream.options.password);
           return crypto.createDecipher(stream.options.algorithm, password);
         }
+        throw new Error("Missing the configuration for crypto-decrypt options");
       }
 
       case "sync-external-items": {
@@ -655,6 +684,7 @@ export const createCompose = (options?: Options) => {
             columns: stream.options?.columns,
           });
         }
+        throw new Error("Missing the configuration for csv-stringify options");
       }
 
       case "process.stdout": {
