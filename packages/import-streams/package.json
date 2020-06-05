@@ -11,8 +11,9 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "clean": "rm -rf dist",
-    "build": "npm run build:rollup",
+    "build": "cp src/cli.js dist/cli.js & npm run build:rollup",
     "build:rollup": "rollup -c",
+    "start": "node dist/cli.js",
     "prepublish": "npm run clean & npm run build"
   },
   "homepage": "https://github.com/AlpacaTravel/import-streams",

@@ -1,0 +1,8 @@
+version: 1.0
+
+stream:
+  - type: file-read-stream
+    options:
+      path: "./tests/data/file.txt"
+
+  - process.stdout
