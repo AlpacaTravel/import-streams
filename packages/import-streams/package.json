@@ -45,6 +45,7 @@
     "@types/sanitize-html": "^1.23.0",
     "@types/sprintf-js": "^1.1.2",
     "@types/striptags": "^3.1.1",
+    "@types/unzipper": "^0.10.3",
     "@types/urijs": "^1.19.9",
     "assert": "^2.0.0",
     "aws-sdk": "^2.689.0",
@@ -63,6 +64,7 @@
     "smart-truncate": "^1.0.1",
     "sprintf-js": "^1.1.2",
     "striptags": "^3.1.1",
+    "unzipper": "^0.10.11",
     "urijs": "^1.19.2",
     "yaml": "^1.10.0"
   },

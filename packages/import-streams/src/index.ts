@@ -15,6 +15,7 @@ import YAML from "yaml";
 import * as fs from "fs";
 import zlib from "zlib";
 import crypto from "crypto";
+import unzipper from "unzipper";
 
 import { isTransformFunction, isTransformSupportingContext } from "./types";
 import transforms from "./transform/index";
@@ -181,6 +182,23 @@ export interface AwsS3ListObjectsStreamOptions extends StreamFactoryOptions {
   limit?: number;
   debug?: boolean;
 }
+
+export interface UnzipOneOptions extends StreamFactoryOptions {
+  regex?: string;
+  regexFlags?: string;
+}
+
+const isUnzipOneOptions = (
+  options?: StreamFactoryOptions
+): options is UnzipOneOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("regex" in options) {
+    return true;
+  }
+  return false;
+};
 
 const isAwsS3ListObjectsStreamOptions = (
   options?: StreamFactoryOptions
@@ -685,6 +703,19 @@ export const createCompose = (options?: Options) => {
           });
         }
         throw new Error("Missing the configuration for csv-stringify options");
+      }
+
+      case "unzip-one": {
+        if (isUnzipOneOptions(stream.options)) {
+          if (stream.options?.regex) {
+            const reg = new RegExp(
+              stream.options.regex,
+              stream.options.regexFlags
+            );
+            return unzipper.ParseOne(reg);
+          }
+        }
+        return unzipper.ParseOne();
       }
 
       case "process.stdout": {

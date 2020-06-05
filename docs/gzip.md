@@ -1,6 +1,6 @@
-# File Write Stream
+# Gzip
 
-A basic read stream, wrapping fs.createWriteStream.
+The transform stream `gzip` will use zlib in order to compress the stream
 
 ## Usage
 

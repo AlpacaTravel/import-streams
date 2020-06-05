@@ -1,6 +1,6 @@
-# File Write Stream
+# Crypto Encrypt
 
-A basic read stream, wrapping fs.createWriteStream.
+A transform stream that encrypt a stream with a crypto algorithm and password
 
 ## Usage
 
@@ -13,12 +13,14 @@ stream:
     options:
       url: https://raw.githubusercontent.com/AlpacaTravel/import-streams/master/packages/import-streams/tests/data/file.txt
 
-  # Gzip...
-  - gzip
+  - type: crypto-encrypt
+    options:
+      algorithm: aes-256-ctr
+      password: e8dF3eqe
 
   # Use the file-write-stream to write the output
   - type: file-write-stream
     options:
       # Required:
-      path: ./output.txt.gz
+      path: ./file.enc
 ```

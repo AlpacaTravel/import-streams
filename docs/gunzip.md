@@ -1,6 +1,6 @@
-# File Write Stream
+# Gzip
 
-A basic read stream, wrapping fs.createWriteStream.
+The transform stream `gunzip` will use zlib in order to inflate the stream
 
 ## Usage
 
@@ -11,14 +11,14 @@ stream:
   # Stream in a file from somewhere (e.g. a hello world txt)
   - type: fetch-stream
     options:
-      url: https://raw.githubusercontent.com/AlpacaTravel/import-streams/master/packages/import-streams/tests/data/file.txt
+      url: https://somehost.com/example.txt.gz
 
-  # Gzip...
-  - gzip
+  # Guzip
+  - gunzip
 
   # Use the file-write-stream to write the output
   - type: file-write-stream
     options:
       # Required:
-      path: ./output.txt.gz
+      path: ./inflated.txt
 ```
