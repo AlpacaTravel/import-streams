@@ -12,14 +12,14 @@ import { Transform } from "readable-stream";
 import parse from "csv-parse";
 import stringify from "csv-stringify";
 import YAML from "yaml";
-import * as fs from "fs";
+import fs from "fs";
 import zlib from "zlib";
 import crypto from "crypto";
 import unzipper from "unzipper";
 
 import { isTransformFunction, isTransformSupportingContext } from "./types";
 import transforms from "./transform/index";
-import { createReadStream as createJsonApiDataReadStream } from "./read/json-api-data";
+import { createReadStream as createJsonApiObjectReadStream } from "./read/json-api-object";
 import { createTransformStream as createMapSelectorTransformStream } from "./transform/map-selector";
 import { createWriteStream as createSyncExternalItemsWriteStream } from "./write/sync-external-items";
 import { createReadStream as createJourneyReadStream } from "./read/journey";
@@ -29,7 +29,6 @@ import {
   createReadStream as createFetchObjectStream,
   Headers,
 } from "./read/fetch-object";
-import { createReadStream as createFetchPaginatedObjectsStream } from "./read/fetch-paginated-objects";
 import { createReadStream as createAwsS3GetObjectStream } from "./read/aws-s3-get-object-stream";
 import { createReadStream as createAwsS3GetObject } from "./read/aws-s3-get-object";
 import { createReadStream as createAwsS3ListObjectsStream } from "./read/aws-s3-list-objects";
@@ -38,7 +37,7 @@ import createFetchStream from "./read/fetch-stream";
 
 export {
   // Read Streams
-  createJsonApiDataReadStream,
+  createJsonApiObjectReadStream,
   createFetchObjectStream,
   createJourneyReadStream,
   createSqliteStatementReadStream,
@@ -82,17 +81,6 @@ export interface JsonApiDataOptions extends StreamFactoryOptions {
 }
 
 export interface FetchObjectOptions extends StreamFactoryOptions {
-  url: string | string[];
-  method?: string;
-  limit?: number;
-  iterate?: boolean;
-  path?: string;
-  headers?: Headers;
-  wait?: number;
-  retry?: boolean | number;
-}
-
-export interface FetchPaginatedObjectsOptions extends StreamFactoryOptions {
   url: string;
   limit?: number;
   offset?: number;
@@ -107,13 +95,17 @@ export interface FetchPaginatedObjectsOptions extends StreamFactoryOptions {
   debug?: boolean;
 }
 
-interface FetchPaginatedObjectsOffsetBaseOptions
-  extends FetchPaginatedObjectsOptions {
+export interface FetchPaginatedObjectsOptions extends FetchObjectOptions {
+  pagesize?: number;
+  pagesizeQueryParam?: string;
+  pathTotalRecords: string;
+}
+
+interface FetchObjectOffsetBaseOptions extends FetchPaginatedObjectsOptions {
   offsetQueryParam: string;
 }
 
-interface FetchPaginatedObjectsPageBasedOptions
-  extends FetchPaginatedObjectsOptions {
+interface FetchObjectPageBasedOptions extends FetchPaginatedObjectsOptions {
   pageQueryParam: string;
   usePageStartingAtOne?: boolean;
 }
@@ -248,7 +240,7 @@ const isCipherOptions = (
   return false;
 };
 
-const isJsonApiDataOptions = (
+const isJsonApiObjectOptions = (
   options?: StreamFactoryOptions
 ): options is JsonApiDataOptions => {
   if (!options) {
@@ -275,9 +267,9 @@ const isCsvStringifyOptions = (
   return false;
 };
 
-const isFetchPaginatedObjectsOffsetBaseOptions = (
+const isFetchObjectOffsetBaseOptions = (
   options?: StreamFactoryOptions
-): options is FetchPaginatedObjectsOffsetBaseOptions => {
+): options is FetchObjectOffsetBaseOptions => {
   if (!options) {
     return false;
   }
@@ -287,9 +279,9 @@ const isFetchPaginatedObjectsOffsetBaseOptions = (
   return false;
 };
 
-const isFetchPaginatedObjectsPageBasedOptions = (
+const isFetchObjectPageBasedOptions = (
   options?: StreamFactoryOptions
-): options is FetchPaginatedObjectsPageBasedOptions => {
+): options is FetchObjectPageBasedOptions => {
   if (!options) {
     return false;
   }
@@ -432,15 +424,15 @@ export const createCompose = (options?: Options) => {
         );
       }
 
-      case "json-api-data": {
-        if (isJsonApiDataOptions(stream.options)) {
+      case "json-api-object": {
+        if (isJsonApiObjectOptions(stream.options)) {
           assert(
             stream.options.url,
             "Missing the URL for the JsonApiData stream"
           );
 
           // Create the read stream
-          return createJsonApiDataReadStream(stream.options.url, {
+          return createJsonApiObjectReadStream(stream.options.url, {
             limit: stream.options.limit,
             debug: stream.options.debug,
             retry: stream.options.retry,
@@ -497,29 +489,11 @@ export const createCompose = (options?: Options) => {
       }
 
       case "fetch-object": {
-        if (isFetchObjectOptions(stream.options)) {
+        if (isFetchObjectOffsetBaseOptions(stream.options)) {
           assert(stream.options.url, "Missing the URL for the stream");
 
           // Create the read stream
           return createFetchObjectStream(stream.options.url, {
-            limit: stream.options.limit,
-            method: stream.options.method,
-            path: stream.options.path,
-            headers: stream.options.headers,
-            iterate: stream.options.iterate,
-            retry: stream.options.retry,
-            wait: stream.options.wait,
-          });
-        }
-        throw new Error("Missing the configuration for fetch-object options");
-      }
-
-      case "fetch-paginated-objects": {
-        if (isFetchPaginatedObjectsOffsetBaseOptions(stream.options)) {
-          assert(stream.options.url, "Missing the URL for the stream");
-
-          // Create the read stream
-          return createFetchPaginatedObjectsStream(stream.options.url, {
             limit: stream.options.limit,
             method: stream.options.method,
             path: stream.options.path,
@@ -533,11 +507,11 @@ export const createCompose = (options?: Options) => {
             pagesize: stream.options.pagesize,
           });
         }
-        if (isFetchPaginatedObjectsPageBasedOptions(stream.options)) {
+        if (isFetchObjectPageBasedOptions(stream.options)) {
           assert(stream.options.url, "Missing the URL for the stream");
 
           // Create the read stream
-          return createFetchPaginatedObjectsStream(stream.options.url, {
+          return createFetchObjectStream(stream.options.url, {
             limit: stream.options.limit,
             method: stream.options.method,
             path: stream.options.path,
@@ -552,9 +526,21 @@ export const createCompose = (options?: Options) => {
             pagesizeQueryParam: stream.options.pagesizeQueryParam,
           });
         }
-        throw new Error(
-          "Missing the configuration for fetch-paginated-objects options"
-        );
+        if (isFetchObjectOptions(stream.options)) {
+          assert(stream.options.url, "Missing the URL for the stream");
+
+          // Create the read stream
+          return createFetchObjectStream(stream.options.url, {
+            limit: stream.options.limit,
+            method: stream.options.method,
+            path: stream.options.path,
+            headers: stream.options.headers,
+            retry: stream.options.retry,
+            wait: stream.options.wait,
+            debug: stream.options.debug,
+          });
+        }
+        throw new Error("Missing the configuration for fetch-object options");
       }
 
       case "fetch-stream": {

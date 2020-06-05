@@ -6,7 +6,7 @@ import compose, {
   createJourneyReadStream,
   createFetchObjectStream,
   createSyncExternalItemsWriteStream,
-  createJsonApiDataReadStream,
+  createJsonApiObjectReadStream,
   createMapSelectorTransformStream,
   createSqliteStatementReadStream,
 } from "../../src/index";
@@ -23,7 +23,7 @@ describe("module", () => {
     expect(typeof compose).toBe("function");
     expect(typeof createCompose).toBe("function");
     expect(typeof createSyncExternalItemsWriteStream).toBe("function");
-    expect(typeof createJsonApiDataReadStream).toBe("function");
+    expect(typeof createJsonApiObjectReadStream).toBe("function");
     expect(typeof createFetchObjectStream).toBe("function");
     expect(typeof createJourneyReadStream).toBe("function");
     expect(typeof createMapSelectorTransformStream).toBe("function");

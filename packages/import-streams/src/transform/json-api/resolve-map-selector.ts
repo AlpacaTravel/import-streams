@@ -6,7 +6,7 @@ import {
   MapSelectorOptions,
   Mapping,
 } from "../map-selector";
-import { createReadStream } from "../../read/json-api-data";
+import { createReadStream } from "../../read/json-api-object";
 import { assertValidTransformOptions } from "../../assertions";
 
 interface JsonApiHref {

@@ -1,8 +1,8 @@
 import { Writable } from "readable-stream";
 import nock from "nock";
-import { createReadStream } from "../../../src/read/fetch-paginated-objects";
+import { createReadStream } from "../../../src/read/fetch-object";
 
-describe("Fetch Paginated Objects using createReadStream", () => {
+describe("Fetch Object using createReadStream", () => {
   test("paging with record count offsets", async () => {
     let output: any[] = [];
 
