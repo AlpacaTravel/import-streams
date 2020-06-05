@@ -27,6 +27,9 @@
   "files": [
     "dist"
   ],
+  "bin": {
+    "import-streams": "./dist/cli.js"
+  },
   "author": "Cam Manderson <cam@alpaca.travel>",
   "license": "MIT",
   "dependencies": {
