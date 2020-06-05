@@ -11,7 +11,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "clean": "rm -rf dist",
-    "build": "cp src/cli.js dist/cli.js & npm run build:rollup",
+    "build": "npm run build:rollup && cp src/cli.js dist/cli.js",
     "build:rollup": "rollup -c",
     "import-streams": "node dist/cli.js",
     "prepublish": "npm run clean & npm run build"
