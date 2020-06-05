@@ -4,30 +4,13 @@
 
 This project is currently in a Alpha Preview release.
 
-A set of libraries ot assist import related tasks, assisting importing (or exporting) from one source (such as drupal or other API) to (or from) the Alpaca API.
-
-Goals:
-
-- Offer a platform to describe and implement a custom import pipelines
-- Provide the tools and capabilities to move data to and from various data sources
-- Provide tools to map common data sources (CSV, File, JSON:API, REST, AWS, etc)
-- Making mapping data easy from bespoke schemas, with common field-type processing (such as supporting reading and translating Drupal field types)
-- Use streams and offer network read/write rate limiting to optimise the pipeline
-- Offer an easy way to describe the import entirely using YAML and no implementation code
-- Offer points of extensibility with the ability to write your own read/write or transform code and inject at any stage
-- Dogfooding - use around the Alpaca use cases first and expand to be able to be used in other scenarios
-- Expand the field types, sources and more and offer as MIT Licensing for everyone to have access and leverage
-
-Implementation Overview:
-
-- You can describe imports either using YAML, JSON or programatically using typings and steams directly
-- Describe the import using various stages, that can define read sources, map/lookup values for fields and write output
-- Map fields and properties using 'selectors' as well as transforms that can change the data
-- Supply to an exposed 'compose' function that crates the implementation and performs the actions
+A simple tool built to parse YAML or JSON in order to perform powerful stream functions, such as importing data or processing between stages.
 
 ## Getting Started
 
-Create an YAML file like below into a file called `stream.yaml` locally.
+Import streams uses a YAML (or JSON) in order to define the import streams.
+
+Let's start with creating an simple YAML file `stream.yaml` which will pipe a file obtained from this repository to the command line.
 
 ```yaml
 version: 1.0
@@ -43,13 +26,15 @@ stream:
   - process.stdout
 ```
 
-Try it out with a NPX (no install required)
+There are all types of stream sources, transforms and ways to write out data, ranging from reading and writing files to working with HTTP API's, CMS's and AWS S3. You can compose complex stream pipelines easily in one file.
+
+You can run import streams in a node environment (tested in latest LTS 10+). Your options are to run with `npx` which makes the command available without any installation as follows:
 
 ```shell
 $ npx @alpaca-travel/import-streams stream.yaml
 ```
 
-If you think it is useful, you can then build your own import-streams and run them using the `import-streams` cli.
+Otherwise, if you like it and perform regular import streams work, you can install it on your host using npm to install globally. The CLI `import-streams` will become available for you to point at any YAML file.
 
 ```shell
 $ npm install -g @alpaca-travel/import-streams
@@ -72,6 +57,27 @@ There are a lot of already developed streams available for processing input and 
 ## Docs
 
 See [docs](https://github.com/AlpacaTravel/import-streams/tree/master/docs)
+
+## Project Goals
+
+The following goals are behind the import-streams
+
+- Offer a platform to describe and implement a custom import pipelines simply
+- Provide the tools and capabilities to move data to and from various data sources
+- Provide tools to map common data sources (CSV, File, JSON:API, REST, AWS, etc)
+- Making mapping data easy from bespoke schemas, with common field-type processing (such as supporting reading and translating Drupal field types)
+- Use streams and offer network read/write rate limiting to optimise the pipeline
+- Offer an easy way to describe the import entirely using YAML and no implementation code
+- Offer points of extensibility with the ability to write your own read/write or transform code and inject at any stage
+- Dogfooding - use around the Alpaca use cases first and expand to be able to be used in other scenarios
+- Expand the field types, sources and more and offer as MIT Licensing for everyone to have access and leverage
+
+## Implementation Overview
+
+- You can describe imports either using YAML, JSON or programatically using typings and steams directly
+- Describe the import using various stages, that can define read sources, map/lookup values for fields and write output
+- Map fields and properties using 'selectors' as well as transforms that can change the data
+- Supply to an exposed 'compose' function that crates the implementation and performs the actions
 
 ## Composeable Pipelines
 
