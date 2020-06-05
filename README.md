@@ -212,7 +212,7 @@ version: 1.0
 streams:
   # Site one source
   # You can combine additional read sources using "combine: ..."
-  - type: json-api-data
+  - type: json-api-object
     options:
       url: https://www.site1.com/jsonapi/type
 
