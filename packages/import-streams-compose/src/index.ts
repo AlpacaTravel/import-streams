@@ -1,8 +1,9 @@
-import { Writable, Readable, Transform, Stream } from "readable-stream";
+import { Writable, Readable, Transform, Stream, Duplex } from "readable-stream";
 import {
   Writable as NodeJSWritable,
   Readable as NodeJSReadable,
   Transform as NodeJSTransform,
+  Duplex as NodeJSDuplex,
 } from "stream";
 import MultiReadStream from "multistream";
 import MultiWriteStream from "multi-write-stream";
@@ -15,9 +16,11 @@ export type SupportedStream =
   | Transform
   | Writable
   | Stream
+  | Duplex
   | NodeJSReadable
   | NodeJSTransform
-  | NodeJSWritable;
+  | NodeJSWritable
+  | NodeJSDuplex;
 
 export interface CombineStreamOptions {
   objectMode?: boolean;
@@ -80,8 +83,10 @@ const isWritable = (stream: any): stream is Writable => {
   if (
     stream instanceof Writable ||
     stream instanceof Transform ||
+    stream instanceof Duplex ||
     stream instanceof NodeJSWritable ||
-    stream instanceof NodeJSTransform
+    stream instanceof NodeJSTransform ||
+    stream instanceof NodeJSDuplex
   ) {
     return true;
   }
@@ -105,9 +110,14 @@ const isReadable = (stream: any): stream is Readable => {
   if (
     stream instanceof Readable ||
     stream instanceof Transform ||
+    stream instanceof Duplex ||
     stream instanceof NodeJSReadable ||
-    stream instanceof NodeJSTransform
+    stream instanceof NodeJSTransform ||
+    stream instanceof NodeJSDuplex
   ) {
+    return true;
+  }
+  if (stream instanceof Stream && "readable" in stream) {
     return true;
   }
 
@@ -120,6 +130,7 @@ const isSupportedStream = (tbd: any): tbd is SupportedStream => {
     tbd instanceof Readable ||
     tbd instanceof Writable ||
     tbd instanceof Transform ||
+    tbd instanceof Duplex ||
     tbd instanceof NodeJSReadable ||
     tbd instanceof NodeJSTransform ||
     tbd instanceof NodeJSWritable
