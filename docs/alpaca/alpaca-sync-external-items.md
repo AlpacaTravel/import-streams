@@ -30,6 +30,7 @@ stream:
       value:
         # This structure describes a place object with syncing info
         # and can come from any source that maps to this structure
+        # collection and profile will be added by the external sync
         $schema: https://schemas.alpaca.dev/item-v1.0.0.schema.json
         # Dates used to detect whether an update is necessary
         created: 2020-06-10
