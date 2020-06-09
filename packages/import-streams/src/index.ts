@@ -32,6 +32,7 @@ import {
 import { createReadStream as createAwsS3GetObjectStream } from "./read/aws-s3-get-object-stream";
 import { createReadStream as createAwsS3GetObject } from "./read/aws-s3-get-object";
 import { createReadStream as createAwsS3ListObjectsStream } from "./read/aws-s3-list-objects";
+import { createReadStream as createObjectReadStream } from "./read/object";
 
 import createFetchStream from "./read/fetch-stream";
 
@@ -39,6 +40,10 @@ export {
   // Read Streams
   createJsonApiObjectReadStream,
   createFetchObjectStream,
+  createFetchStream,
+  createAwsS3GetObject,
+  createAwsS3GetObjectStream,
+  createAwsS3ListObjectsStream,
   createJourneyReadStream,
   createSqliteStatementObjectStream,
   // Transform Streams
@@ -179,6 +184,23 @@ export interface UnzipOneOptions extends StreamFactoryOptions {
   regex?: string;
   regexFlags?: string;
 }
+
+export interface ReadObjectOptions extends StreamFactoryOptions {
+  iterate?: boolean;
+  value: any;
+}
+
+const isReadObjectOptions = (
+  options?: StreamFactoryOptions
+): options is ReadObjectOptions => {
+  if (!options) {
+    return false;
+  }
+  if ("value" in options) {
+    return true;
+  }
+  return false;
+};
 
 const isUnzipOneOptions = (
   options?: StreamFactoryOptions
@@ -400,6 +422,16 @@ export const createCompose = (options?: Options) => {
 
     // Attempt to create the factory ourselves
     switch (stream.type) {
+      case "object": {
+        if (isReadObjectOptions(stream.options)) {
+          return createObjectReadStream({
+            iterate: stream.options.iterate,
+            value: stream.options.value,
+          });
+        }
+        throw new Error("Missing the value configuration for ogject");
+      }
+
       case "file-read-stream": {
         if (isFsStreamOptions(stream.options)) {
           return fs.createReadStream(stream.options.path, {

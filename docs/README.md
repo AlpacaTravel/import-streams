@@ -190,9 +190,10 @@ Performs compression/decompression using the zlib library
 
 An additional couple of streams can be useful for diagnosing issues
 
-| type    | overview                                             |
-| ------- | ---------------------------------------------------- |
-| console | Calls console.log with the value, and passes through |
+| type    | overview                                                        |
+| ------- | --------------------------------------------------------------- |
+| object  | Emits the value option, and if array will iterate and emit each |
+| console | Calls console.log with the value, and passes through            |
 
 ## Drupal Streams
 
