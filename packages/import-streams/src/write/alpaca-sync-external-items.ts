@@ -8,6 +8,9 @@ interface AlpacaSyncExternalItemsOptions {
   profile: string;
   force?: boolean;
   debug?: boolean;
+  retry?: number;
+  wait?: number;
+  externalSource?: string | string[];
 }
 
 interface Attribute {
@@ -64,6 +67,9 @@ class AlpacaSyncExternalItems extends Writable {
   private force: boolean;
   private useDebug: boolean;
   private count: number;
+  private retry: number;
+  private wait: number;
+  private externalSources: string[];
 
   constructor(options: AlpacaSyncExternalItemsOptions) {
     super({ objectMode: true });
@@ -74,6 +80,9 @@ class AlpacaSyncExternalItems extends Writable {
       profile,
       force = false,
       debug = false,
+      retry = 2,
+      wait = 5000,
+      externalSource,
     } = options;
 
     assert(
@@ -98,11 +107,23 @@ class AlpacaSyncExternalItems extends Writable {
 
     this.pushed = [];
     this.count = 0;
+    this.retry = retry;
+    this.wait = wait;
+
+    this.externalSources = (() => {
+      if (Array.isArray(externalSource)) {
+        return externalSource;
+      }
+      if (typeof externalSource === "string") {
+        return [externalSource];
+      }
+      return [];
+    })();
   }
 
   debug(...args: any[]) {
     if (this.useDebug === true) {
-      console.log("SyncExternalItems:", ...args);
+      console.log("alpaca-sync-external-items:", ...args);
     }
   }
 
@@ -128,6 +149,15 @@ class AlpacaSyncExternalItems extends Writable {
         if (!externalRef || !externalSource) {
           throw new Error(
             "Must configure the external-ref and external-source attribute values in order to push record to the collection"
+          );
+        }
+
+        if (
+          this.externalSources.length &&
+          this.externalSources.indexOf(externalSource) === -1
+        ) {
+          throw new Error(
+            "Streaming items with an external source that does not match the configured write stream"
           );
         }
 
@@ -196,8 +226,8 @@ class AlpacaSyncExternalItems extends Writable {
             this.debug(url, httpOptions);
             const res = await network.retry(
               () => network.write(url, httpOptions),
-              2,
-              5000
+              this.retry,
+              this.wait
             );
             if (!res.ok) {
               const text = await res.text();
@@ -251,8 +281,8 @@ class AlpacaSyncExternalItems extends Writable {
           this.debug(url, httpOptions);
           const res = await network.retry(
             () => network.write(url, httpOptions),
-            2,
-            5000
+            this.retry,
+            this.wait
           );
           if (!res.ok) {
             const text = await res.text();
@@ -263,6 +293,7 @@ class AlpacaSyncExternalItems extends Writable {
         }
 
         this.count += 1;
+        this.pushed.push(fetchRecordSyncDetails(item));
         callback();
       } catch (e) {
         this.debug("Error", e);
@@ -286,6 +317,13 @@ class AlpacaSyncExternalItems extends Writable {
               return c;
             }
 
+            // Only look at the corresponding collection sources
+            if (record.externalSource && this.externalSources.length) {
+              if (this.externalSources.indexOf(record.externalSource) === -1) {
+                return c;
+              }
+            }
+
             const seen = this.pushed.find((r) => {
               return (
                 r.externalRef === record.externalRef &&
@@ -300,6 +338,8 @@ class AlpacaSyncExternalItems extends Writable {
           },
           []
         );
+
+        this.debug("Remove", toRemove);
 
         const removeTasks = toRemove.map(async (record) => {
           const mergeRecordFlag: Item = {
@@ -331,8 +371,8 @@ class AlpacaSyncExternalItems extends Writable {
           this.debug(url, httpOptions);
           const res = await network.retry(
             () => network.write(url, httpOptions),
-            2,
-            5000
+            this.retry,
+            this.wait
           );
           if (!res.ok) {
             const text = await res.text();
@@ -383,6 +423,7 @@ class AlpacaSyncExternalItems extends Writable {
           !data.results ||
           data.results.length === 0
         ) {
+          this.debug("No items present in collection");
           break;
         }
 
@@ -411,6 +452,8 @@ class AlpacaSyncExternalItems extends Writable {
         // Update the offset
         offset += limit;
       }
+
+      this.debug(recordSyncs);
 
       return recordSyncs;
     })();
