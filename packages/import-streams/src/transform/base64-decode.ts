@@ -1,6 +1,18 @@
 import { TransformFunction, TransformOptions } from "../types";
 
-export interface Base64DecodeOptions extends TransformOptions {}
+export interface Base64DecodeOptions extends TransformOptions {
+  encoding?:
+    | "ascii"
+    | "utf8"
+    | "utf-8"
+    | "utf16le"
+    | "ucs2"
+    | "ucs-2"
+    | "base64"
+    | "latin1"
+    | "binary"
+    | "hex";
+}
 
 const base64decode: TransformFunction<
   Promise<string | undefined>,
@@ -10,10 +22,11 @@ const base64decode: TransformFunction<
   options: Base64DecodeOptions
 ): Promise<string | undefined> => {
   if (typeof value === "string") {
-    if (options.debug) {
-    }
     const buff = new Buffer(value);
-    return buff.toString("ascii");
+    return buff.toString((options && options.encoding) || "utf-8");
+  }
+  if (value instanceof Buffer) {
+    return value.toString((options && options.encoding) || "utf-8");
   }
 
   return undefined;

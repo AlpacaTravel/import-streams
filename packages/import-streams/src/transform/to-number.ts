@@ -1,11 +1,14 @@
 import { TransformFunction, TransformOptions } from "../types";
 
-export interface NumberOptions extends TransformOptions {}
+export interface ToNumberOptions extends TransformOptions {}
 
-const number: TransformFunction<
+const toNumber: TransformFunction<
   Promise<number | undefined>,
-  NumberOptions
-> = async (value: any, options: NumberOptions): Promise<number | undefined> => {
+  ToNumberOptions
+> = async (
+  value: any,
+  options: ToNumberOptions
+): Promise<number | undefined> => {
   if (typeof value !== "undefined" || value !== null) {
     const val = Number(value);
     if (val !== Number.NaN) {
@@ -16,4 +19,4 @@ const number: TransformFunction<
   return undefined;
 };
 
-export default number;
+export default toNumber;

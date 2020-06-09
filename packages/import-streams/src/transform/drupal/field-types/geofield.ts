@@ -1,5 +1,5 @@
 import { TransformFunction, TransformOptions } from "../../../types";
-import position from "../../position";
+import toCoordinate from "../../to-coordinate";
 
 export interface GeofieldOptions extends TransformOptions {}
 
@@ -10,7 +10,7 @@ const geofield: TransformFunction<
   value: any,
   options: GeofieldOptions
 ): Promise<Array<number> | undefined> => {
-  return position(value, options);
+  return toCoordinate(value, options);
 };
 
 export default geofield;

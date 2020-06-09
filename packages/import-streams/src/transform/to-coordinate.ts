@@ -1,17 +1,17 @@
 import { TransformFunction, TransformOptions } from "../types";
 import { assertValidTransformOptions } from "../assertions";
 
-export interface PositionOptions extends TransformOptions {
+export interface ToCoordinateOptions extends TransformOptions {
   flip?: boolean;
   delimiter?: string;
 }
 
-const position: TransformFunction<
+const toPosition: TransformFunction<
   Promise<Array<number> | undefined>,
-  PositionOptions
+  ToCoordinateOptions
 > = async (
   value: any,
-  options: PositionOptions
+  options: ToCoordinateOptions
 ): Promise<Array<number> | undefined> => {
   assertValidTransformOptions(options, ["flip", "delimiter"], "position");
 
@@ -37,4 +37,4 @@ const position: TransformFunction<
   return undefined;
 };
 
-export default position;
+export default toPosition;

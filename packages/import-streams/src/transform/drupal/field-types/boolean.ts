@@ -1,12 +1,12 @@
 import { TransformFunction } from "../../../types";
-import standardBoolean, { BooleanOptions } from "../../boolean";
+import standardBoolean, { ToBooleanOptions } from "../../to-boolean";
 
 const boolean: TransformFunction<
   Promise<boolean | undefined>,
-  BooleanOptions
+  ToBooleanOptions
 > = async (
   value: any,
-  options: BooleanOptions
+  options: ToBooleanOptions
 ): Promise<boolean | undefined> => {
   return standardBoolean(value, options);
 };

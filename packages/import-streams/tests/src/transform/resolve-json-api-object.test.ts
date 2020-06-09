@@ -1,8 +1,8 @@
 import nock from "nock";
-import resolveMapSelector, {
-  ResolveMapSelectorOptions,
-} from "../../../../src/transform/json-api/resolve-map-selector";
-import { createCompose } from "../../../../src/index";
+import resolveJsonApiObject, {
+  ResolveJsonApiObjectOptions,
+} from "../../../src/transform/resolve-json-api-object";
+import { createCompose } from "../../../src/index";
 
 const compose = createCompose();
 const context = {
@@ -59,7 +59,7 @@ describe("JSON:API Resolve Map Selector", () => {
         ["Content-Type", "application/vnd.api+json"]
       );
 
-    const options: ResolveMapSelectorOptions = {
+    const options: ResolveJsonApiObjectOptions = {
       href: "https://www.example.com/jsonapi",
       context,
       limit: 3,
@@ -69,7 +69,7 @@ describe("JSON:API Resolve Map Selector", () => {
         fubar: "foo",
       },
     };
-    const result = await resolveMapSelector(null, options);
+    const result = await resolveJsonApiObject(null, options);
 
     expect(result.length).toBe(3);
     expect(result).toMatchObject([
@@ -103,7 +103,7 @@ describe("JSON:API Resolve Map Selector", () => {
         ["Content-Type", "application/vnd.api+json"]
       );
 
-    const options: ResolveMapSelectorOptions = {
+    const options: ResolveJsonApiObjectOptions = {
       href: "https://www.example.com/jsonapi",
       iterate: false,
       context,
@@ -111,7 +111,7 @@ describe("JSON:API Resolve Map Selector", () => {
         fubar: "foo",
       },
     };
-    const result = await resolveMapSelector(null, options);
+    const result = await resolveJsonApiObject(null, options);
 
     expect(result).toMatchObject({
       fubar: "bar-1",

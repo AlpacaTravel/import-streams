@@ -1,7 +1,7 @@
-import { createReadStream } from "../../../src/read/sqlite-statement-read";
+import { createReadStream } from "../../../src/read/sqlite-statement-object";
 import { Writable } from "readable-stream";
 
-describe("sqlite-statement-read", () => {
+describe("sqlite-statement-object", () => {
   test("createReadStream", async () => {
     const output: any[] = [];
 

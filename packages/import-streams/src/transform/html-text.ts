@@ -1,11 +1,11 @@
 import striptags from "striptags";
 import { TransformFunction, TransformOptions } from "../types";
 
-export interface TextOptions extends TransformOptions {}
+export interface HtmlTextOptions extends TransformOptions {}
 
-const text: TransformFunction<Promise<any>, TextOptions> = async (
+const htmlText: TransformFunction<Promise<any>, HtmlTextOptions> = async (
   value: any,
-  options: TextOptions
+  options: HtmlTextOptions
 ): Promise<string | undefined> => {
   if (typeof value === "string") {
     const newValue = striptags(value).trim();
@@ -18,4 +18,4 @@ const text: TransformFunction<Promise<any>, TextOptions> = async (
   return undefined;
 };
 
-export default text;
+export default htmlText;

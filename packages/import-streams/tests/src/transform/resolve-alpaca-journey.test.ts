@@ -1,7 +1,7 @@
 import nock from "nock";
 import resolveJourney, {
-  ResolveJourneyOptions,
-} from "../../../src/transform/resolve-journey";
+  ResolveAlpacaJourneyOptions,
+} from "../../../src/transform/resolve-alpaca-journey";
 import { createCompose } from "../../../src/index";
 
 const compose = createCompose();
@@ -34,7 +34,7 @@ describe("Ressolve HTTP Request", () => {
         ["Content-Type", "application/json"]
       );
 
-    const options: ResolveJourneyOptions = {
+    const options: ResolveAlpacaJourneyOptions = {
       context,
       iterate: false,
       mapping: {

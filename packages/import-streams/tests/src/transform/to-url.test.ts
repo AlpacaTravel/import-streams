@@ -1,5 +1,5 @@
 import { Readable, Writable } from "readable-stream";
-import url from "../../../src/transform/url";
+import url from "../../../src/transform/to-url";
 import Transforms from "../../../src/transform/index";
 
 import { createCompose, transforms } from "../../../src/index";
@@ -13,7 +13,7 @@ const context: ComposeContext = {
 
 describe("URL", () => {
   test("exports", () => {
-    expect(typeof transforms["url"]).toBe("function");
+    expect(typeof transforms["to-url"]).toBe("function");
   });
 
   test("a string", async () => {

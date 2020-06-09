@@ -1,6 +1,6 @@
-# Sqlite Statement Read
+# Sqlite Statement
 
-This readable stream will prepare a Sqlite statement exec to obtain all results. The resulting rows are streamed.
+This writable stream will prepare a Sqlite statement exec the statement without reading back.
 
 ## Usage
 
@@ -30,7 +30,7 @@ stream:
       delimiter: ,
 
   # Create a write stream for writing the SQL elements
-  - type: sqlite-statement-write
+  - type: sqlite-statement
     options:
       # Required:
       database: ./sqlite-database.db
@@ -39,7 +39,7 @@ stream:
       debug: true
 ```
 
-Example database..
+Example database schema
 
 ```sql
 CREATE TABLE "example" (

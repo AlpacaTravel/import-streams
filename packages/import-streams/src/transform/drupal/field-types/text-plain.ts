@@ -1,14 +1,14 @@
-import { TransformFunction, TransformOptions } from "../../../types";
-import text, { TextOptions } from "../../text";
+import { TransformFunction } from "../../../types";
+import text, { HtmlTextOptions } from "../../html-text";
 
-export interface TextPlainOptions extends TextOptions {}
+export interface TextPlainOptions extends HtmlTextOptions {}
 
 const textPlain: TransformFunction<
   Promise<string | undefined>,
-  TextPlainOptions
+  HtmlTextOptions
 > = async (
   value: any,
-  options: TextPlainOptions
+  options: HtmlTextOptions
 ): Promise<string | undefined> => {
   return text(value, options);
 };

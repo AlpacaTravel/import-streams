@@ -23,7 +23,7 @@ describe("selectorTransforms", () => {
     const options = {
       selector: {
         path: "foo",
-        transform: "url",
+        transform: "to-url",
       },
       context: {
         compose,
@@ -38,7 +38,7 @@ describe("selectorTransforms", () => {
     const config = {
       selector: {
         path: "foo",
-        transform: [{ type: "boolean", options: { inverse: true } }],
+        transform: [{ type: "to-boolean", options: { inverse: true } }],
       },
       context: {
         compose,
@@ -53,7 +53,7 @@ describe("selectorTransforms", () => {
     const options = {
       selector: {
         path: "foo",
-        transform: ["text", { type: "url" }],
+        transform: ["html-text", { type: "to-url" }],
       },
       context: {
         compose,
@@ -68,7 +68,7 @@ describe("selectorTransforms", () => {
     const options = {
       selector: {
         path: ["non-existant", "foo"],
-        transform: ["text", { type: "url" }],
+        transform: ["html-text", { type: "to-url" }],
       },
       context: {
         compose,

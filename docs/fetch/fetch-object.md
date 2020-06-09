@@ -36,6 +36,8 @@ stream:
       wait: 1000
 
       # Supporting paging
+      # Will continue through a set of URL's based on adjusting query parameters
+      # in order to obtain multiple objects from an end-point
       # The path to total records (e.g. { total: 1000 }) in the response
       pathTotalRecords: total
       # Configure the number of elements per page

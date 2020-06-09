@@ -2,7 +2,7 @@ import assert from "assert";
 import { Writable } from "readable-stream";
 import network from "../network";
 
-interface SyncExternalItemsOptions {
+interface AlpacaSyncExternalItemsOptions {
   apiKey: string;
   collection: string;
   profile: string;
@@ -46,8 +46,8 @@ interface RecordSync {
 
 type Callback = (error?: Error) => undefined;
 
-export const createWriteStream = (options: SyncExternalItemsOptions) => {
-  return new SyncExternalItems(options);
+export const createWriteStream = (options: AlpacaSyncExternalItemsOptions) => {
+  return new AlpacaSyncExternalItems(options);
 };
 
 const cleanRef = (ref: string, type: string) => {
@@ -55,7 +55,7 @@ const cleanRef = (ref: string, type: string) => {
   return `alpaca://${type}/${id}`;
 };
 
-class SyncExternalItems extends Writable {
+class AlpacaSyncExternalItems extends Writable {
   private apiKey: string;
   private collection: string;
   private profile: string;
@@ -65,7 +65,7 @@ class SyncExternalItems extends Writable {
   private useDebug: boolean;
   private count: number;
 
-  constructor(options: SyncExternalItemsOptions) {
+  constructor(options: AlpacaSyncExternalItemsOptions) {
     super({ objectMode: true });
 
     const {
@@ -488,7 +488,7 @@ class SyncExternalItems extends Writable {
   }
 }
 
-export default SyncExternalItems;
+export default AlpacaSyncExternalItems;
 
 const fetchRecordSyncDetails = (record: Item): RecordSync => {
   const externalRef = (() => {

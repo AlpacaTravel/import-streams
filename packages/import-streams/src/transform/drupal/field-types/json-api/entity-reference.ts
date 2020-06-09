@@ -1,15 +1,15 @@
 import { TransformFunction, JsonApiFieldReference } from "../../../../types";
-import resolveMapSelector, {
-  ResolveMapSelectorOptions,
-} from "../../../json-api/resolve-map-selector";
+import resolveJsonApiObject, {
+  ResolveJsonApiObjectOptions,
+} from "../../../resolve-json-api-object";
 
-export interface EntityReferenceOptions extends ResolveMapSelectorOptions {}
+export interface EntityReferenceOptions extends ResolveJsonApiObjectOptions {}
 
 const entityReference: TransformFunction<
   Promise<string | JsonApiFieldReference | undefined>,
   EntityReferenceOptions
 > = async (value: any, options: EntityReferenceOptions): Promise<any> => {
-  return resolveMapSelector(value, options);
+  return resolveJsonApiObject(value, options);
 };
 
 export default entityReference;

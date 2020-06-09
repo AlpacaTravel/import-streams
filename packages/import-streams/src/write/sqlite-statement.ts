@@ -1,7 +1,7 @@
 import Database, { Statement, Database as DatabaseType } from "better-sqlite3";
 import { Writable } from "readable-stream";
 
-interface SqliteStatementWriteOptions {
+interface SqliteStatementOptions {
   database: string;
   sql: string;
   debug?: boolean;
@@ -9,14 +9,14 @@ interface SqliteStatementWriteOptions {
 
 type Callback = (error?: Error) => undefined;
 
-class SqliteWrite extends Writable {
+class SqliteStatement extends Writable {
   private path: string;
   private sql: string;
   private statement?: any;
   private database?: DatabaseType;
   private useDebug: boolean;
 
-  constructor(options: SqliteStatementWriteOptions) {
+  constructor(options: SqliteStatementOptions) {
     super({ objectMode: true });
 
     this.path = options.database;
@@ -26,7 +26,7 @@ class SqliteWrite extends Writable {
 
   debug(...args: any[]) {
     if (this.useDebug === true) {
-      console.log("sqlite-statement-write:", ...args);
+      console.log("sqlite-statement:", ...args);
     }
   }
 
@@ -76,8 +76,8 @@ class SqliteWrite extends Writable {
   }
 }
 
-export const createWriteStream = (options: SqliteStatementWriteOptions) => {
-  return new SqliteWrite(options);
+export const createWriteStream = (options: SqliteStatementOptions) => {
+  return new SqliteStatement(options);
 };
 
-export default SqliteWrite;
+export default SqliteStatement;

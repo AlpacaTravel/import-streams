@@ -21,10 +21,10 @@ import { isTransformFunction, isTransformSupportingContext } from "./types";
 import transforms from "./transform/index";
 import { createReadStream as createJsonApiObjectReadStream } from "./read/json-api-object";
 import { createTransformStream as createMapSelectorTransformStream } from "./transform/map-selector";
-import { createWriteStream as createSyncExternalItemsWriteStream } from "./write/sync-external-items";
-import { createReadStream as createJourneyReadStream } from "./read/journey";
-import { createReadStream as createSqliteStatementReadStream } from "./read/sqlite-statement-read";
-import { createWriteStream as createSqliteStatementWriteStream } from "./write/sqlite-statement-write";
+import { createWriteStream as createAlpacaSyncExternalItemsWriteStream } from "./write/alpaca-sync-external-items";
+import { createReadStream as createJourneyReadStream } from "./read/alpaca-journey";
+import { createReadStream as createSqliteStatementObjectStream } from "./read/sqlite-statement-object";
+import { createWriteStream as createSqliteStatementStream } from "./write/sqlite-statement";
 import {
   createReadStream as createFetchObjectStream,
   Headers,
@@ -40,13 +40,13 @@ export {
   createJsonApiObjectReadStream,
   createFetchObjectStream,
   createJourneyReadStream,
-  createSqliteStatementReadStream,
+  createSqliteStatementObjectStream,
   // Transform Streams
   transforms,
   createMapSelectorTransformStream,
   // Write Streams
-  createSyncExternalItemsWriteStream,
-  createSqliteStatementWriteStream,
+  createAlpacaSyncExternalItemsWriteStream,
+  createSqliteStatementStream,
 };
 
 type Callback = (error?: Error) => undefined;
@@ -326,7 +326,7 @@ const isJourneyOptions = (
   return false;
 };
 
-const isSqliteStatementOptionsOptions = (
+const isSqliteStatementOptions = (
   options?: StreamFactoryOptions
 ): options is SqliteStatementOptions => {
   if (!options) {
@@ -366,7 +366,7 @@ const isFsStreamOptions = (
   return false;
 };
 
-interface SyncExternalItemsOptions extends StreamFactoryOptions {
+interface AlpacaSyncExternalItemsOptions extends StreamFactoryOptions {
   apiKey: string;
   collection: string;
   profile: string;
@@ -374,9 +374,9 @@ interface SyncExternalItemsOptions extends StreamFactoryOptions {
   debug?: boolean;
 }
 
-const isSyncExternalItemsOptions = (
+const isAlpacaSyncExternalItemsOptions = (
   options?: StreamFactoryOptions
-): options is SyncExternalItemsOptions => {
+): options is AlpacaSyncExternalItemsOptions => {
   if (!options) {
     return false;
   }
@@ -444,8 +444,8 @@ export const createCompose = (options?: Options) => {
         );
       }
 
-      case "sqlite-statement-read": {
-        if (isSqliteStatementOptionsOptions(stream.options)) {
+      case "sqlite-statement-object": {
+        if (isSqliteStatementOptions(stream.options)) {
           assert(
             stream.options.database,
             "Missing the database path for the sqlite-statement-read stream"
@@ -455,7 +455,7 @@ export const createCompose = (options?: Options) => {
             "Missing the database sql for the sqlite-statement-read stream"
           );
 
-          return createSqliteStatementReadStream({
+          return createSqliteStatementObjectStream({
             database: stream.options.database,
             sql: stream.options.sql,
             debug: stream.options.debug || false,
@@ -466,8 +466,8 @@ export const createCompose = (options?: Options) => {
         );
       }
 
-      case "sqlite-statement-write": {
-        if (isSqliteStatementOptionsOptions(stream.options)) {
+      case "sqlite-statement": {
+        if (isSqliteStatementOptions(stream.options)) {
           assert(
             stream.options.database,
             "Missing the database path for the sqlite-statement-write stream"
@@ -477,7 +477,7 @@ export const createCompose = (options?: Options) => {
             "Missing the database sql for the sqlite-statement-write stream"
           );
 
-          return createSqliteStatementWriteStream({
+          return createSqliteStatementStream({
             database: stream.options.database,
             sql: stream.options.sql,
             debug: stream.options.debug,
@@ -651,8 +651,8 @@ export const createCompose = (options?: Options) => {
         throw new Error("Missing the configuration for crypto-decrypt options");
       }
 
-      case "sync-external-items": {
-        if (isSyncExternalItemsOptions(stream.options)) {
+      case "alpaca-sync-external-items": {
+        if (isAlpacaSyncExternalItemsOptions(stream.options)) {
           assert(
             stream.options.collection,
             "Missing the collection in options"
@@ -661,7 +661,7 @@ export const createCompose = (options?: Options) => {
           assert(stream.options.profile, "Missing the profile in options");
 
           // Create the collection write stream
-          return createSyncExternalItemsWriteStream({
+          return createAlpacaSyncExternalItemsWriteStream({
             collection: stream.options.collection,
             apiKey: stream.options.apiKey,
             profile: stream.options.profile,

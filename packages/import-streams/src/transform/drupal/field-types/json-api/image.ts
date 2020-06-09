@@ -1,7 +1,7 @@
 import { TransformFunction, TransformOptions, Media } from "../../../../types";
-import resolveMapSelectors, {
-  ResolveMapSelectorOptions,
-} from "../../../json-api/resolve-map-selector";
+import resolveJsonApiObject, {
+  ResolveJsonApiObjectOptions,
+} from "../../../resolve-json-api-object";
 
 export interface ImageStyle {
   width: number;
@@ -50,13 +50,13 @@ const image: TransformFunction<
   };
 
   // Resolve the element
-  const resolveOptions: ResolveMapSelectorOptions = {
+  const resolveOptions: ResolveJsonApiObjectOptions = {
     context: options.context,
     iterate: false,
   };
 
   // Obtain the file reference
-  const file = await resolveMapSelectors(value, resolveOptions);
+  const file = await resolveJsonApiObject(value, resolveOptions);
 
   // Prepare the original file information
   const { attributes = {} } = file;

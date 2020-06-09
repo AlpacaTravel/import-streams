@@ -23,16 +23,16 @@ describe("transforms", () => {
             mapping: {
               bool1: {
                 path: "bool1",
-                transform: "boolean",
+                transform: "to-boolean",
               },
               bool2: {
                 path: "bool2",
-                transform: "boolean",
+                transform: "to-boolean",
               },
               date: {
                 path: "date",
                 transform: {
-                  type: "date",
+                  type: "to-date-format",
                   options: {
                     format: "timestamp",
                   },

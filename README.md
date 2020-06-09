@@ -4,11 +4,9 @@
 
 This project is currently in a Alpha Preview release.
 
-A simple tool built to parse YAML or JSON in order to perform powerful stream functions, such as importing data or processing between stages.
+A simple tool that describes streams to process imports or data processing in YAML/JSON.
 
 ## Getting Started
-
-Import streams uses a YAML (or JSON) in order to define the import streams.
 
 Let's start with creating an simple YAML file `stream.yaml` which will pipe a file obtained from this repository to the command line.
 
@@ -41,36 +39,34 @@ $ npm install -g @alpaca-travel/import-streams
 $ import-streams stream.yaml
 ```
 
-## Outline of Streams
+## Capabilities
 
 There are a lot of already developed streams available for processing input and sending output. These form a "swiss-army" knife of transform functions making processing data from various sources easier.
 
-- Sqlite, csv, JSON:API, AWS S3 and fetch
-- Drupal fields, entity references
-- URI, JSON parsing
+- Input/Output Sqlite statements, Read from JSON:API, Fetch HTTP/HTTPS, AWS S3 and local filesystems
+- Control flow, combine multiple read/write streams, transform individual values
+- Parse/stringify URI, JSON, CSV
+- basic type coercion, sprintf
 - map, flatten, join, concat
-- path selectors
-- math, regex, control, combining, string manipulation, membership, existence type, equality
+- path selectors, filter expressions
+- expressive math, regex, control, combining, string manipulation, membership, existence type, equality
 - prettier, html santize
-- cipher, zlib
+- cipher, zlib/unzip
+- ... and Drupal fields, entity references, etc
 
 ## Docs
 
 See [docs](https://github.com/AlpacaTravel/import-streams/tree/master/docs)
 
-## Project Goals
+## Goals
 
 The following goals are behind the import-streams
 
-- Offer a platform to describe and implement a custom import pipelines simply
-- Provide the tools and capabilities to move data to and from various data sources
-- Provide tools to map common data sources (CSV, File, JSON:API, REST, AWS, etc)
-- Making mapping data easy from bespoke schemas, with common field-type processing (such as supporting reading and translating Drupal field types)
-- Use streams and offer network read/write rate limiting to optimise the pipeline
-- Offer an easy way to describe the import entirely using YAML and no implementation code
-- Offer points of extensibility with the ability to write your own read/write or transform code and inject at any stage
-- Dogfooding - use around the Alpaca use cases first and expand to be able to be used in other scenarios
-- Expand the field types, sources and more and offer as MIT Licensing for everyone to have access and leverage
+- Describe simple imports and processing in a readable format (YAML/JSON)
+- Provide a comprehensive toolset with the ability to expand your own
+- Make mapping data between formats/sources easy
+- Leverage streams and tools to handle processing flow
+- MIT
 
 ## Implementation Overview
 
@@ -152,17 +148,19 @@ streams:
         # Obtain a lng/lat from the lng-lat column; e.g. "lng,lat" 
         position:
           path: coords
-          type: position
-          options:
-            # Depending if you use lng/lat or lat/lng
-            # flip: true
-            # The delimiter, if you use something other than ","
-            # delimiter: ";"
+          transform:
+            - type: to-coordinate
+            - options:
+              # Depending if you use lng/lat or lat/lng
+              # flip: true
+              # The delimiter, if you use something other than ","
+              # delimiter: ";"
 
         # Syncing fields, this can be used only to update affected records
         modified:
           path: last_updated
-          type: date
+          transform:
+            - to-date-format
         
         # Map a "custom://external-ref" to your ID to sync
         custom://external-ref: id
@@ -170,9 +168,10 @@ streams:
         # Assign the source (Recommended to avoid ID conflicts)
         custom://external-source:
           path: .
-          type: replace
-          options:
-            value: https://www.example.com
+          transform:
+            - type: replace
+              options:
+                value: https://www.example.com
 
         # More mapping here....
 
@@ -227,12 +226,13 @@ streams:
         modified:
           path: attributes.changed
           transform:
-            - date
+            - to-date-format
 
         # Parse more complex values with pre-established transforms
         position:
           path: attributes.lngLat
-          type: position
+          transform:
+            - to-coordinate
 
         # Parse through multiple streams
         description:
@@ -248,14 +248,14 @@ streams:
         tags:
           path: relationships.field_types
           transform:
-          # Leverage pre-existing transforms offered to map data
-          - type: drupal.field-types.json-api.entity-reference
-            options:
-              iterate: true
-              mapping:
-                title: attributes.title
-          # and reduce...
-          - flatten
+            # Leverage pre-existing transforms offered to map data
+            - type: drupal.field-types.json-api.entity-reference
+              options:
+                iterate: true
+                mapping:
+                  title: attributes.title
+            # and reduce...
+            - flatten
 
         # Support alpaca attributes
         custom://external-ref: id
@@ -274,7 +274,7 @@ streams:
 
   # Sync only changed records to a collection, and hide missing
   # Note: You can also combine: to multiple write sources
-  - type: sync-external-items
+  - type: alpaca-sync-external-items
     options:
       apiKey: ...
       collection: alpaca://collection/123

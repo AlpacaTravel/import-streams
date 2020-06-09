@@ -1,17 +1,17 @@
 import { TransformFunction, TransformOptions } from "../types";
 import { assertValidTransformOptions } from "../assertions";
 
-export interface BooleanOptions extends TransformOptions {
+export interface ToBooleanOptions extends TransformOptions {
   inverse?: boolean;
   default?: boolean;
 }
 
-const boolean: TransformFunction<
+const toBoolean: TransformFunction<
   Promise<boolean | undefined>,
-  BooleanOptions
+  ToBooleanOptions
 > = async (
   value: any,
-  options: BooleanOptions
+  options: ToBooleanOptions
 ): Promise<boolean | undefined> => {
   assertValidTransformOptions(options, ["inverse", "default"], "boolean");
 
@@ -59,4 +59,4 @@ const boolean: TransformFunction<
   return undefined;
 };
 
-export default boolean;
+export default toBoolean;

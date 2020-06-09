@@ -5,10 +5,10 @@ import compose, {
   transforms,
   createJourneyReadStream,
   createFetchObjectStream,
-  createSyncExternalItemsWriteStream,
+  createAlpacaSyncExternalItemsWriteStream,
   createJsonApiObjectReadStream,
   createMapSelectorTransformStream,
-  createSqliteStatementReadStream,
+  createSqliteStatementObjectStream,
 } from "../../src/index";
 import { TransformReferences } from "../../src/types";
 import { Readable, Writable } from "readable-stream";
@@ -22,36 +22,36 @@ describe("module", () => {
   test("named exports", () => {
     expect(typeof compose).toBe("function");
     expect(typeof createCompose).toBe("function");
-    expect(typeof createSyncExternalItemsWriteStream).toBe("function");
+    expect(typeof createAlpacaSyncExternalItemsWriteStream).toBe("function");
     expect(typeof createJsonApiObjectReadStream).toBe("function");
     expect(typeof createFetchObjectStream).toBe("function");
     expect(typeof createJourneyReadStream).toBe("function");
     expect(typeof createMapSelectorTransformStream).toBe("function");
-    expect(typeof createSqliteStatementReadStream).toBe("function");
+    expect(typeof createSqliteStatementObjectStream).toBe("function");
     expect(typeof transforms).toBe("object");
   });
 
   test("exports for transforms", () => {
     // Should export required functions
     const exportedTransforms: TransformReferences = transforms;
-    expect(typeof exportedTransforms.boolean).toBe("function");
-    expect(typeof exportedTransforms.date).toBe("function");
+    expect(typeof exportedTransforms["to-boolean"]).toBe("function");
+    expect(typeof exportedTransforms["to-date-format"]).toBe("function");
     expect(typeof exportedTransforms.flatten).toBe("function");
     expect(typeof exportedTransforms["html-prettier"]).toBe("function");
     expect(typeof exportedTransforms["html-sanitize"]).toBe("function");
     expect(typeof exportedTransforms["map-selector"]).toBe("function");
-    expect(typeof exportedTransforms.number).toBe("function");
+    expect(typeof exportedTransforms["to-number"]).toBe("function");
     expect(typeof exportedTransforms.concat).toBe("function");
     expect(typeof exportedTransforms["resolve-fetch-object"]).toBe("function");
     expect(typeof exportedTransforms["resolve-journey"]).toBe("function");
     expect(typeof exportedTransforms["json-stringify"]).toBe("function");
     expect(typeof exportedTransforms["console"]).toBe("function");
-    expect(typeof exportedTransforms.position).toBe("function");
+    expect(typeof exportedTransforms["to-coordinate"]).toBe("function");
     expect(typeof exportedTransforms.replace).toBe("function");
     expect(typeof exportedTransforms.selector).toBe("function");
-    expect(typeof exportedTransforms.text).toBe("function");
+    expect(typeof exportedTransforms["html-text"]).toBe("function");
     expect(typeof exportedTransforms.truncate).toBe("function");
-    expect(typeof exportedTransforms.url).toBe("function");
+    expect(typeof exportedTransforms["to-url"]).toBe("function");
     expect(
       typeof exportedTransforms["drupal.field-types.json-api.entity-reference"]
     ).toBe("function");
@@ -82,7 +82,7 @@ describe("module", () => {
     expect(typeof exportedTransforms["drupal.field-types.text-plain"]).toBe(
       "function"
     );
-    expect(typeof exportedTransforms["json-api.resolve-map-selector"]).toBe(
+    expect(typeof exportedTransforms["resolve-json-api-object"]).toBe(
       "function"
     );
   });
@@ -98,7 +98,7 @@ describe("module", () => {
   version: 1.0
   stream:
     - fu
-    - url
+    - to-url
     - write
   `;
 
@@ -120,7 +120,7 @@ describe("module", () => {
   version: 1.0
   stream:
     - fus
-    - url
+    - to-url
     - concat
     - write
   `;
@@ -215,16 +215,16 @@ stream:
       mapping:
         position:
           path: lngLat
-          transform: position
+          transform: to-coordinate
         synopsis:
           path: overview
           transform:
-            - text
+            - html-text
             - html-entities-decode
         host:
           path: url
           transform:
-            - url
+            - to-url
             - uri-parse
             - type: flatten
               options:
@@ -232,7 +232,7 @@ stream:
         missing:
           path: missing
           transform:
-            - url
+            - to-url
             - uri-parse
             - type: flatten
               options:
@@ -245,11 +245,11 @@ stream:
         checked:
           path: isChecked
           transform:
-            - boolean
+            - to-boolean
         count:
           path: count
           transform:
-            - number
+            - to-number
         value:
           path: .
           transform:

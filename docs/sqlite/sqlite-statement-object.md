@@ -9,7 +9,7 @@ version: 1.0
 
 stream:
   # Create a read stream for objects returned from a SQL query
-  - type: sqlite-statement-read
+  - type: sqlite-statement-object
     options:
       # Required:
       database: ./sqlite-database.db

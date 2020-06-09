@@ -1,7 +1,7 @@
 import { TransformFunction } from "../../../types";
-import url, { UrlOptions } from "../../url";
+import url, { ToUrlOptions } from "../../to-url";
 
-export interface LinkOptions extends UrlOptions {}
+export interface LinkOptions extends ToUrlOptions {}
 
 const link: TransformFunction<
   Promise<string | undefined>,

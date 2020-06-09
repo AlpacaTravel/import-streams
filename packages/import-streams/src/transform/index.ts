@@ -1,36 +1,39 @@
 import { TransformReferences } from "../types";
 import selector from "./selector";
 import mapSelector from "./map-selector";
-import url from "./url";
+import toUrl from "./to-url";
 import uriParse from "./uri-parse";
-import boolean from "./boolean";
-import date from "./date";
+import toBoolean from "./to-boolean";
+import toDateFormat from "./to-date-format";
 import flatten from "./flatten";
 import htmlPrettier from "./html-prettier";
 import htmlSanitize from "./html-sanitize";
-import number from "./number";
-import position from "./position";
+import toNumber from "./to-number";
+import toCoordinate from "./to-coordinate";
 import replace from "./replace";
-import text from "./text";
+import htmlText from "./html-text";
 import truncate from "./truncate";
 import concat from "./concat";
 import console from "./console";
 import stringify from "./json-stringify";
 import parse from "./json-parse";
 import resolveFetchObject from "./resolve-fetch-object";
+import resolveJsonApiObject from "./resolve-json-api-object";
 import base64Decode from "./base64-decode";
+import base64Encode from "./base64-encode";
 import each from "./each";
 import join from "./join";
-import jsonApi from "./json-api";
 import drupal from "./drupal";
 import skip from "./skip";
-import resolveJourney from "./resolve-journey";
+import resolveJourney from "./resolve-alpaca-journey";
 import fexp from "./fexp";
 import FilterFexp from "./filter-fexp";
 import htmlEntitiesDecode from "./html-entities-decode";
 import sprintf from "./sprintf";
 import resolveAwsS3GetObjectStream from "./resolve-aws-s3-get-object-stream";
 import resolveAwsS3GetObject from "./resolve-aws-s3-get-object";
+import stringLowercase from "./string-lowercase";
+import stringUppercase from "./string-uppercase";
 
 import { packageTransforms } from "../packaging";
 
@@ -49,33 +52,35 @@ Object.assign(transforms, {
   each,
   "map-selector": mapSelector,
   "base64-decode": base64Decode,
-  url,
-  boolean,
+  "base64-encode": base64Encode,
+  "to-url": toUrl,
+  "to-boolean": toBoolean,
+  "to-date-format": toDateFormat,
   fexp: fexp,
   "filter-fexp": FilterFexp,
-  date,
   flatten,
   skip,
   "html-prettier": htmlPrettier,
   "html-sanitize": htmlSanitize,
   "html-entities-decode": htmlEntitiesDecode,
-  ["resolve-fetch-object"]: resolveFetchObject,
-  ["resolve-journey"]: resolveJourney,
-  number,
+  "resolve-fetch-object": resolveFetchObject,
+  "resolve-journey": resolveJourney,
+  "resolve-alpaca-journey": resolveJourney,
+  "resolve-json-api-object": resolveJsonApiObject,
+  "to-number": toNumber,
   truncate,
-  position,
+  "to-coordinate": toCoordinate,
   replace,
-  text,
-  ["resolve-aws-s3-get-object-stream"]: resolveAwsS3GetObjectStream,
-  ["resolve-aws-s3-get-object"]: resolveAwsS3GetObject,
+  "html-text": htmlText,
+  "resolve-aws-s3-get-object-stream": resolveAwsS3GetObjectStream,
+  "resolve-aws-s3-get-object": resolveAwsS3GetObject,
+  "string-lowercase": stringLowercase,
+  "string-uppercase": stringUppercase,
 });
 
 // Assign sub-collections
 Object.assign(
   transforms,
-
-  // JSON:API
-  packageTransforms(jsonApi, "json-api"),
 
   // Drupal
   packageTransforms(drupal, "drupal")

@@ -3,19 +3,19 @@ import { Readable } from "readable-stream";
 import network from "../network";
 import { JourneyJsonEnvelope } from "../types";
 
-interface JourneyOptions {
+interface AlpacaJourneyOptions {
   includeRouteGeometry?: boolean;
   limit?: number;
 }
 
-export default class Journey extends Readable {
+export default class AlpacaJourney extends Readable {
   private journeyIds: string[];
   private includeRouteGeometry: boolean;
   private generator: any;
   private limit: number;
   private count: number;
 
-  constructor(journeyIds: string | string[], options?: JourneyOptions) {
+  constructor(journeyIds: string | string[], options?: AlpacaJourneyOptions) {
     super({ objectMode: true });
 
     const processedJourneyIds = Array.isArray(journeyIds)
@@ -89,9 +89,9 @@ export default class Journey extends Readable {
 
 export const createReadStream = (
   journeyIds: string | string[],
-  options?: JourneyOptions
+  options?: AlpacaJourneyOptions
 ) => {
-  const api = new Journey(journeyIds, options);
+  const api = new AlpacaJourney(journeyIds, options);
 
   return api;
 };

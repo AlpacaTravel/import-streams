@@ -1,5 +1,5 @@
 import { TransformFunction, TransformOptions, Callback } from "../types";
-import { createReadStream as createJourneysReadStream } from "../read/journey";
+import { createReadStream as createJourneysReadStream } from "../read/alpaca-journey";
 import { Writable } from "readable-stream";
 import {
   createTransformStream as createMapSelectorTransformStream,
@@ -8,18 +8,18 @@ import {
 } from "./map-selector";
 import { assertValidTransformOptions } from "../assertions";
 
-export interface ResolveJourneyOptions extends TransformOptions {
+export interface ResolveAlpacaJourneyOptions extends TransformOptions {
   includeRouteGeometry?: boolean;
   iterate: false;
   mapping?: Mapping;
 }
 
-const resolveJourneyJson: TransformFunction<
+const resolveAlpacaJourneyJson: TransformFunction<
   Promise<any[] | any | undefined>,
-  ResolveJourneyOptions
+  ResolveAlpacaJourneyOptions
 > = async (
   value: any,
-  options: ResolveJourneyOptions
+  options: ResolveAlpacaJourneyOptions
 ): Promise<any[] | any | undefined> => {
   assertValidTransformOptions(
     options,
@@ -72,4 +72,4 @@ const resolveJourneyJson: TransformFunction<
   }
 };
 
-export default resolveJourneyJson;
+export default resolveAlpacaJourneyJson;

@@ -1,13 +1,13 @@
 import assert from "assert";
 import { Writable } from "readable-stream";
-import { TransformFunction, TransformOptions, Callback } from "../../types";
+import { TransformFunction, TransformOptions, Callback } from "../types";
 import {
   createTransformStream as createMapSelectorTransformStream,
   MapSelectorOptions,
   Mapping,
-} from "../map-selector";
-import { createReadStream } from "../../read/json-api-object";
-import { assertValidTransformOptions } from "../../assertions";
+} from "./map-selector";
+import { createReadStream } from "../read/json-api-object";
+import { assertValidTransformOptions } from "../assertions";
 
 interface JsonApiHref {
   href: string;
@@ -23,7 +23,7 @@ interface JsonApiReference {
   links: JsonApiLinks;
 }
 
-export interface ResolveMapSelectorOptions extends TransformOptions {
+export interface ResolveJsonApiObjectOptions extends TransformOptions {
   iterate?: boolean;
   href?: string;
   limit?: number;
@@ -34,12 +34,12 @@ export interface ResolveMapSelectorOptions extends TransformOptions {
   wait?: number;
 }
 
-const resolveMapSelector: TransformFunction<
+const resolveJsonApiObject: TransformFunction<
   Promise<any | undefined>,
-  ResolveMapSelectorOptions
+  ResolveJsonApiObjectOptions
 > = async (
   value: JsonApiReference | undefined,
-  options: ResolveMapSelectorOptions
+  options: ResolveJsonApiObjectOptions
 ): Promise<any | undefined> => {
   assertValidTransformOptions(
     options,
@@ -143,4 +143,4 @@ const resolveMapSelector: TransformFunction<
   }
 };
 
-export default resolveMapSelector;
+export default resolveJsonApiObject;

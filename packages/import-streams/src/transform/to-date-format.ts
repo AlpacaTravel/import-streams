@@ -1,13 +1,16 @@
 import { TransformFunction, TransformOptions } from "../types";
 import { assertValidTransformOptions } from "../assertions";
 
-export interface DateOptions extends TransformOptions {
+export interface ToDateFormatOptions extends TransformOptions {
   format?: string;
 }
 
-const date: TransformFunction<Promise<any>, DateOptions> = async (
+const toDateFormat: TransformFunction<
+  Promise<any>,
+  ToDateFormatOptions
+> = async (
   value: any,
-  options: DateOptions
+  options: ToDateFormatOptions
 ): Promise<number | string | undefined> => {
   assertValidTransformOptions(options, ["format"], "date");
 
@@ -27,4 +30,4 @@ const date: TransformFunction<Promise<any>, DateOptions> = async (
   return undefined;
 };
 
-export default date;
+export default toDateFormat;

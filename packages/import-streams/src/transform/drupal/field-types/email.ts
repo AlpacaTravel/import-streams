@@ -1,5 +1,5 @@
 import { TransformFunction, TransformOptions } from "../../../types";
-import text from "../../text";
+import text from "../../html-text";
 
 export interface EmailOptions extends TransformOptions {}
 

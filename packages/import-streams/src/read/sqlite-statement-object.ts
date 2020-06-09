@@ -1,19 +1,19 @@
 import { Readable } from "readable-stream";
 import Database from "better-sqlite3";
 
-export interface SqliteStatementReadOptions {
+export interface SqliteStatementObjectOptions {
   database: string;
   sql: string;
   debug?: boolean;
 }
 
-class SqliteStatementRead<T> extends Readable {
+class SqliteStatementObject<T> extends Readable {
   private path: string;
   private sql: string;
   private generator: any;
   private useDebug: any;
 
-  constructor(options: SqliteStatementReadOptions) {
+  constructor(options: SqliteStatementObjectOptions) {
     super({ objectMode: true });
 
     this.path = options.database;
@@ -76,8 +76,8 @@ class SqliteStatementRead<T> extends Readable {
   }
 }
 
-export default SqliteStatementRead;
+export default SqliteStatementObject;
 
-export function createReadStream<T>(options: SqliteStatementReadOptions) {
-  return new SqliteStatementRead<T>(options);
+export function createReadStream<T>(options: SqliteStatementObjectOptions) {
+  return new SqliteStatementObject<T>(options);
 }

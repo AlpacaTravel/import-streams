@@ -2,15 +2,15 @@ import { TransformFunction, TransformOptions } from "../types";
 import { assertValidTransformOptions } from "../assertions";
 import URI from "urijs";
 
-export interface UrlOptions extends TransformOptions {
+export interface ToUrlOptions extends TransformOptions {
   prefix?: string;
   lowercaseHostname?: boolean;
   useUndefinedOnError?: boolean;
 }
 
-const url: TransformFunction<Promise<any>, UrlOptions> = async (
+const toUrl: TransformFunction<Promise<any>, ToUrlOptions> = async (
   value: any,
-  options: UrlOptions
+  options: ToUrlOptions
 ): Promise<string | undefined> => {
   assertValidTransformOptions(
     options,
@@ -53,4 +53,4 @@ const url: TransformFunction<Promise<any>, UrlOptions> = async (
   return undefined;
 };
 
-export default url;
+export default toUrl;
