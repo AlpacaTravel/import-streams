@@ -37,6 +37,9 @@ stream:
         # Content...
         title: Melbourne
         synopsis: Visit our city
+        tags:
+          - tag1
+          - tag2
         # Resource (a place)
         resource:
           $schema: https://schemas.alpaca.dev/place-v1.0.0.schema.json
@@ -69,7 +72,7 @@ stream:
         attributes:
           # There is a list of standardised item attributes
           - attribute:
-              $ref: alpaca://attribute/item/website-url
+              $ref: alpaca://attribute/place/website-url
             value: https://www.mysite.com/record-123
           # These are the custom attributes required for syncing
           - attribute:
