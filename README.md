@@ -6,6 +6,8 @@ This project is currently in a Alpha Preview release.
 
 A simple tool that describes streams to process imports or data processing in YAML/JSON.
 
+It is built to help transform data between formats and sources, such as reading in data from any source, transforming it to the required format, and writing it to another location.
+
 ## Getting Started
 
 Let's start with creating an simple YAML file `stream.yaml` which will pipe a file obtained from this repository to the command line.
