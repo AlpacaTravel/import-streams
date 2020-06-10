@@ -17,6 +17,7 @@ import concat from "./concat";
 import console from "./console";
 import stringify from "./json-stringify";
 import parse from "./json-parse";
+import jsonSchemaValidate from "./json-schema-validate";
 import resolveFetchObject from "./resolve-fetch-object";
 import resolveJsonApiObject from "./resolve-json-api-object";
 import base64Decode from "./base64-decode";
@@ -47,6 +48,7 @@ Object.assign(transforms, {
   sprintf,
   "json-stringify": stringify,
   "json-parse": parse,
+  "json-schema-validate": jsonSchemaValidate,
   "uri-parse": uriParse,
   selector,
   each,

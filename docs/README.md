@@ -88,10 +88,11 @@ Fexp-js provides a way to evaluate or process a value, such as using control flo
 
 #### Filter
 
-| type        | overview                                                     |
-| ----------- | ------------------------------------------------------------ |
-| filter-fexp | Filter supplied stream objects based on a fexp-js expression |
-| skip        | Skip a number of objects in the stream                       |
+| type                 | overview                                                       |
+| -------------------- | -------------------------------------------------------------- |
+| filter-fexp          | Filter supplied stream objects based on a fexp-js expression   |
+| json-schema-validate | Filter out objects based on meeting the json schema definition |
+| skip                 | Skip a number of objects in the stream                         |
 
 #### HTML
 
@@ -104,10 +105,11 @@ Fexp-js provides a way to evaluate or process a value, such as using control flo
 
 #### JSON
 
-| type           | overview                       |
-| -------------- | ------------------------------ |
-| json-parse     | Parse stream as JSON           |
-| json-stringify | Format streamed object as JSON |
+| type                 | overview                               |
+| -------------------- | -------------------------------------- |
+| json-parse           | Parse stream as JSON                   |
+| json-stringify       | Format streamed object as JSON         |
+| json-schema-validate | Validate an object against json schema |
 
 #### Map functions
 

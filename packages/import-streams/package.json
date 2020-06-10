@@ -47,6 +47,7 @@
     "@types/striptags": "^3.1.1",
     "@types/unzipper": "^0.10.3",
     "@types/urijs": "^1.19.9",
+    "ajv": "^6.12.2",
     "assert": "^2.0.0",
     "aws-sdk": "^2.689.0",
     "better-sqlite3": "^7.0.1",

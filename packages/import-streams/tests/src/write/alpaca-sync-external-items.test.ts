@@ -84,6 +84,33 @@ describe("alpaca-sync-external-items", () => {
         "application/json",
       ]);
 
+    const mergeItem = {
+      $schema: "https://schemas.alpaca.travel/item-v1.0.0.schema.json",
+      $id: "item/234",
+      title: "existing sync",
+      modified: new Date("2020-02-02"),
+      attributes: [
+        {
+          attribute: {
+            $ref: "custom://external-ref",
+          },
+          value: "e",
+        },
+        {
+          attribute: {
+            $ref: "custom://external-source",
+          },
+          value: "https://www.example.com",
+        },
+        {
+          attribute: {
+            $ref: "custom://something-existing",
+          },
+          value: "retained",
+        },
+      ],
+    };
+
     // The items witnessed
     const streamedItems = [
       {
@@ -161,10 +188,7 @@ describe("alpaca-sync-external-items", () => {
       .query({
         accessToken: "sk.123",
       })
-      .reply(200, { ...streamedItems[2], $ref: "alpaca://item/234" }, [
-        "Content-Type",
-        "application/json",
-      ]);
+      .reply(200, mergeItem, ["Content-Type", "application/json"]);
 
     // Should put the item with import present
     nock("https://withalpaca.com:443", { encodedQueryParams: true })
@@ -192,6 +216,13 @@ describe("alpaca-sync-external-items", () => {
             (attr: any) =>
               attr.attribute.$ref === "custom://import-present" &&
               attr.value === false
+          )
+        ).not.toBeUndefined();
+        expect(
+          body.attributes.find(
+            (attr: any) =>
+              attr.attribute.$ref === "custom://something-existing" &&
+              attr.value === "retained"
           )
         ).not.toBeUndefined();
         return true;

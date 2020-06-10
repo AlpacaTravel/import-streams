@@ -30,7 +30,6 @@ stream:
       value:
         # This structure describes a place object with syncing info
         # and can come from any source that maps to this structure
-        # collection and profile will be added by the external sync
         $schema: https://schemas.alpaca.dev/item-v1.0.0.schema.json
         # Dates used to detect whether an update is necessary
         created: 2020-06-10
@@ -69,6 +68,11 @@ stream:
               # You can include information like attribution or caption
               attribution: A photographer (https://photographer.photo)
               caption: This is an example caption
+        # Destination assignments
+        collection:
+          $ref: alpaca://collection/123
+        profile:
+          $ref: alpaca://profile/123
         # Item Attributes (can support locale, etc)
         attributes:
           # There is a list of standardised item attributes
@@ -85,10 +89,17 @@ stream:
             # The source of the import (anything, website URL is fine)
             value: https://www.mysite.com
 
+  # Validate the items to pick up on mis-mapping of data
+  # Will check the schema of the supplied valud
+  - type: json-schema-validate
+    options:
+      debug: true
+
   # This service will update changed records in the collection and mark
   # them as present (to detect removals)
   - type: alpaca-sync-external-items
     options:
+      # Sync configuration
       apiKey: sk.123
       collection: alpaca://collection/123
       profile: alpaca://profile/123

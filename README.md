@@ -49,6 +49,7 @@ There are a lot of already developed streams available for processing input and 
 - basic type coercion, sprintf
 - map, flatten, join, concat
 - path selectors, filter expressions
+- JSON schema validation
 - expressive math, regex, control, combining, string manipulation, membership, existence type, equality
 - prettier, html santize
 - cipher, zlib/unzip

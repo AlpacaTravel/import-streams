@@ -1,5 +1,6 @@
 import assert from "assert";
 import { Writable } from "readable-stream";
+import * as _ from "lodash";
 import network from "../network";
 
 interface AlpacaSyncExternalItemsOptions {
@@ -127,7 +128,7 @@ class AlpacaSyncExternalItems extends Writable {
     }
   }
 
-  _write(item: Item, _: string, callback: Callback) {
+  _write(item: Item, encoding: string, callback: Callback) {
     // Perform teh sync
     (async () => {
       try {
@@ -251,7 +252,7 @@ class AlpacaSyncExternalItems extends Writable {
             externalRef,
             externalSource
           );
-          const merged: Item = JSON.parse(JSON.stringify(item));
+          const merged: Item = _.clone(item);
 
           // Update the toggle flag
           const importPresentAttribute = (merged.attributes || []).find(
@@ -462,7 +463,7 @@ class AlpacaSyncExternalItems extends Writable {
   }
 
   getItemForTransport(item: Item): Item {
-    const dupe = JSON.parse(JSON.stringify(item));
+    const dupe = _.clone(item);
 
     // Any final cleanup - this probably can be removed
     delete dupe.created;
@@ -502,7 +503,7 @@ class AlpacaSyncExternalItems extends Writable {
       throw new Error(`Record ${id} no longer exists`);
     }
 
-    const replacement: Item = JSON.parse(JSON.stringify(data));
+    const replacement: Item = _.clone(data) as Item;
 
     // Replace the direct entries
     Object.keys(next)
@@ -513,9 +514,15 @@ class AlpacaSyncExternalItems extends Writable {
 
     // Remove any matching values
     replacement.attributes = (replacement.attributes || []).filter((att) => {
-      const match = (next.attributes || []).find(
-        (rAtt) => rAtt.attribute.$ref === att.attribute.$ref
-      );
+      const match = (next.attributes || []).find((rAtt) => {
+        if (!rAtt.locale && !att.locale) {
+          return rAtt.attribute.$ref === att.attribute.$ref;
+        }
+        return (
+          rAtt.locale === att.locale &&
+          rAtt.attribute.$ref === att.attribute.$ref
+        );
+      });
       if (match) {
         return false;
       }
