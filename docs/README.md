@@ -188,14 +188,15 @@ Performs compression/decompression using the zlib library
 | ---------------- | ----------------------------------------------- |
 | sqlite-statement | Execute a SQL statement with the streamed value |
 
-### Debug
+### Debug/Misc
 
 An additional couple of streams can be useful for diagnosing issues
 
 | type    | overview                                                        |
 | ------- | --------------------------------------------------------------- |
-| object  | Emits the value option, and if array will iterate and emit each |
 | console | Calls console.log with the value, and passes through            |
+| object  | Emits the value option, and if array will iterate and emit each |
+| replace | Replaces the current stream contents with the supplied value    |
 
 ## Drupal Streams
 
