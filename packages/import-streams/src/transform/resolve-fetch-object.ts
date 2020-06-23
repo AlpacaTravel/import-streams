@@ -18,6 +18,7 @@ export interface ResolveFetchObjectOptions extends TransformOptions {
   method?: string;
   url?: string;
   request?: FetchObjectOptions;
+  useUndefinedOnError?: boolean;
 }
 
 const resolveFetchObject: TransformFunction<
@@ -88,7 +89,11 @@ const resolveFetchObject: TransformFunction<
 
     return records;
   } catch (e) {
-    throw e;
+    if (options && options.useUndefinedOnError) {
+      return undefined;
+    } else {
+      throw e;
+    }
   }
 };
 
