@@ -53,6 +53,7 @@ const resolveFetchObject: TransformFunction<
       }
 
       const readStream = createFetchObjectReadStream(urls, httpRequestOptions);
+      readStream.on("error", fail);
       const collatorStream = new Writable({
         objectMode: true,
         write(response: any, _: string, callback: Callback) {

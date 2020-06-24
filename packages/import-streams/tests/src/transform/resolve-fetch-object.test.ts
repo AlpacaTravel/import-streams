@@ -46,4 +46,30 @@ describe("Ressolve HTTP Request", () => {
       { fubar: "bar-2" },
     ]);
   });
+
+  test("on bad response", async () => {
+    nock("https://www.example.com:443", {
+      encodedQueryParams: true,
+    })
+      .get("/records")
+      .reply(500);
+
+    const options: ResolveFetchObjectOptions = {
+      context,
+      mapping: {
+        fubar: "foo",
+      },
+      request: {
+        retry: 1,
+        wait: 200,
+      },
+      useUndefinedOnError: true,
+    };
+    const result = await resolveFetchObject(
+      "https://www.example.com/records",
+      options
+    );
+
+    expect(result).toBeUndefined();
+  });
 });
