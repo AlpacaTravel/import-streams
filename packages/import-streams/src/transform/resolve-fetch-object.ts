@@ -30,7 +30,7 @@ const resolveFetchObject: TransformFunction<
 ): Promise<any | undefined> => {
   assertValidTransformOptions(
     options,
-    ["iterate", "mapping", "method", "url", "request"],
+    ["iterate", "mapping", "method", "url", "request", "useUndefinedOnError"],
     "resolve-fetch-object"
   );
   try {
