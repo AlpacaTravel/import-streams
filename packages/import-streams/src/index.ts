@@ -395,6 +395,7 @@ interface AlpacaSyncExternalItemsOptions extends StreamFactoryOptions {
   force?: boolean;
   debug?: boolean;
   dryRun?: boolean;
+  externalSource?: string;
 }
 
 const isAlpacaSyncExternalItemsOptions = (
@@ -701,6 +702,7 @@ export const createCompose = (options?: Options) => {
             force: stream.options.force,
             debug: stream.options.debug,
             dryRun: stream.options.dryRun,
+            externalSource: stream.options.externalSource,
           });
         }
 
