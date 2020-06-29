@@ -12,6 +12,7 @@ interface AlpacaSyncExternalItemsOptions {
   retry?: number;
   wait?: number;
   externalSource?: string | string[];
+  dryRun?: boolean;
 }
 
 interface Attribute {
@@ -71,6 +72,10 @@ class AlpacaSyncExternalItems extends Writable {
   private retry: number;
   private wait: number;
   private externalSources: string[];
+  private dryRun: boolean;
+  private updated: number;
+  private created: number;
+  private removed: number;
 
   constructor(options: AlpacaSyncExternalItemsOptions) {
     super({ objectMode: true });
@@ -84,6 +89,7 @@ class AlpacaSyncExternalItems extends Writable {
       retry = 2,
       wait = 5000,
       externalSource,
+      dryRun = false,
     } = options;
 
     assert(
@@ -105,6 +111,10 @@ class AlpacaSyncExternalItems extends Writable {
 
     this.force = force;
     this.useDebug = debug;
+    this.dryRun = dryRun;
+    this.created = 0;
+    this.updated = 0;
+    this.removed = 0;
 
     this.pushed = [];
     this.count = 0;
@@ -225,16 +235,23 @@ class AlpacaSyncExternalItems extends Writable {
               body: JSON.stringify(merged),
             };
             this.debug(url, httpOptions);
-            const res = await network.retry(
-              () => network.write(url, httpOptions),
-              this.retry,
-              this.wait
-            );
-            if (!res.ok) {
-              const text = await res.text();
-              throw new Error(
-                `Unable to write record, ${res.status} - "${res.statusText}", received ${text}`
+
+            // If we are simulating a dry run, don't modify
+            if (this.dryRun) {
+              this.debug("Dry run - bypassing update");
+              this.updated += 1;
+            } else {
+              const res = await network.retry(
+                () => network.write(url, httpOptions),
+                this.retry,
+                this.wait
               );
+              if (!res.ok) {
+                const text = await res.text();
+                throw new Error(
+                  `Unable to write record, ${res.status} - "${res.statusText}", received ${text}`
+                );
+              }
             }
           } else {
             // We can ignore the record here.
@@ -280,16 +297,22 @@ class AlpacaSyncExternalItems extends Writable {
             body: JSON.stringify(this.getItemForTransport(merged)),
           };
           this.debug(url, httpOptions);
-          const res = await network.retry(
-            () => network.write(url, httpOptions),
-            this.retry,
-            this.wait
-          );
-          if (!res.ok) {
-            const text = await res.text();
-            throw new Error(
-              `Unable to write record, ${res.status} - "${res.statusText}", received ${text}`
+          // If we are simulating, don't modify
+          if (this.dryRun) {
+            this.debug("Dry run - bypassing create");
+            this.created += 1;
+          } else {
+            const res = await network.retry(
+              () => network.write(url, httpOptions),
+              this.retry,
+              this.wait
             );
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(
+                `Unable to write record, ${res.status} - "${res.statusText}", received ${text}`
+              );
+            }
           }
         }
 
@@ -370,20 +393,37 @@ class AlpacaSyncExternalItems extends Writable {
           };
 
           this.debug(url, httpOptions);
-          const res = await network.retry(
-            () => network.write(url, httpOptions),
-            this.retry,
-            this.wait
-          );
-          if (!res.ok) {
-            const text = await res.text();
-            throw new Error(
-              `Unable to write record, ${res.status} - "${res.statusText}", received ${text}`
+          if (this.dryRun) {
+            this.debug("Dry run - bypassing remove");
+            this.removed += 1;
+          } else {
+            const res = await network.retry(
+              () => network.write(url, httpOptions),
+              this.retry,
+              this.wait
             );
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(
+                `Unable to write record, ${res.status} - "${res.statusText}", received ${text}`
+              );
+            }
           }
         });
 
         await Promise.all(removeTasks);
+
+        if (this.dryRun) {
+          this.debug(
+            "Dry Run Results:",
+            "Created",
+            this.created,
+            "Updated",
+            this.updated,
+            "Removed",
+            this.removed
+          );
+        }
 
         callback();
       } catch (e) {

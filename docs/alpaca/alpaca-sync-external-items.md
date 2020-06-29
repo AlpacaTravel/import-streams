@@ -104,4 +104,7 @@ stream:
       collection: alpaca://collection/123
       profile: alpaca://profile/123
       externalSource: https://www.mysite.com
+      # debug
+      # Perform a dry-run without modifying the collection
+      # dryRun: true
 ```
