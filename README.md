@@ -1,6 +1,6 @@
 # import-streams
 
-[![Build Status](https://travis-ci.com/AlpacaTravel/import-streams.svg?branch=master)](https://travis-ci.com/AlpacaTravel/import-streams)[![Coverage Status](https://coveralls.io/repos/github/AlpacaTravel/import-streams/badge.svg?branch=master)](https://coveralls.io/github/AlpacaTravel/import-streams?branch=master)![MIT](https://img.shields.io/npm/l/@alpaca-travel/import-streams)
+[![Build Status](https://travis-ci.com/AlpacaTravel/import-streams.svg?branch=master)](https://travis-ci.com/AlpacaTravel/import-streams)[![Coverage Status](https://coveralls.io/repos/github/AlpacaTravel/import-streams/badge.svg?branch=master)](https://coveralls.io/github/AlpacaTravel/import-streams?branch=master)![MIT](https://img.shields.io/npm/l/@alpaca-travel/import-streams)![npm](https://img.shields.io/npm/v/@alpaca-travel/import-streams)
 
 This project is currently in a Alpha Preview release.
 
