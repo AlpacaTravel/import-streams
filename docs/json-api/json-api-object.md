@@ -1,4 +1,4 @@
-# JSON:API Data
+# JSON:API Object
 
 Provides a readable stream of data from a JSON:API end-point.
 
@@ -11,7 +11,7 @@ version: 1.0
 
 stream:
   # Obtain objects from the json-api
-  - type: json-api-data
+  - type: json-api-object
     options:
       # Required:
       href: https://www.mysite.com/jsonapi/resources
