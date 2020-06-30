@@ -6,14 +6,28 @@ import { Readable } from "readable-stream";
 
 // TODO: Push the network controls out to a container, allowing for plugging
 
+// Set of reasonable (slow) 3rd party throttled limits
+const readMaxConcurrent = process.env.NETWORK_READ_MAX_CONCURRENT
+  ? Number(process.env.NETWORK_READ_MAX_CONCURRENT)
+  : 5;
+const readMinTime = process.env.NETWORK_READ_MIN_TIME
+  ? Number(process.env.NETWORK_READ_MIN_TIME)
+  : 1000 / readMaxConcurrent;
+const writeMaxConcurrent = process.env.NETWORK_WRITE_MAX_CONCURRENT
+  ? Number(process.env.NETWORK_WRITE_MAX_CONCURRENT)
+  : 2;
+const writeMinTime = process.env.NETWORK_WRITE_MIN_TIME
+  ? Number(process.env.NETWORK_WRITE_MIN_TIME)
+  : 1000 / writeMaxConcurrent;
+
 const read = new Bottleneck({
-  maxConcurrent: 5,
-  minTime: 200,
+  maxConcurrent: readMaxConcurrent,
+  minTime: readMinTime,
 }).wrap(fetch);
 
 const write = new Bottleneck({
-  maxConcurrent: 2,
-  minTime: 500,
+  maxConcurrent: writeMaxConcurrent,
+  minTime: writeMinTime,
 }).wrap(fetch);
 
 type Fetch = (url: string, options: any) => Promise<any>;
