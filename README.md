@@ -293,3 +293,85 @@ const stream = compose(definition, { factory }).on("finish", () =>
   console.log("Complete!")
 );
 ```
+
+## AWS Lambda Runtime
+
+AWS Lambda can provide a friendly runtime environment in order to host your regular ongoing import processes. You can build your import using the `serverless` framework, or leverage the following layer ARN
+
+Layer ARN
+
+```
+arn:aws:lambda:ap-southeast-2:353721752909:layer:import-streams:2
+```
+
+### Step by step guide to create a AWS lambda import-streams
+
+It can be quick and easy to create a lambda leveraging the shared layer. This allows you to use a simple script and yaml file without any installation in order to run your import on a cron-like schedule.
+
+#### Creating the lambda function
+
+1. Log into Amazon Web Services
+2. Go to Lambda
+3. Click "Create Function"
+4. Select "Author from scratch"
+5. Enter the name of your lambda function, such as "example-import-stream"
+6. Chose the runtime of "Node.js 10.x"
+7. Select "Create Function"
+8. Select "Layers" from the Designer
+9. Select "Add a layer"
+10. Select "Provide a layer version ARN"
+11. Enter the Layer ARN (as shown above) into the field
+12. Click "Add"
+
+#### Adding the script
+
+In the section titled "Function code", replace the index.js source code with:
+
+```javascript
+#!/usr/bin/env node
+const fs = require("fs");
+const path = require("path");
+const assert = require("assert");
+const compose = require("@alpaca-travel/import-streams").default;
+
+const file = "./stream.yaml";
+
+module.exports.handler = async () => {
+  // Resolved...
+  const resolved = path.resolve(file);
+  console.log("Resolving yaml input:", resolved);
+
+  try {
+    // Include the source
+    const source = fs.readFileSync(resolved, "utf-8");
+
+    // Process
+    await new Promise((success, fail) => {
+      compose(source).on("finish", success).on("error", fail);
+    });
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+```
+
+Then, create a script beside the index.js file named "stream.yaml" and paste your stream yaml contents.
+
+```yaml
+version: 1.0
+
+# Trivial stream
+stream:
+  # Read a URL source
+  - type: fetch-stream
+    options:
+      url: https://raw.githubusercontent.com/AlpacaTravel/import-streams/master/packages/import-streams/tests/data/file.txt
+
+  # Output the stream contents to the screen
+  - process.stdout
+```
+
+Finally, save your lambda function and test it out. You will see the words "Hello import-streams, you are running!" once it is operating.
+
+Your final steps may be; extending the script exection from 3 seconds to something longer (such as 5 minutes or more), or setting up a trigger (such as CloudWatch Events for a schedule).

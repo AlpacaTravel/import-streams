@@ -1,0 +1,38 @@
+#!/bin/bash
+
+cd packages/import-streams
+PACKAGE_VERSION=$(cat package.json \
+  | grep version \
+  | head -1 \
+  | awk -F: '{ print $2 }' \
+  | sed 's/[",]//g' \
+  | tr -d '[[:space:]]')
+cd -
+
+echo "Building the layer contents as a ZIP (will use docker for native dependencies)"
+mkdir -p build
+rm -f import-streams-layer.zip
+rm -rf build/layer
+mkdir -p build/layer
+cd build/layer
+npm init --yes
+docker run -v "$PWD":/var/task lambci/lambda:build-nodejs10.x npm add @alpaca-travel/import-streams
+mkdir nodejs
+cp -r node_modules nodejs/.
+zip -r ../import-streams-layer.zip nodejs
+cd ..
+rm -rf layer
+echo "... Built build/import-streams-layer.zip"
+
+
+echo "Copying to s3"
+aws s3 cp import-streams-layer.zip s3://cdn.alpacamaps.com/builds/import-streams/$PACKAGE_VERSION/layer.zip
+echo "... Done"
+
+echo "Creating the AWS Layer"
+aws lambda publish-layer-version \
+    --layer-name import-streams \
+    --description "A layer for nodejs containing @alpaca-travel/import-streams@$PACKAGE_VERSION" \
+    --license-info "MIT" \
+    --content S3Bucket=cdn.alpacamaps.com,S3Key=builds/import-streams/$PACKAGE_VERSION/layer.zip \
+    --compatible-runtimes nodejs10.x
