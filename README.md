@@ -328,24 +328,21 @@ It can be quick and easy to create a lambda leveraging the shared layer. This al
 In the section titled "Function code", replace the index.js source code with:
 
 ```javascript
-const fs = require("fs");
-const path = require("path");
-const assert = require("assert");
+// This is available when the layer is added without
 const compose = require("@alpaca-travel/import-streams").default;
 
-const file = "./stream.yaml";
-
+// This is the default handler
 module.exports.handler = async () => {
-  // Resolved...
-  const resolved = path.resolve(file);
-  console.log("Resolving yaml input:", resolved);
+  // Obtain the stream path
+  const resolved = require("path").resolve("./stream.yaml");
 
   try {
     // Include the source
-    const source = fs.readFileSync(resolved, "utf-8");
+    const source = require("fs").readFileSync(resolved, "utf-8");
 
     // Process
     await new Promise((success, fail) => {
+      // This does out compose
       compose(source).on("finish", success).on("error", fail);
     });
   } catch (e) {
