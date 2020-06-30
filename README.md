@@ -368,6 +368,6 @@ stream:
   - process.stdout
 ```
 
-Finally, save your lambda function and test it out. You will see the words "Hello import-streams, you are running!" once it is operating.
+Finally, save your lambda function and test it out. If you have used the above example, you should see the words "Hello import-streams, you are running!" once it is operating.
 
-Your final steps may be; extending the script exection from 3 seconds to something longer (such as 5 minutes or more), or setting up a trigger (such as CloudWatch Events for a schedule).
+Your final steps may be; extending the script exection from 3 seconds to something longer (such as 5 minutes or more), or setting up a trigger (such as CloudWatch Events for a schedule). You can also consider configuring the network layer bottlenecks using environment variables. (See [docs/network.md](https://github.com/AlpacaTravel/import-streams/tree/master/docs/network.md))
