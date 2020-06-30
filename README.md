@@ -1,6 +1,6 @@
 # import-streams
 
-[![Build Status](https://travis-ci.com/AlpacaTravel/import-streams.svg?branch=master)](https://travis-ci.com/AlpacaTravel/import-streams)[![Coverage Status](https://coveralls.io/repos/github/AlpacaTravel/import-streams/badge.svg?branch=master)](https://coveralls.io/github/AlpacaTravel/import-streams?branch=master)![MIT](https://img.shields.io/npm/l/@alpaca-travel/import-streams)![![npm](https://img.shields.io/npm/v/@alpaca-travel/import-streams)](https://www.npmjs.com/package/@alpaca-travel/import-streams)
+[![Build Status](https://travis-ci.com/AlpacaTravel/import-streams.svg?branch=master)](https://travis-ci.com/AlpacaTravel/import-streams)[![Coverage Status](https://coveralls.io/repos/github/AlpacaTravel/import-streams/badge.svg?branch=master)](https://coveralls.io/github/AlpacaTravel/import-streams?branch=master)![MIT](https://img.shields.io/npm/l/@alpaca-travel/import-streams)[![npm](https://img.shields.io/npm/v/@alpaca-travel/import-streams)](https://www.npmjs.com/package/@alpaca-travel/import-streams)
 
 This project is currently in a Alpha Preview release.
 
@@ -328,7 +328,6 @@ It can be quick and easy to create a lambda leveraging the shared layer. This al
 In the section titled "Function code", replace the index.js source code with:
 
 ```javascript
-#!/usr/bin/env node
 const fs = require("fs");
 const path = require("path");
 const assert = require("assert");
