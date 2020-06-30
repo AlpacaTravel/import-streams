@@ -14,7 +14,7 @@ Read streams for AWS S3 Storage
 | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
 | [aws-s3-get-object](https://github.com/AlpacaTravel/import-streams/tree/master/docs/aws-s3/aws-s3-get-object.md)               | Stream object (string/json object(s)) from an object stored in AWS S3 |
 | [aws-s3-get-object-stream](https://github.com/AlpacaTravel/import-streams/tree/master/docs/aws-s3/aws-s3-get-object-stream.md) | Create a stream from an object stored in AWS S3                       |
-| [aws-s3-list-objects](https://github.com/AlpacaTravel/import-streams/tree/master/docs/aws-s3/aws-list-objects.md)              | Stream a list of object references that exist in a bucket             |
+| [aws-s3-list-objects](https://github.com/AlpacaTravel/import-streams/tree/master/docs/aws-s3/aws-s3-list-objects.md)           | Stream a list of object references that exist in a bucket             |
 
 #### Fetch
 
