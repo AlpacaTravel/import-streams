@@ -13,9 +13,8 @@ const set: TransformFunction<Promise<any>, SetOptions> = async (
   options: SetOptions
 ): Promise<any> => {
   assertValidTransformOptions(options, ["path", "value"], "set");
-  const { path, value: replacementValue } = options;
+  const { path, value: replacementValue = undefined } = options;
   assert(path, "Missing a path");
-  assert(replacementValue, "Missing a value");
 
   const clone = cloneDeep(value);
   _set(clone, path, replacementValue);
