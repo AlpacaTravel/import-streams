@@ -9,6 +9,7 @@ export interface MapSelectorOptions extends TransformFunctionOptions {
   mapping: Mapping;
   attributeLocale?: string;
   template?: any;
+  useValueAsTemplate?: boolean;
 }
 
 export interface Mapping {
@@ -62,7 +63,7 @@ const mapSelector: TransformFunction<MappedObject, MapSelectorOptions> = async (
 ): Promise<MappedObject> => {
   assertValidTransformOptions(
     options,
-    ["mapping", "attributeLocale", "template"],
+    ["mapping", "attributeLocale", "template", "useValueAsTemplate"],
     "map-selector"
   );
 
@@ -84,6 +85,10 @@ const mapSelector: TransformFunction<MappedObject, MapSelectorOptions> = async (
 
   // Create the map template
   const template = (() => {
+    if (options && options.useValueAsTemplate) {
+      return _.cloneDeep(value);
+    }
+
     if (options && options.template) {
       return options.template;
     }
