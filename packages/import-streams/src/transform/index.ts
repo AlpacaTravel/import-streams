@@ -26,6 +26,7 @@ import each from "./each";
 import join from "./join";
 import drupal from "./drupal";
 import skip from "./skip";
+import set from "./set";
 import resolveJourney from "./resolve-alpaca-journey";
 import fexp from "./fexp";
 import FilterFexp from "./filter-fexp";
@@ -62,6 +63,7 @@ Object.assign(transforms, {
   "filter-fexp": FilterFexp,
   flatten,
   skip,
+  set,
   "html-prettier": htmlPrettier,
   "html-sanitize": htmlSanitize,
   "html-entities-decode": htmlEntitiesDecode,

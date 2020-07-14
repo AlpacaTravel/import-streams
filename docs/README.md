@@ -192,11 +192,12 @@ Performs compression/decompression using the zlib library
 
 An additional couple of streams can be useful for diagnosing issues
 
-| type    | overview                                                        |
-| ------- | --------------------------------------------------------------- |
-| console | Calls console.log with the value, and passes through            |
-| object  | Emits the value option, and if array will iterate and emit each |
-| replace | Replaces the current stream contents with the supplied value    |
+| type                                                                          | overview                                                                                    |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| console                                                                       | Calls console.log with the value, and passes through                                        |
+| object                                                                        | Emits the value option, and if array will iterate and emit each                             |
+| replace                                                                       | Replaces the current stream contents with the supplied value                                |
+| [set](https://github.com/AlpacaTravel/import-streams/tree/master/docs/set.md) | Sets a value on an object in the stream based on the path and value provided in the options |
 
 ## Drupal Streams
 
