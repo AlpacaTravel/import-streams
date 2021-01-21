@@ -90,7 +90,7 @@ const mapSelector: TransformFunction<MappedObject, MapSelectorOptions> = async (
     }
 
     if (options && options.template) {
-      return options.template;
+      return _.cloneDeep(options.template);
     }
 
     return {};

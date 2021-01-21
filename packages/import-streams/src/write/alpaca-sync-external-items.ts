@@ -446,6 +446,11 @@ class AlpacaSyncExternalItems extends Writable {
       const limit = 100;
       let offset = 0;
       let href = `https://withalpaca.com/api/v2/item?collection=${this.collection}&profile=${this.profile}&limit=${limit}&offset=${offset}&accessToken=${this.apiKey}`;
+      if (this.externalSources) {
+        href = `${href}&customExternalSources=${this.externalSources.join(
+          ","
+        )}`;
+      }
       const httpOptions = {
         headers: {
           Accept: "application/json",
