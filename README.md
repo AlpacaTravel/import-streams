@@ -298,10 +298,10 @@ const stream = compose(definition, { factory }).on("finish", () =>
 
 AWS Lambda can provide a friendly runtime environment in order to host your regular ongoing import processes. You can build your import using the `serverless` framework, or leverage the following layer ARN
 
-Layer ARN
+Layer ARN (version 0.0.86-alpha.0)
 
 ```
-arn:aws:lambda:ap-southeast-2:353721752909:layer:import-streams:2
+arn:aws:lambda:ap-southeast-2:353721752909:layer:import-streams:4
 ```
 
 ### Step by step guide to create a AWS lambda import-streams
