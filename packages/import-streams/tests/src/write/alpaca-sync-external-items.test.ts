@@ -78,6 +78,7 @@ describe("alpaca-sync-external-items", () => {
         limit: "100",
         offset: "0",
         accessToken: "sk.123",
+        customExternalSources: "https://www.example.com",
       })
       .reply(200, { results: currentItems, total: currentItems.length }, [
         "Content-Type",
