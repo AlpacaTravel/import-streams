@@ -41,7 +41,16 @@ $ npm install -g @alpaca-travel/import-streams
 $ import-streams stream.yaml
 ```
 
-## Capabilities
+## Creating Pipelines
+
+The import streams works with standard Readable, Transform and Writable streams.
+Those streams can be composed into a pipeline that can follow a read ->
+transform -> write.
+
+With the `import-streams-compose` functionality, you can combine together
+multiple read streams, transforms and writes together into a pipeline.
+
+## Package Capabilities
 
 There are a lot of already developed streams available for processing input and sending output. These form a "swiss-army" knife of transform functions making processing data from various sources easier.
 
@@ -292,6 +301,43 @@ const factory = ({ type, options }) => {
 const stream = compose(definition, { factory }).on("finish", () =>
   console.log("Complete!")
 );
+```
+
+## Adding your own streams
+
+import-streams uses a type lookup which allows you to create and map your own
+streams. These streams must follow the support of `readable-streams`.
+
+```javascript
+const compose = require("@alpaca-travel/import-streams").default;
+const { factory } = require("@alpaca-travel/compatibility-import-streams");
+const fs = require("fs");
+const path = require("path");
+
+// My custom stream class
+const MyStream = require("./my-stream");
+
+// Provide a stream wrapper to instantiate my custom stream
+const factoryWrapper = ({ type, options }) => {
+  if (type === "my-stream") {
+    return new MyStream();
+  }
+
+  return factory({ type, options });
+};
+
+// Read in my stream pipeline file
+const pipeline = fs.readFileSync(
+  path.resolve(__dirname, "./stream.yaml"),
+  "utf-8"
+);
+
+// Create the pipeline with our custom factory
+compose(pipeline, {
+  factory: factoryWrapper,
+})
+  .on("finish", () => console.log("Finished"))
+  .on("error", console.error);
 ```
 
 ## AWS Lambda Runtime
