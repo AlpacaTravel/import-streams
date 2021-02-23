@@ -36,6 +36,7 @@ import resolveAwsS3GetObjectStream from "./resolve-aws-s3-get-object-stream";
 import resolveAwsS3GetObject from "./resolve-aws-s3-get-object";
 import stringLowercase from "./string-lowercase";
 import stringUppercase from "./string-uppercase";
+import bufferToString from "./buffer-to-string";
 
 import { packageTransforms } from "../packaging";
 
@@ -80,6 +81,7 @@ Object.assign(transforms, {
   "resolve-aws-s3-get-object": resolveAwsS3GetObject,
   "string-lowercase": stringLowercase,
   "string-uppercase": stringUppercase,
+  "buffer-to-string": bufferToString,
 });
 
 // Assign sub-collections
