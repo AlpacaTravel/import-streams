@@ -5,6 +5,7 @@ export interface SqliteStatementObjectOptions {
   database: string;
   sql: string;
   debug?: boolean;
+  params?: any;
 }
 
 class SqliteStatementObject<T> extends Readable {
@@ -12,6 +13,7 @@ class SqliteStatementObject<T> extends Readable {
   private sql: string;
   private generator: any;
   private useDebug: any;
+  private params: any;
 
   constructor(options: SqliteStatementObjectOptions) {
     super({ objectMode: true });
@@ -19,6 +21,7 @@ class SqliteStatementObject<T> extends Readable {
     this.path = options.database;
     this.sql = options.sql;
     this.useDebug = options.debug || false;
+    this.params = options.params || {};
   }
 
   debug(...args: any[]) {
@@ -27,13 +30,13 @@ class SqliteStatementObject<T> extends Readable {
     }
   }
 
-  async *getRecordsGenerator() {
+  async *getRecordsGenerator(params: any) {
     const db = new Database(this.path, { readonly: true });
 
     try {
       this.debug(this.sql);
       const select = db.prepare(this.sql);
-      const all = select.all();
+      const all = select.all(params);
       for (let row of all) {
         yield row;
       }
@@ -48,7 +51,7 @@ class SqliteStatementObject<T> extends Readable {
   _read() {
     const generator = (() => {
       if (!this.generator) {
-        this.generator = this.getRecordsGenerator();
+        this.generator = this.getRecordsGenerator(this.params);
       }
 
       return this.generator;

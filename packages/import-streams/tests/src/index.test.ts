@@ -43,6 +43,9 @@ describe("module", () => {
     expect(typeof exportedTransforms["to-number"]).toBe("function");
     expect(typeof exportedTransforms.concat).toBe("function");
     expect(typeof exportedTransforms["resolve-fetch-object"]).toBe("function");
+    expect(typeof exportedTransforms["resolve-sqlite-statement-object"]).toBe(
+      "function"
+    );
     expect(typeof exportedTransforms["resolve-journey"]).toBe("function");
     expect(typeof exportedTransforms["json-stringify"]).toBe("function");
     expect(typeof exportedTransforms["console"]).toBe("function");

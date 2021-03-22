@@ -33,6 +33,7 @@ import FilterFexp from "./filter-fexp";
 import htmlEntitiesDecode from "./html-entities-decode";
 import sprintf from "./sprintf";
 import resolveAwsS3GetObjectStream from "./resolve-aws-s3-get-object-stream";
+import resolveSqliteStatementObject from "./resolve-sqlite-statement-object";
 import resolveAwsS3GetObject from "./resolve-aws-s3-get-object";
 import stringLowercase from "./string-lowercase";
 import stringUppercase from "./string-uppercase";
@@ -72,6 +73,7 @@ Object.assign(transforms, {
   "resolve-journey": resolveJourney,
   "resolve-alpaca-journey": resolveJourney,
   "resolve-json-api-object": resolveJsonApiObject,
+  "resolve-sqlite-statement-object": resolveSqliteStatementObject,
   "to-number": toNumber,
   truncate,
   "to-coordinate": toCoordinate,
